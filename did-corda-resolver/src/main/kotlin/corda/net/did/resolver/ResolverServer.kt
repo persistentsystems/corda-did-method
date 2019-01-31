@@ -4,13 +4,15 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
-class ResolverServer(port: Int) : Http4kServer by ResolverApp().asServer(Jetty(port)) {
+class ResolverServer(port: Int, target: IdentityNode) : Http4kServer by ResolverApp(target).asServer(Jetty(port)) {
 
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             val port = args.firstOrNull()?.toIntOrNull() ?: 0
-            ResolverServer(port).start()
+            // TODO get from parameters
+            val target = IdentityNode("example.org", 80)
+            ResolverServer(port, target).start()
         }
     }
 }

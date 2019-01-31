@@ -2,11 +2,11 @@ DID Corda Resolver
 ==================
 
 
-Configuration of Target Nodes
------------------------------
+Configuration of Identity Node
+------------------------------
 
-The host names of well-known target nodes are stored in [nodes](src/main/resources/nodes) in the form of a tab-separated list.
+The host name of the target node needs to be provided as configuration parameter at startup.
 
 TODO:
- - Implement a proper selection strategy (so far, a random server is selected per request)
+ - Implement support for multiple target nodes
  - Implement fingerprinting of the target servers. Storing a cryptographic attribute with their host name
