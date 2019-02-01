@@ -1,18 +1,15 @@
 package corda.net.did.resolver
 
-import com.natpryce.konfig.ConfigurationProperties
-import com.natpryce.konfig.EnvironmentVariables
-import com.natpryce.konfig.Key
-import com.natpryce.konfig.intType
-import com.natpryce.konfig.overriding
-import corda.net.did.resolver.registry.IdentityNodeRegistry
+import com.natpryce.konfig.*
+import corda.net.did.resolver.registry.IdentityNodeClient
 import corda.net.did.resolver.registry.StaticNodeRegistry
+import org.http4k.client.OkHttp
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
-class ResolverServer(registry: IdentityNodeRegistry, port: Int?) :
-        Http4kServer by ResolverApp(registry).asServer(Jetty(port ?: 0)) {
+class ResolverServer(client: IdentityNodeClient, port: Int?) :
+    Http4kServer by ResolverApp(client).asServer(Jetty(port ?: 0)) {
 
     companion object {
         @JvmStatic
@@ -21,8 +18,9 @@ class ResolverServer(registry: IdentityNodeRegistry, port: Int?) :
 
             val port = config.getOrNull(Key("port", intType))
             val registry = StaticNodeRegistry(config[Key("nodes", identityNodeListType)].toSet())
+            val client = IdentityNodeClient(OkHttp(), registry)
 
-            ResolverServer(registry, port).start()
+            ResolverServer(client, port).start()
         }
     }
 }
