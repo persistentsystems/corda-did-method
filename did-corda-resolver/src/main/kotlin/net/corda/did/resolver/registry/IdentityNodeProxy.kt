@@ -1,6 +1,6 @@
-package corda.net.did.resolver.registry
+package net.corda.did.resolver.registry
 
-import corda.net.did.resolver.CordaDid
+import net.corda.did.resolver.CordaDid
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response

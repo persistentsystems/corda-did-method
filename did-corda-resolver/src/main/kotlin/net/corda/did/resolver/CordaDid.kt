@@ -1,4 +1,4 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
 import java.util.UUID
 

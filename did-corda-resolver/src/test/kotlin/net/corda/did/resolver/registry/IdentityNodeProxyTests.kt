@@ -1,9 +1,9 @@
-package corda.net.did.resolver.registry
+package net.corda.did.resolver.registry
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
-import corda.net.did.resolver.CordaDid
+import net.corda.did.resolver.CordaDid
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response

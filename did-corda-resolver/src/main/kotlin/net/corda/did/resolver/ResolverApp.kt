@@ -1,7 +1,8 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
-import corda.net.did.resolver.registry.IdentityNodeProxy
-import corda.net.did.resolver.registry.SourceException
+import net.corda.did.resolver.CordaDid.Companion
+import net.corda.did.resolver.registry.IdentityNodeProxy
+import net.corda.did.resolver.registry.SourceException
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

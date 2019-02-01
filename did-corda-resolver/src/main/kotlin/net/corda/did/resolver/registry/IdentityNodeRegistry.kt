@@ -1,4 +1,4 @@
-package corda.net.did.resolver.registry
+package net.corda.did.resolver.registry
 
 /**
  * TODO This should contain some cryptographic property that allows for validating the identity of the node

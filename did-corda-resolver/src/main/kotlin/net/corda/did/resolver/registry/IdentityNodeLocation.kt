@@ -1,4 +1,4 @@
-package corda.net.did.resolver.registry
+package net.corda.did.resolver.registry
 
 data class IdentityNodeLocation(
         val host: String,

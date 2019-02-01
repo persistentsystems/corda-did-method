@@ -1,4 +1,4 @@
-group "corda.net.did"
+group "net.corda.did"
 version "1.0-SNAPSHOT"
 
 buildscript {

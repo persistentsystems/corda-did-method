@@ -1,12 +1,12 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
-import corda.net.did.resolver.registry.IdentityNodeProxy
-import corda.net.did.resolver.registry.StaticIdentityNodeRegistry
+import net.corda.did.resolver.registry.IdentityNodeProxy
+import net.corda.did.resolver.registry.StaticIdentityNodeRegistry
 import org.http4k.client.OkHttp
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty

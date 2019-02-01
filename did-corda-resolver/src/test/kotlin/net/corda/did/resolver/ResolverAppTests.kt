@@ -1,9 +1,9 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
 import com.natpryce.hamkrest.assertion.assertThat
-import corda.net.did.resolver.registry.IdentityNodeLocation
-import corda.net.did.resolver.registry.IdentityNodeProxy
-import corda.net.did.resolver.registry.StaticIdentityNodeRegistry
+import net.corda.did.resolver.registry.IdentityNodeLocation
+import net.corda.did.resolver.registry.IdentityNodeProxy
+import net.corda.did.resolver.registry.StaticIdentityNodeRegistry
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

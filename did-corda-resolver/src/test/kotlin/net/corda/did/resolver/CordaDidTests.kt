@@ -1,7 +1,8 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import net.corda.did.resolver.CordaDid.Companion
 import org.junit.Test
 import java.util.UUID
 

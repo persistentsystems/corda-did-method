@@ -1,9 +1,9 @@
-package corda.net.did.resolver
+package net.corda.did.resolver
 
 import com.natpryce.konfig.ParseResult
 import com.natpryce.konfig.PropertyType
 import com.natpryce.konfig.propertyType
-import corda.net.did.resolver.registry.IdentityNodeLocation
+import net.corda.did.resolver.registry.IdentityNodeLocation
 
 val identityNodeListType: PropertyType<List<IdentityNodeLocation>> = propertyType { line ->
     line.split(",").map { host ->
