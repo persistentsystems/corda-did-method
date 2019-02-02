@@ -3,6 +3,13 @@ Corda DID Method Proof-of-Concept
 
 ![Corda DID Architecture](architecture.svg)
 
+Corda DID Format
+----------------
+
+| did: | corda- | tcn: | guid |
+|------|--------|------|------|
+|      |        |      |      |
+
 Deliverables
 ------------
 
@@ -15,3 +22,11 @@ Design-Decisions
 
 To-Do's
 -------
+
+Risks/Known Attack Surface
+--------------------------
+
+### Denial-of-Service Attack on Edge-Nodes
+
+### Replication Issues During Unavailibility of Witness Nodes
+
