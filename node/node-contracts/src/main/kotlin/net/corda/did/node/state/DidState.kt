@@ -6,12 +6,12 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
 import net.corda.did.Condition
-import net.corda.did.Did
+import net.corda.did.DidDocument
 import net.corda.did.node.contract.DidContract
 
 @BelongsToContract(DidContract::class)
 class DidState(
-        val did: Did,
+        val didDocument: DidDocument,
         val condition: Condition,
         val originator: Party,
         val witnesses: Set<Party>,
