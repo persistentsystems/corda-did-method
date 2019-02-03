@@ -1,12 +1,11 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonParser
-import java.security.PublicKey
 
 /**
- * This encapsulates a DID, preserving the full JSON document as received by the owner. While it would be beneficial
- * to have a strongly typed `DidDocument` class in which the aspects of a DID are stored as individual fields, the lack
- * of a canonical JSON representation on which hashes are generated makes this problematic.
+ * This encapsulates a DID, preserving the full JSON document as received by the owner. While it would be beneficial to
+ * have a strongly typed `DidDocument` class in which the aspects of a DID are stored as individual fields, the lack of
+ * a canonical JSON representation on which hashes are generated makes this problematic.
  *
  * Instead, this class provides convenience methods, that extract information from the JSON document on request. Note
  * that the document tree these operations work on will not be stored in a field to keep serialisation size small. This
@@ -18,15 +17,5 @@ data class DidDocument(private val document: String) {
 
 	fun id(): Did = json().run {
 		Did(getString("id"))
-	}
-
-	fun publicKeys(): List<PublicKey> {
-		json().run {
-			getArray("publicKey").map {
-				println(it)
-			}
-		}
-
-		TODO()
 	}
 }
