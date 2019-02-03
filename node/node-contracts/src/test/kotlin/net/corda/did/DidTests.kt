@@ -23,4 +23,5 @@ class DidTests {
 			Did("bogus:corda:tcn:6f262985-38e9-4766-98b9-9dde14a38740")
 		}, throws<IllegalArgumentException>(has(IllegalArgumentException::message, equalTo("""DID must use the "did" scheme. Found "bogus"."""))))
 	}
+
 }

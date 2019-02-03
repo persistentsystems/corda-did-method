@@ -1,6 +1,7 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonParser
+import java.security.PublicKey
 
 /**
  * This encapsulates a DID, preserving the full JSON document as received by the owner. While it would be beneficial
@@ -17,5 +18,15 @@ data class DidDocument(private val document: String) {
 
 	fun id(): Did = json().run {
 		Did(getString("id"))
+	}
+
+	fun publicKeys(): List<PublicKey> {
+		json().run {
+			getArray("publicKey").map {
+				println(it)
+			}
+		}
+
+		TODO()
 	}
 }
