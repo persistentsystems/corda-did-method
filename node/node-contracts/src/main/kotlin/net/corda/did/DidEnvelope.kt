@@ -30,7 +30,7 @@ class DidEnvelope(
 				it.algorithm == publicKey.algorithm
 			}
 
-			signature.isValidSignature(document.bytes, publicKey)
+			signature.isValidSignature(suite, document.bytes, publicKey)
 		}
 	}
 }

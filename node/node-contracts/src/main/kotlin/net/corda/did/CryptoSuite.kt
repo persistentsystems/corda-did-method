@@ -5,7 +5,7 @@ import net.corda.core.utilities.base58ToByteArray
 import net.corda.core.utilities.hexToByteArray
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
-import net.corda.did.CryptoSuite.Rsa
+import net.corda.did.CryptoSuite.RSA
 import net.i2p.crypto.eddsa.EdDSAEngine
 import net.i2p.crypto.eddsa.EdDSAPublicKey
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable
@@ -26,7 +26,7 @@ enum class CryptoSuite(
 		val keyIndentifier: String
 ) {
 	Ed25519("EdDSA", "Ed25519", "Ed25519VerificationKey2018"),
-	Rsa("TODO", "Rsa", "RsaVerificationKey2018"),
+	RSA("TODO", "RSA", "RsaVerificationKey2018"),
 	EdDsaSASecp256k1("TODO", "EdDsaSASecp256k1", "EdDsaSAPublicKeySecp256k1")
 }
 
@@ -44,7 +44,7 @@ fun JsonObject.toPublicKey(suite: CryptoSuite): PublicKey =
 				assert(has("publicKeyBase58"))
 				getString("publicKeyBase58").base58ToByteArray().toEd25519PublicKey()
 			}
-			Rsa              -> {
+			RSA              -> {
 				assert(has("publicKeyPem"))
 				getString("publicKeyPem").toRsaPublicKey()
 			}
@@ -54,15 +54,23 @@ fun JsonObject.toPublicKey(suite: CryptoSuite): PublicKey =
 			}
 		}
 
-fun String.toRsaPublicKey(): PublicKey {
+private fun String.toRsaPublicKey(): PublicKey {
 	TODO("do it!")
 }
 
-fun ByteArray.toEdDsaSAPublicKey(): PublicKey {
+private fun ByteArray.toEdDsaSAPublicKey(): PublicKey {
 	TODO("do it!")
 }
 
-fun ByteArray.isValidSignature(originalMessage: ByteArray, signer: PublicKey): Boolean {
+fun ByteArray.isValidSignature(suite: CryptoSuite, originalMessage: ByteArray, signer: PublicKey): Boolean {
+	return when (suite) {
+		Ed25519          -> isValidEd25519Signature(originalMessage, signer)
+		RSA              -> TODO()
+		EdDsaSASecp256k1 -> TODO()
+	}
+}
+
+private fun ByteArray.isValidEd25519Signature(originalMessage: ByteArray, signer: PublicKey): Boolean {
 	val spec = EdDSANamedCurveTable.getByName("Ed25519")
 	return EdDSAEngine(MessageDigest.getInstance(spec.hashAlgorithm)).apply {
 		initVerify(signer)

@@ -65,4 +65,19 @@ class DidEnvelopeCryptoSuiteTests {
 
 		assertThat(envelope.hasIntegrity(), equalTo(true))
 	}
+
+	@Test
+	fun `can parse valid envelope with RSA key`() {
+		TODO()
+	}
+
+	@Test
+	fun `can parse valid envelope with EdDsaSASecp256k1 key`() {
+		TODO()
+	}
+
+	@Test
+	fun `can parse valid envelope with multiple keys`() {
+		TODO()
+	}
 }
