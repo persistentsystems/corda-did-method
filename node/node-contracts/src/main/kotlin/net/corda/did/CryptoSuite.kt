@@ -1,12 +1,17 @@
 package net.corda.did
 
-import net.corda.did.CryptoSuite.Ed25519Signature2018
-import net.corda.did.CryptoSuite.EdDsaSASignatureSecp256k1
-import net.corda.did.CryptoSuite.RsaSignature2018
-import org.bouncycastle.util.io.pem.PemReader
-import java.security.KeyFactory
+import com.grack.nanojson.JsonObject
+import net.corda.core.utilities.base58ToByteArray
+import net.corda.core.utilities.hexToByteArray
+import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.CryptoSuite.EdDsaSASecp256k1
+import net.corda.did.CryptoSuite.Rsa
+import net.i2p.crypto.eddsa.EdDSAEngine
+import net.i2p.crypto.eddsa.EdDSAPublicKey
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec
+import java.security.MessageDigest
 import java.security.PublicKey
-import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
 
 /**
@@ -16,33 +21,53 @@ import java.security.spec.X509EncodedKeySpec
  * https://w3c-ccg.github.io/ld-cryptosuite-registry/
  */
 enum class CryptoSuite(
+		val algorithm: String,
 		val signatureIdentifier: String,
 		val keyIndentifier: String
 ) {
-	Ed25519Signature2018("Ed25519Signature2018", "Ed25519VerificationKey2018"),
-	RsaSignature2018("RsaSignature2018", "RsaVerificationKey2018"),
-	EdDsaSASignatureSecp256k1("EdDsaSASignatureSecp256k1", "EdDsaSAPublicKeySecp256k1")
+	Ed25519("EdDSA", "Ed25519", "Ed25519VerificationKey2018"),
+	Rsa("TODO", "Rsa", "RsaVerificationKey2018"),
+	EdDsaSASecp256k1("TODO", "EdDsaSASecp256k1", "EdDsaSAPublicKeySecp256k1")
 }
 
-fun String.toPublicKey(suite: CryptoSuite): PublicKey {
-//	val raw = rawPEMString()
-//	val spec = X509EncodedKeySpec(Base64.getDecoder().decode(raw))
-
-	val pem = PemReader(reader()).readPemObject()
-	val pubKeyBytes = pem.getContent()
-	val keyFactory = KeyFactory.getInstance("RSA")
-	val pubSpec = X509EncodedKeySpec(pubKeyBytes)
-	val pubKey = keyFactory.generatePublic(pubSpec) as RSAPublicKey
-
-	return when (suite) {
-		Ed25519Signature2018      -> TODO()
-		RsaSignature2018          -> keyFactory.generatePublic(pubSpec) as RSAPublicKey
-		EdDsaSASignatureSecp256k1 -> TODO()
+fun ByteArray.toEd25519PublicKey(): EdDSAPublicKey {
+	val spec = EdDSAPublicKey(X509EncodedKeySpec(this)).let { key ->
+		EdDSAPublicKeySpec(key.a, key.params)
 	}
-
+	return EdDSAPublicKey(spec)
 }
 
-private fun String.rawPEMString(): String = trim()
-		.substringAfter("-----BEGIN PGP PUBLIC KEY BLOCK-----")
-		.substringBefore("-----END PGP PUBLIC KEY BLOCK-----")
-		.lines().joinToString("") { it.trim() }
+// TODO moritzplatt 2019-02-05 -- Make this agnostic to the representation (so far, only one representation per key is supported)
+fun JsonObject.toPublicKey(suite: CryptoSuite): PublicKey =
+		when (suite) {
+			Ed25519          -> {
+				assert(has("publicKeyBase58"))
+				getString("publicKeyBase58").base58ToByteArray().toEd25519PublicKey()
+			}
+			Rsa              -> {
+				assert(has("publicKeyPem"))
+				getString("publicKeyPem").toRsaPublicKey()
+			}
+			EdDsaSASecp256k1 -> {
+				assert(has("publicKeyHex"))
+				getString("publicKeyPem").hexToByteArray().toEdDsaSAPublicKey()
+			}
+		}
+
+fun String.toRsaPublicKey(): PublicKey {
+	TODO("do it!")
+}
+
+fun ByteArray.toEdDsaSAPublicKey(): PublicKey {
+	TODO("do it!")
+}
+
+fun ByteArray.isValidSignature(originalMessage: ByteArray, signer: PublicKey): Boolean {
+	val spec = EdDSANamedCurveTable.getByName("Ed25519")
+	return EdDSAEngine(MessageDigest.getInstance(spec.hashAlgorithm)).apply {
+		initVerify(signer)
+		update(originalMessage)
+	}.verify(this)
+}
+
+
