@@ -5,7 +5,7 @@
 	 width="518px" height="352px" viewBox="6.5 35 518 352" enable-background="new 6.5 35 518 352" xml:space="preserve">
 <polygon fill="#DEEBF7" stroke="#4472C4" stroke-width="2" stroke-miterlimit="10" points="284.678,361.171 67.883,361.171 
 	67.883,63 501.363,63 501.363,361.171 "/>
-<text transform="matrix(1 0 0 1 81.1042 85.6609)" enable-background="new    "><tspan x="0" y="0" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">JWT</tspan><tspan x="31.003" y="0" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875"> </tspan><tspan x="34.79" y="0" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">Envelope</tspan></text>
+<text transform="matrix(1 0 0 1 81.1042 85.6609)" enable-background="new    "><tspan x="0" y="0" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">Envelope</tspan></text>
 <path fill="none" stroke="#4472C4" stroke-width="2.0031" stroke-linejoin="round" stroke-miterlimit="10" d="M340.172,291.522"/>
 <g>
 	<polygon fill="#FFFFFF" stroke="#666666" stroke-width="2" stroke-miterlimit="10" points="282.354,213 81.104,213 81.104,103 
@@ -20,7 +20,7 @@
 </g>
 <polygon fill="#FFFFFF" stroke="#666666" stroke-width="2" stroke-miterlimit="10" points="282.354,341 81.104,341 81.104,225 
 	483.5,225 483.5,341 "/>
-<text transform="matrix(1 0 0 1 95.4998 244.9998)" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">JWT Payload/DID</text>
+<text transform="matrix(1 0 0 1 95.4998 244.9998)" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">Payload/DID</text>
 <polygon fill="#F2F2F2" stroke="#C4446A" stroke-width="2" stroke-miterlimit="10" points="279.547,324 95.5,324 95.5,256 
 	463.5,256 463.5,324 "/>
 <text transform="matrix(1 0 0 1 105.4998 276.9998)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">PubKey</text>
