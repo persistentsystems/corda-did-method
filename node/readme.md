@@ -25,7 +25,7 @@ Currently, only cryptographic suites as per the [Linked Data Cryptographic Suite
 | Cryptographic Suite         | Representation        |
 |-----------------------------|-----------------------|
 | `Ed25519Signature2018`      | Base 58               |
-| `Ed25519Signature2018`      | PEM                   |
+| `RsaSignature2018`          | PEM                   |
 | `EdDsaSASignatureSecp256k1` | Lowercase Hexadecimal |
 
 Future implementations should be representation-agnostic.
