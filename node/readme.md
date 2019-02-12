@@ -5,13 +5,36 @@ Methods
 
 `GET {did}`
 
-### Create
+### Create `PUT {did}`
 
-`POST {did}`
+```json
+{
+  "action": "create",
+  "did": {
+    "@context": "https://w3id.org/did/v1",
+    "id": "did:corda:tcn:00000000-0000-0000-0000-000000000000",
+    "publicKey": [
+      {
+        "id": "did:corda:tcn:00000000-0000-0000-0000-000000000000#keys-1",
+        "type": "Ed25519",
+        "controller": "did:example:00000000-0000-0000-0000-000000000000",
+        "publicKeyBase58": "GfHq2tTVk9z4eXgyP8um5eg46am2W7LiuDyxW1kk5wy3tRWDg8HNn6UeEUnK"
+      }
+    ]
+  }
+}
+```
 
 #### Payload:
 
+Any payload that creates or modifies a DID document will have to contain _proof of ownership_ with it.
+To implement that, any DID document must be be wrapped in an envelope.
+This envelope must contain signatures by all private keys associated with the public keys contained in the documents.
 
+![Corda DID API](did_envelope.svg)
+
+Envelopes that do not contain signatures for all public keys will be rejected.
+Envelopes using unsupported cryptographic suites or unsupported serialisation mechanisms will be rejected.
 
 Caveats
 -------

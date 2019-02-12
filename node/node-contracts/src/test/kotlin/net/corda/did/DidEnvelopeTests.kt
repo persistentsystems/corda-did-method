@@ -17,7 +17,7 @@ class DidEnvelopeTests {
 		val spec = EdDSANamedCurveTable.getByName("Ed25519")
 		val keyPair = KeyPairGenerator().generateKeyPair()
 		val pubKeyBase58 = keyPair.public.encoded.toBase58()
-		val keyUri = URI("did:example:00000000-0000-0000-0000-000000000000#keys-1")
+		val keyUri = URI("did:corda:tcn:00000000-0000-0000-0000-000000000000#keys-1")
 
 		val envelope = """{
 			"action": "create",
@@ -35,5 +35,6 @@ class DidEnvelopeTests {
 			}
 		}""".trimIndent()
 
+        println(envelope)
 	}
 }
