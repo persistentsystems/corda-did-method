@@ -1,5 +1,19 @@
 package net.corda.did
 
+import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.CryptoSuite.EdDsaSASecp256k1
+import net.corda.did.CryptoSuite.RSA
+import net.corda.did.DidValidationResult.DidValidationFailure.CryptoSuiteMismatchFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.InvalidSignatureFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.MalformedDocumentFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.NoKeysFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.SignatureCountFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.UnsupportedCryptoSuiteFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.UntargetedSignatureFailure
+import net.corda.did.DidValidationResult.Success
+import net.corda.isValidEd25519Signature
+import net.corda.toEd25519PublicKey
 import java.net.URI
 
 /**
@@ -16,6 +30,7 @@ import java.net.URI
  * along with cryptographic proof of ownership of the DID document in form of a signature.
  * @param document The DID Document string to be written/updated
  */
+@Suppress("MemberVisibilityCanBePrivate")
 class DidEnvelope(
 		instruction: String,
 		document: String
@@ -27,32 +42,63 @@ class DidEnvelope(
 
 	fun publicKeys(): Set<QualifiedPublicKey> = document.publicKeys()
 
-	fun hasIntegrity(): Boolean {
-//		document().let { doc ->
-//
-//			// The keys embedded in the DID document
-//			val documentKeys = doc.keys()
-//
-//			// 1 - check the number of proofs matches the number of keys in the document
-//			if (proofs.size != documentKeys.size)
-//				return false
-//
-//			// 2 - check that each proof key ID has a corresponding key in the document
-//			if (!proofs.keys.containsAll(documentKeys.keys))
-//				return false
-//
-//			// 3 - check that each of the proofs contains a valid signature over the DID document
-//			return documentKeys.all { (reference, publicKey) ->
-//				val signature = proofs[reference]!!
-//
-//				val suite = CryptoSuite.values().single {
-//					it.algorithm == publicKey.algorithm
-//				}
-//
-//				signature.isValidSignature(suite, payload.bytes, publicKey)
-//			}
-//		}
-		return false
+	fun validate(): DidValidationResult {
+		val signatures = try {
+			signatures()
+		} catch (e: IllegalArgumentException) {
+			return MalformedInstructionFailure(e)
+		}
+
+		val publicKeys = try {
+			publicKeys()
+		} catch (e: IllegalArgumentException) {
+			return MalformedDocumentFailure(e)
+		}
+
+		if (publicKeys.isEmpty())
+			return NoKeysFailure()
+
+		if (signatures.size != publicKeys.size)
+			return SignatureCountFailure()
+
+		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
+		publicKeys.firstOrNull {
+			it.type != Ed25519
+		}?.let {
+			return UnsupportedCryptoSuiteFailure(it.type)
+		}
+
+		val pairings = publicKeys.map { publicKey ->
+			val signature = signatures.singleOrNull {
+				it.target == publicKey.id
+			} ?: return UntargetedSignatureFailure(publicKey.id)
+			publicKey to signature
+		}
+
+		pairings.forEach { (publicKey, signature) ->
+			if (publicKey.type != signature.suite)
+				return CryptoSuiteMismatchFailure(
+						target = publicKey.id,
+						keySuite = publicKey.type,
+						signatureSuite = signature.suite
+				)
+		}
+
+		pairings.forEach { (publicKey, signature) ->
+			when (signature.suite) {
+				Ed25519          -> {
+					if (!signature.value.isValidEd25519Signature(document.bytes, publicKey.value.toEd25519PublicKey()))
+						return InvalidSignatureFailure(publicKey.id)
+
+				}
+
+				// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+				RSA              -> TODO()
+				EdDsaSASecp256k1 -> TODO()
+			}
+		}
+
+		return Success
 	}
 }
 
@@ -60,13 +106,14 @@ sealed class DidValidationResult {
 	object Success : DidValidationResult()
 
 	sealed class DidValidationFailure(description: String) : DidValidationResult() {
-		class MalformedInstructionException(root: Exception) : DidValidationFailure("The instruction document is invalid: ${root.localizedMessage}")
-		class MalformedDocumentException(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
-		class NoKeysException : DidValidationFailure("The DID does not contain any public keys")
-		class SignatureCountException : DidValidationFailure("The number of keys in the DID document does not match the number of signatures")
-		class SignatureMismatchException(target: URI) : DidValidationFailure("No signature was provided for target $target")
-		class InvalidSignatureException(target: URI) : DidValidationFailure("Signature for $target was invalid.")
-		class UnsupportedCryptoSuiteException(suite: String) : DidValidationFailure("$suite is no a supported cryptographic suite")
+		class MalformedInstructionFailure(root: Exception) : DidValidationFailure("The instruction document is invalid: ${root.localizedMessage}")
+		class MalformedDocumentFailure(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
+		class NoKeysFailure : DidValidationFailure("The DID does not contain any public keys")
+		class SignatureCountFailure : DidValidationFailure("The number of keys in the DID document does not match the number of signatures")
+		class UnsupportedCryptoSuiteFailure(suite: CryptoSuite) : DidValidationFailure("$suite is no a supported cryptographic suite")
+		class UntargetedSignatureFailure(target: URI) : DidValidationFailure("No signature was provided for target $target")
+		class CryptoSuiteMismatchFailure(target: URI, keySuite: CryptoSuite, signatureSuite: CryptoSuite) : DidValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
+		class InvalidSignatureFailure(target: URI) : DidValidationFailure("Signature for $target was invalid.")
 	}
 
 }
