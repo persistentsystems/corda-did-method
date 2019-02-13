@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.isA
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidValidationResult.Success
 import net.corda.did.Network.CordaNetwork
 import net.i2p.crypto.eddsa.KeyPairGenerator
@@ -82,7 +83,22 @@ class DidEnvelopeTests {
 	}
 
 	@Test
-	fun `A document with malformed instructions will fail`() {
+	fun `A document with malformed instruction will fail`() {
+		val document = """{
+		  "@context": "https://w3id.org/did/v1",
+		  "id": "did:corda:tcn:f85c1782-4dd4-4433-b375-6218c7e53600",
+		  "publicKey": [
+			{
+			  "id": "did:corda:tcn:f85c1782-4dd4-4433-b375-6218c7e53600#keys-1",
+			  "type": "Ed25519VerificationKey2018",
+			  "controller": "did:corda:tcn:f85c1782-4dd4-4433-b375-6218c7e53600",
+			  "publicKeyBase58": "GfHq2tTVk9z4eXgyL5pXiwbd7iK9Xf6d13z8zQqD3ys5VFuTJk2VA1GQGjz6"
+			}
+		  ]
+		}""".trimMargin()
 
+		val instruction = "Bogus"
+
+		assertThat(DidEnvelope(document, instruction).validate(), isA<MalformedInstructionFailure>())
 	}
 }

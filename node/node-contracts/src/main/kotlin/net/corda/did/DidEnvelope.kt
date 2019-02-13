@@ -45,13 +45,13 @@ class DidEnvelope(
 	fun validate(): DidValidationResult {
 		val signatures = try {
 			instruction.signatures()
-		} catch (e: IllegalArgumentException) {
+		} catch (e: Exception) {
 			return MalformedInstructionFailure(e)
 		}
 
 		val action = try {
 			instruction.action()
-		} catch (e: IllegalArgumentException) {
+		} catch (e: Exception) {
 			return MalformedInstructionFailure(e)
 		}
 
