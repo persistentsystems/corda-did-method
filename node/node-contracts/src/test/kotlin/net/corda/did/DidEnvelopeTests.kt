@@ -68,7 +68,7 @@ class DidEnvelopeTests {
 			{
 			  "id": "$keyUri",
 			  "type": "Ed25519Signature2018",
-			  "publicKeyBase58": "$base58Signature"
+			  "signatureBase58": "$base58Signature"
 			}
 		  ]
 		}""".trimIndent()

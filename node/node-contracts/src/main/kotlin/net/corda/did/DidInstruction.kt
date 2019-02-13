@@ -1,10 +1,12 @@
 package net.corda.did
 
+import net.corda.core.crypto.Base58
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Read
 import net.corda.did.Action.Update
-import java.security.Signature
+import net.corda.getArrayOfObjects
+import java.net.URI
 
 class DidInstruction(json: String) : JsonBacked(json) {
 	fun action(): Action = json().getString("action")?.toAction()
@@ -13,12 +15,22 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	fun nonce(): String? = json().getString("nonce")
 
 	/**
-	 * Returns a list of signatures if all signatures adhere to the Linked Data Cryptographic Suite Registry (Draft
-	 * Community Group Report 09 December 2018). Throws an exception otherwise.
+	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an unknown
+	 * crypto suite is detected.
 	 */
-	fun signatures(): List<Signature> {
-		TODO()
-	}
+	fun signatures(): Set<QualifiedSignature> = json().getArrayOfObjects("signatures").map { signature ->
+		val suite = signature.getString("type")?.let { CryptoSuite.fromSignatureID(it) }
+				?: throw IllegalArgumentException("No signature type provided")
+
+		val id = signature.getString("id")?.let(::URI)
+				?: throw IllegalArgumentException("No key ID provided")
+
+		val value = signature.getString("signatureBase58")?.let {
+			Base58.decode(it)
+		} ?: throw IllegalArgumentException("No signature in Base58 format provided")
+
+		QualifiedSignature(suite, id, value)
+	}.toSet()
 }
 
 enum class Action {
