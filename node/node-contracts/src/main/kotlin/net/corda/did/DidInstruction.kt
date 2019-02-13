@@ -7,7 +7,10 @@ import net.corda.did.Action.Update
 import java.security.Signature
 
 class DidInstruction(json: String) : JsonBacked(json) {
-	fun action(): Action = json().getString("action").toAction()
+	fun action(): Action = json().getString("action")?.toAction()
+			?: throw IllegalArgumentException("Instruction does not contain an action")
+
+	fun nonce(): String? = json().getString("nonce")
 
 	/**
 	 * Returns a list of signatures if all signatures adhere to the Linked Data Cryptographic Suite Registry (Draft

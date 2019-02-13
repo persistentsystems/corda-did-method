@@ -1,8 +1,6 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonParser
-import net.corda.did.CryptoSuite.values
-import net.corda.getArrayOfObjects
 import java.net.URI
 import java.security.PublicKey
 import kotlin.text.Charsets.UTF_8
@@ -26,16 +24,7 @@ data class DidDocument(private val document: String) {
 	}
 
 	fun keys(): Map<URI, PublicKey> = json().run {
-		getArrayOfObjects("publicKey").map { keyJson ->
-			val keyType = values().single {
-				it.signatureIdentifier == keyJson.getString("type")
-			}
-
-			val uri = keyJson.getString("id").let {
-				URI.create(it)
-			}
-			uri to keyJson.toPublicKey(keyType)
-		}.toMap()
+		TODO()
 	}
 }
 

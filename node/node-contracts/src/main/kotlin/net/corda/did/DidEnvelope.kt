@@ -18,8 +18,12 @@ class DidEnvelope(
 		instruction: String,
 		document: String
 ) {
-	private val instruction = DidInstruction(instruction)
-	private val document = DidDocument(document)
+	val instruction = DidInstruction(instruction)
+	val document = DidDocument(document)
+
+	fun signatures(): Set<QualifiedSignature> {
+		TODO("do it!")
+	}
 
 	fun hasIntegrity(): Boolean {
 //		document().let { doc ->
