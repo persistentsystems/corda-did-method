@@ -36,7 +36,6 @@ data class DidDocument(private val document: String) {
 
 		// TODO moritzplatt 2019-02-13 -- Support other encodings
 		val value = publicKey.getString("publicKeyBase58")?.let {
-			println(it)
 			Base58.decode(it)
 		} ?: throw IllegalArgumentException("No signature in Base58 format provided")
 

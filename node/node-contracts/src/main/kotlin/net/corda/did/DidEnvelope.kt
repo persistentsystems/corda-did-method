@@ -1,5 +1,7 @@
 package net.corda.did
 
+import net.corda.did.Action.Delete
+import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
 import net.corda.did.CryptoSuite.RSA
@@ -8,6 +10,7 @@ import net.corda.did.DidValidationResult.DidValidationFailure.InvalidSignatureFa
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedDocumentFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.NoKeysFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.NoNonceFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.SignatureCountFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.UnsupportedCryptoSuiteFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.UntargetedSignatureFailure
@@ -38,20 +41,28 @@ class DidEnvelope(
 	val instruction = DidInstruction(instruction)
 	val document = DidDocument(document)
 
-	fun signatures(): Set<QualifiedSignature> = instruction.signatures()
-
-	fun publicKeys(): Set<QualifiedPublicKey> = document.publicKeys()
-
 	// TODO moritzplatt 2019-02-13 -- should be rewritten in a monadic fashion to avoid early returns
 	fun validate(): DidValidationResult {
 		val signatures = try {
-			signatures()
+			instruction.signatures()
+		} catch (e: IllegalArgumentException) {
+			return MalformedInstructionFailure(e)
+		}
+
+		val action = try {
+			instruction.action()
+		} catch (e: IllegalArgumentException) {
+			return MalformedInstructionFailure(e)
+		}
+
+		val nonce = try {
+			instruction.nonce()
 		} catch (e: IllegalArgumentException) {
 			return MalformedInstructionFailure(e)
 		}
 
 		val publicKeys = try {
-			publicKeys()
+			document.publicKeys()
 		} catch (e: IllegalArgumentException) {
 			return MalformedDocumentFailure(e)
 		}
@@ -61,6 +72,9 @@ class DidEnvelope(
 
 		if (signatures.size != publicKeys.size)
 			return SignatureCountFailure()
+
+		if ((action == Update || action == Delete) && nonce == null)
+			return NoNonceFailure()
 
 		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
 		publicKeys.firstOrNull {
@@ -107,6 +121,7 @@ sealed class DidValidationResult {
 
 	sealed class DidValidationFailure(description: String) : DidValidationResult() {
 		class MalformedInstructionFailure(root: Exception) : DidValidationFailure("The instruction document is invalid: ${root.localizedMessage}")
+		class NoNonceFailure : DidValidationFailure("No nonce provided with instruction")
 		class MalformedDocumentFailure(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
 		class NoKeysFailure : DidValidationFailure("The DID does not contain any public keys")
 		class SignatureCountFailure : DidValidationFailure("The number of keys in the DID document does not match the number of signatures")

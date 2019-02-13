@@ -80,4 +80,9 @@ class DidEnvelopeTests {
 		 */
 		assertThat(actual, isA<Success>())
 	}
+
+	@Test
+	fun `A document with malformed instructions will fail`() {
+
+	}
 }
