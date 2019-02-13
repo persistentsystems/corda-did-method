@@ -42,6 +42,7 @@ class DidEnvelope(
 
 	fun publicKeys(): Set<QualifiedPublicKey> = document.publicKeys()
 
+	// TODO moritzplatt 2019-02-13 -- should be rewritten in a monadic fashion to avoid early returns
 	fun validate(): DidValidationResult {
 		val signatures = try {
 			signatures()
@@ -89,7 +90,6 @@ class DidEnvelope(
 				Ed25519          -> {
 					if (!signature.value.isValidEd25519Signature(document.bytes, publicKey.value.toEd25519PublicKey()))
 						return InvalidSignatureFailure(publicKey.id)
-
 				}
 
 				// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites

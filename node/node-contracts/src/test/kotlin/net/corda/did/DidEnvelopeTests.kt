@@ -1,18 +1,16 @@
 package net.corda.did
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
-import net.corda.did.Action.Create
 import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.DidValidationResult.Success
 import net.corda.did.Network.CordaNetwork
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
 import java.util.UUID
-import kotlin.test.fail
 import kotlin.text.Charsets.UTF_8
 
 class DidEnvelopeTests {
@@ -75,28 +73,11 @@ class DidEnvelopeTests {
 		  ]
 		}""".trimIndent()
 
-		val actual = DidEnvelope(instruction, document)
+		val actual = DidEnvelope(instruction, document).validate()
 
 		/*
 		 * 8. Test Instruction
 		 */
-		assertThat(actual.instruction.action(), equalTo(Create))
-		assertThat(actual.instruction.nonce(), absent())
-
-		val actualSignature = actual.signatures().singleOrNull() ?: fail("No single signature in instructions")
-
-		/*
-		 * 10. Extract Signer
-		 */
-
-		val actualSigner = actual.publicKeys()
-
-//		/*
-//		 * 9. Validate Signature
-//		 */
-//		assertThat(actualSignature.suite, equalTo(Ed25519))
-//		assertThat(actualSignature.target, equalTo(keyUri))
-//
-//		assertThat(actualSignature.value.isValidEd25519Signature(document.bytes(), ))
+		assertThat(actual, isA<Success>())
 	}
 }
