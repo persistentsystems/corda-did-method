@@ -23,6 +23,8 @@ class DidEnvelope(
 
 	fun signatures(): Set<QualifiedSignature> = instruction.signatures()
 
+	fun publicKeys(): Set<QualifiedPublicKey> = document.publicKeys()
+
 	fun hasIntegrity(): Boolean {
 //		document().let { doc ->
 //

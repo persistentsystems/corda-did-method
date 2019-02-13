@@ -21,10 +21,15 @@ enum class CryptoSuite(
 	EdDsaSASecp256k1("EdDsaSAPublicKeySecp256k1", "EdDsaSASignatureSecp256k1");
 
 	companion object {
-		fun fromSignatureID(signatureID: String): CryptoSuite = CryptoSuite
-				.values()
-				.firstOrNull {
-					it.signatureID == signatureID
-				} ?: throw IllegalArgumentException("Unknown Signature ID $signatureID")
+		fun fromSignatureID(signatureID: String): CryptoSuite = filter {
+			it.signatureID == signatureID
+		}
+
+		fun fromKeyID(keyID: String): CryptoSuite = filter {
+			it.keyID == keyID
+		}
+
+		private fun filter(function: (CryptoSuite) -> Boolean) = values()
+				.firstOrNull(function) ?: throw IllegalArgumentException("Unknown ID")
 	}
 }

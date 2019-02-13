@@ -1,8 +1,9 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonParser
+import net.corda.core.crypto.Base58
+import net.corda.getArrayOfObjects
 import java.net.URI
-import java.security.PublicKey
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -23,8 +24,23 @@ data class DidDocument(private val document: String) {
 		Did(getString("id"))
 	}
 
-	fun keys(): Map<URI, PublicKey> = json().run {
-		TODO()
-	}
+	fun publicKeys(): Set<QualifiedPublicKey> = json().getArrayOfObjects("publicKey").map { publicKey ->
+		val id = publicKey.getString("id")?.let(::URI)
+				?: throw IllegalArgumentException("No key ID provided")
+
+		val suite = publicKey.getString("type")?.let { CryptoSuite.fromKeyID(it) }
+				?: throw IllegalArgumentException("No signature type provided")
+
+		val controller = publicKey.getString("controller")?.let(::URI)
+				?: throw IllegalArgumentException("No controller ID provided")
+
+		// TODO moritzplatt 2019-02-13 -- Support other encodings
+		val value = publicKey.getString("publicKeyBase58")?.let {
+			println(it)
+			Base58.decode(it)
+		} ?: throw IllegalArgumentException("No signature in Base58 format provided")
+
+		QualifiedPublicKey(id, suite, controller, value)
+	}.toSet()
 }
 
