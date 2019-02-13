@@ -1,5 +1,7 @@
 package net.corda.did
 
+import java.net.URI
+
 /**
  * This document encapsulates a DID, preserving the full JSON document as received by the owner, the action to be
  * executed on this document and signatures over the document using all key pairs covered in the DID.
@@ -52,4 +54,19 @@ class DidEnvelope(
 //		}
 		return false
 	}
+}
+
+sealed class DidValidationResult {
+	object Success : DidValidationResult()
+
+	sealed class DidValidationFailure(description: String) : DidValidationResult() {
+		class MalformedInstructionException(root: Exception) : DidValidationFailure("The instruction document is invalid: ${root.localizedMessage}")
+		class MalformedDocumentException(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
+		class NoKeysException : DidValidationFailure("The DID does not contain any public keys")
+		class SignatureCountException : DidValidationFailure("The number of keys in the DID document does not match the number of signatures")
+		class SignatureMismatchException(target: URI) : DidValidationFailure("No signature was provided for target $target")
+		class InvalidSignatureException(target: URI) : DidValidationFailure("Signature for $target was invalid.")
+		class UnsupportedCryptoSuiteException(suite: String) : DidValidationFailure("$suite is no a supported cryptographic suite")
+	}
+
 }
