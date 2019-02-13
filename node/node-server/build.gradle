@@ -1,0 +1,22 @@
+apply plugin: "kotlin"
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    compile "org.http4k:http4k-core:$http4k_version"
+    compile "org.http4k:http4k-server-jetty:$http4k_version"
+
+    compile project(":node-contracts")
+    compile project(":node-flows")
+
+    testCompile "junit:junit:$junit_version"
+    testCompile "org.http4k:http4k-testing-hamkrest:$http4k_version"
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        languageVersion = "1.2"
+        apiVersion = "1.2"
+        jvmTarget = "1.8"
+    }
+}

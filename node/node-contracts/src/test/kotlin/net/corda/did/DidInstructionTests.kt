@@ -77,7 +77,7 @@ class DidInstructionTests {
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat({ DidInstruction(instruction).signatures() }, throws(isA<IllegalArgumentException>(
-				has(IllegalArgumentException::message, equalTo("Unknown Signature ID Ed25519Signature2525")))
+				has(IllegalArgumentException::message, equalTo("Unknown ID")))
 		))
 	}
 

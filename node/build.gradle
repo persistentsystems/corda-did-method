@@ -10,6 +10,9 @@ buildscript {
         junit_version = "4.12"
         quasar_version = "0.7.10"
         corda_platform_version = "4"
+
+        hamkrest_version = "1.7.0.0"
+        http4k_version = "3.112.2"
     }
 
     repositories {

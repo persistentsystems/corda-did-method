@@ -1,2 +1,3 @@
 include 'node-contracts'
 include 'node-flows'
+include 'node-server'
