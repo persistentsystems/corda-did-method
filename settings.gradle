@@ -1,4 +1,4 @@
-include 'node-contracts'
-include 'node-flows'
-include 'node-server'
-include 'universal-resolver'
+include 'did-contracts'
+include 'did-flows'
+include 'did-api'
+include 'did-resolver'

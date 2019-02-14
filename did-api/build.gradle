@@ -6,8 +6,8 @@ dependencies {
     compile "org.http4k:http4k-core:$http4k_version"
     compile "org.http4k:http4k-server-jetty:$http4k_version"
 
-    compile project(":node-contracts")
-    compile project(":node-flows")
+    compile project(":did-contracts")
+    compile project(":did-flows")
 
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"

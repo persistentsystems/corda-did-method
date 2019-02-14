@@ -31,7 +31,7 @@ dependencies {
     cordapp "$corda_release_group:corda-finance-contracts:$corda_release_version"
     cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
 
-    cordapp project(":node-contracts")
+    cordapp project(":did-contracts")
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
