@@ -4,6 +4,8 @@ import com.grack.nanojson.JsonParser
 import net.corda.core.crypto.Base58
 import net.corda.getArrayOfObjects
 import java.net.URI
+import java.time.Instant
+import javax.xml.bind.DatatypeConverter
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -41,5 +43,15 @@ data class DidDocument(private val document: String) {
 
 		QualifiedPublicKey(id, suite, controller, value)
 	}.toSet()
+
+	// These (by design) drops time zone information as we are only interested in a before/after relationship of
+	// instants.
+	fun created(): Instant? = getTimestamp("created")
+
+	fun updated(): Instant? = getTimestamp("updated")
+
+	private fun getTimestamp(field: String) = json().getString(field)?.let {
+		DatatypeConverter.parseDateTime(it)
+	}?.toInstant()
 }
 

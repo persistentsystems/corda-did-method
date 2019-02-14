@@ -7,6 +7,8 @@ import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.SpecExamples.`Minimal self-managed DID Document`
 import org.junit.Test
 import java.net.URI
+import java.time.Instant
+import java.time.Instant.EPOCH
 import kotlin.test.fail
 
 class DidDocumentTests {
@@ -44,5 +46,28 @@ class DidDocumentTests {
 		assertThat(actualKey.id, equalTo(URI("did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5#keys-1")))
 		assertThat(actualKey.type, equalTo(Ed25519))
 		assert(actualKey.value.contentEquals(Base58.decode("GfHq2tTVk9z4eXgyMgnD6wQyn62rJfLAnyCB1aAteTjiZj3ejUbjuV4CU4bc")))
+	}
+
+	@Test
+	fun `timestamps can be extracted from a DID`() {
+		val example = """{
+		  "@context": "https://w3id.org/did/v1",
+		  "id": "did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5",
+		  "created": "1970-01-01T00:00:00Z",
+		  "updated": "2019-02-14T14:00:00Z",
+		  "publicKey": [
+			{
+			  "id": "did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5#keys-1",
+			  "type": "Ed25519VerificationKey2018",
+			  "controller": "did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5",
+			  "publicKeyBase58": "GfHq2tTVk9z4eXgyMgnD6wQyn62rJfLAnyCB1aAteTjiZj3ejUbjuV4CU4bc"
+			}
+		  ]
+		}""".trimMargin()
+
+		val actual = DidDocument(example)
+
+		assertThat(actual.created(), equalTo(EPOCH))
+		assertThat(actual.updated(), equalTo(Instant.parse("2019-02-14T14:00:00Z")))
 	}
 }
