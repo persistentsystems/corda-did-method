@@ -3,11 +3,11 @@ apply plugin: "kotlin"
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    compile "org.http4k:http4k-core:$http4k_version"
-    compile "org.http4k:http4k-server-jetty:$http4k_version"
+    implementation "com.natpryce:konfig:1.6.10.0"
 
-    compile project(":node-contracts")
-    compile project(":node-flows")
+    implementation "org.http4k:http4k-core:$http4k_version"
+    implementation "org.http4k:http4k-server-jetty:$http4k_version"
+    implementation "org.http4k:http4k-client-okhttp:$http4k_version"
 
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
