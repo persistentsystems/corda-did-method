@@ -1,7 +1,0 @@
-.idea/
-*.iws
-*.iml
-
-.gradle
-/build/
-!gradle-wrapper.jar
