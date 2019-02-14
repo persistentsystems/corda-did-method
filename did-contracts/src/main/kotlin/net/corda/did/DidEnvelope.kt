@@ -1,17 +1,18 @@
 package net.corda.did
 
-import net.corda.did.Action.Delete
 import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
 import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidValidationResult.DidValidationFailure.CryptoSuiteMismatchFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.DuplicatePublicKeyIdFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.InvalidSignatureFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedDocumentFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.NoKeysFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.NoNonceFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.SignatureCountFailure
+import net.corda.did.DidValidationResult.DidValidationFailure.SignatureTargetFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.UnsupportedCryptoSuiteFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.UntargetedSignatureFailure
 import net.corda.did.DidValidationResult.Success
@@ -43,39 +44,62 @@ class DidEnvelope(
 
 	// TODO moritzplatt 2019-02-13 -- should be rewritten in a monadic fashion to avoid early returns
 	fun validate(): DidValidationResult {
+		// Try to extract the signatures from the `instruction` block.
+		// Fail in case this is not possible (i.e. data provided is not JSON or is not well-formed).
 		val signatures = try {
 			instruction.signatures()
 		} catch (e: Exception) {
 			return MalformedInstructionFailure(e)
 		}
 
+		val distinctSignatureTargets = signatures.map { it.target }.distinct()
+
+		// Ensure each signature targets one distinct key
+		if (signatures.size > distinctSignatureTargets.size)
+			return SignatureTargetFailure()
+
+		// Try to extract the action from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
 		val action = try {
 			instruction.action()
 		} catch (e: Exception) {
 			return MalformedInstructionFailure(e)
 		}
 
+		// Try to extract the nonce from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
 		val nonce = try {
 			instruction.nonce()
 		} catch (e: IllegalArgumentException) {
 			return MalformedInstructionFailure(e)
 		}
 
+		// Try to extract the public keys from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
 		val publicKeys = try {
 			document.publicKeys()
 		} catch (e: IllegalArgumentException) {
 			return MalformedDocumentFailure(e)
 		}
 
+		val distinctPublicKeyIds = publicKeys.map { it.id }.distinct()
+
+		// Ensure key IDs are unique
+		if (publicKeys.size > distinctPublicKeyIds.size)
+			return DuplicatePublicKeyIdFailure()
+
+		// At least one key is required for proof of ownership. Fail if no keys are provided.
 		if (publicKeys.isEmpty())
 			return NoKeysFailure()
 
+		// Exactly one signature per key is required.
 		if (signatures.size != publicKeys.size)
 			return SignatureCountFailure()
 
-		if ((action == Update || action == Delete) && nonce == null)
+		// Ensure a nonce is present for updates. Note that this is not the only check that has to be performed.
+		// In the contract, validation has to be performed to ensure a given nonce has only been used in an update once.
+		// This prevents a replay attack.
+		if (action == Update && nonce == null)
 			return NoNonceFailure()
 
+		// Temporary: Fail is there is at least one RSA or EdDsaSASecp256k1 key
 		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
 		publicKeys.firstOrNull {
 			it.type != Ed25519
@@ -83,6 +107,7 @@ class DidEnvelope(
 			return UnsupportedCryptoSuiteFailure(it.type)
 		}
 
+		// Fail if there are signatures that do not target a public key contained in the document
 		val pairings = publicKeys.map { publicKey ->
 			val signature = signatures.singleOrNull {
 				it.target == publicKey.id
@@ -90,6 +115,7 @@ class DidEnvelope(
 			publicKey to signature
 		}
 
+		// Fail if the crypto suite for any given signature doesn't match the corresponding key's crypto suite
 		pairings.forEach { (publicKey, signature) ->
 			if (publicKey.type != signature.suite)
 				return CryptoSuiteMismatchFailure(
@@ -99,6 +125,7 @@ class DidEnvelope(
 				)
 		}
 
+		// Fail is a signature is invalid
 		pairings.forEach { (publicKey, signature) ->
 			when (signature.suite) {
 				Ed25519          -> {
@@ -124,6 +151,8 @@ sealed class DidValidationResult {
 		class NoNonceFailure : DidValidationFailure("No nonce provided with instruction")
 		class MalformedDocumentFailure(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
 		class NoKeysFailure : DidValidationFailure("The DID does not contain any public keys")
+		class SignatureTargetFailure : DidValidationFailure("Multiple Signatures target the same key")
+		class DuplicatePublicKeyIdFailure : DidValidationFailure("Multiple public keys have the same ID")
 		class SignatureCountFailure : DidValidationFailure("The number of keys in the DID document does not match the number of signatures")
 		class UnsupportedCryptoSuiteFailure(suite: CryptoSuite) : DidValidationFailure("$suite is no a supported cryptographic suite")
 		class UntargetedSignatureFailure(target: URI) : DidValidationFailure("No signature was provided for target $target")
