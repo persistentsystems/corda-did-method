@@ -1,8 +1,8 @@
 package net.corda.did
 
+import com.grack.nanojson.JsonObject
 import com.grack.nanojson.JsonParser
 import net.corda.core.crypto.Base58
-import net.corda.getArrayOfObjects
 import java.net.URI
 import java.time.Instant
 import javax.xml.bind.DatatypeConverter
@@ -26,7 +26,7 @@ data class DidDocument(private val document: String) {
 		Did(getString("id"))
 	}
 
-	fun publicKeys(): Set<QualifiedPublicKey> = json().getArrayOfObjects("publicKey").map { publicKey ->
+	fun publicKeys(): Set<QualifiedPublicKey> = json().getArray("publicKey").filterIsInstance(JsonObject::class.java).map { publicKey ->
 		val id = publicKey.getString("id")?.let(::URI)
 				?: throw IllegalArgumentException("No key ID provided")
 

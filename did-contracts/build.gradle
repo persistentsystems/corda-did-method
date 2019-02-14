@@ -14,6 +14,10 @@ cordapp {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
+    // TODO does this need to be `cordapp` instead?
+    compile "com.grack:nanojson:1.1"
+    compile "com.natpryce:result4k:2.0.0"
+
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
 
@@ -25,9 +29,6 @@ dependencies {
     cordaCompile "$corda_release_group:corda-rpc:$corda_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
-
-    // see comments on [Did] class for why this is bundled with the CorDapp
-    cordapp "com.grack:nanojson:1.1"
 }
 
 

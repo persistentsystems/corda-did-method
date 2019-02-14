@@ -1,11 +1,11 @@
 package net.corda.did
 
+import com.grack.nanojson.JsonObject
 import net.corda.core.crypto.Base58
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Read
 import net.corda.did.Action.Update
-import net.corda.getArrayOfObjects
 import java.net.URI
 
 class DidInstruction(json: String) : JsonBacked(json) {
@@ -16,7 +16,7 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an unknown
 	 * crypto suite is detected.
 	 */
-	fun signatures(): Set<QualifiedSignature> = json().getArrayOfObjects("signatures").map { signature ->
+	fun signatures(): Set<QualifiedSignature> = json().getArray("signatures").filterIsInstance(JsonObject::class.java).map { signature ->
 		val suite = signature.getString("type")?.let { CryptoSuite.fromSignatureID(it) }
 				?: throw IllegalArgumentException("No signature type provided")
 
