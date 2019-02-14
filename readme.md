@@ -167,7 +167,7 @@ i.e.:
 }
 ```
 
-_Update_ and _delete_ actions require a _nonce_ to prevent replay attacks.
+_Updates_ require a _nonce_ to prevent replay attacks.
 
 ##### Document
 
@@ -226,7 +226,6 @@ HTTP Request:
 ```bash
 curl -X PUT \
   http://example.org/did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a \
-  -H 'cache-control: no-cache' \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -F 'instruction={
   "action": "create",
@@ -254,12 +253,24 @@ curl -X PUT \
 
 Response:
 
-The API will respond with status `200` for a request with a well-formed instruction *and* a well-formed document *and* valid signature(s) *and* an unused ID.
-The API will respond with status `400` for a request with a deformed instruction *or* a deformed document *or* at least one invalid signature.
-The API will respond with status `409` for a request with an ID that is already taken.
-
+ - The API will respond with status `200` for a request with a well-formed instruction *and* a well-formed document *and* valid signature(s) *and* an unused ID.
+ - The API will respond with status `400` for a request with a deformed instruction *or* a deformed document *or* at least one invalid signature.
+ - The API will respond with status `409` for a request with an ID that is already taken.
 
 ##### Read (`GET {did}`)
+
+A simple `GET` request specifying the id as fragment is used to retrieve a DID.
+
+HTTP Request:
+
+```bash
+curl -X GET http://example.org/did:corda:tcn:00000000-0000-0000-0000-000000000000
+```
+
+Response:
+
+ - The API will respond with status `200` for a request with a known ID.
+ - The API will respond with status `404` for a request with an unknown ID.
 
 ##### Update (`POST {did}`)
 
@@ -277,22 +288,14 @@ The API will respond with status `409` for a request with an ID that is already 
 | `EdDsaSASignatureSecp256k1` 	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
 
 
-### 
+#### Risks/Known Attack Surface
 
- 1. A basic method spec document to be registered with the [DID method registry](https://w3c-ccg.github.io/did-method-registry/#the-registry).
- 2. A Universal Resolver "[Driver](https://github.com/decentralized-identity/universal-resolver/)" using the `Corda` method.
- 3. A CorDapp providing an end-point implementing the method spec _(1)_ in a way that can be accessed by the resolver _(2)_.
+##### Denial-of-Service Attack on Edge-Nodes
 
-Design-Decisions
-----------------
+##### Replication Issues During Unavailability of Witness Nodes
 
-To-Do's
--------
+### Corda DID Resolver ([`did-resolver`](did-resolver))
 
-Risks/Known Attack Surface
---------------------------
+### Corda DID CorDapp Contracts and States ([`did-contracts`](did-contracts))
 
-### Denial-of-Service Attack on Edge-Nodes
-
-### Replication Issues During Unavailibility of Witness Nodes
-
+### Corda DID CorDapp Flows ([`did-flows`](did-flows))
