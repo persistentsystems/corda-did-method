@@ -1,6 +1,5 @@
 package net.corda.did
 
-import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
 import net.corda.did.CryptoSuite.RSA
@@ -10,7 +9,6 @@ import net.corda.did.DidValidationResult.DidValidationFailure.InvalidSignatureFa
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedDocumentFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.NoKeysFailure
-import net.corda.did.DidValidationResult.DidValidationFailure.NoNonceFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.SignatureCountFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.SignatureTargetFailure
 import net.corda.did.DidValidationResult.DidValidationFailure.UnsupportedCryptoSuiteFailure
@@ -65,13 +63,6 @@ class DidEnvelope(
 			return MalformedInstructionFailure(e)
 		}
 
-		// Try to extract the nonce from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
-		val nonce = try {
-			instruction.nonce()
-		} catch (e: IllegalArgumentException) {
-			return MalformedInstructionFailure(e)
-		}
-
 		// Try to extract the public keys from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
 		val publicKeys = try {
 			document.publicKeys()
@@ -92,12 +83,6 @@ class DidEnvelope(
 		// Exactly one signature per key is required.
 		if (signatures.size != publicKeys.size)
 			return SignatureCountFailure()
-
-		// Ensure a nonce is present for updates. Note that this is not the only check that has to be performed.
-		// In the contract, validation has to be performed to ensure a given nonce has only been used in an update once.
-		// This prevents a replay attack.
-		if (action == Update && nonce == null)
-			return NoNonceFailure()
 
 		// Temporary: Fail is there is at least one RSA or EdDsaSASecp256k1 key
 		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
@@ -148,7 +133,6 @@ sealed class DidValidationResult {
 
 	sealed class DidValidationFailure(description: String) : DidValidationResult() {
 		class MalformedInstructionFailure(root: Exception) : DidValidationFailure("The instruction document is invalid: ${root.localizedMessage}")
-		class NoNonceFailure : DidValidationFailure("No nonce provided with instruction")
 		class MalformedDocumentFailure(root: Exception) : DidValidationFailure("The DID is invalid: ${root.localizedMessage}")
 		class NoKeysFailure : DidValidationFailure("The DID does not contain any public keys")
 		class SignatureTargetFailure : DidValidationFailure("Multiple Signatures target the same key")

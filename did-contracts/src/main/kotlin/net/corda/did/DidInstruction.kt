@@ -11,9 +11,7 @@ import java.net.URI
 class DidInstruction(json: String) : JsonBacked(json) {
 	fun action(): Action = json().getString("action")?.toAction()
 			?: throw IllegalArgumentException("Instruction does not contain an action")
-
-	fun nonce(): String? = json().getString("nonce")
-
+	
 	/**
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an unknown
 	 * crypto suite is detected.

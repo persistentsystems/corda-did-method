@@ -103,10 +103,6 @@ The instruction data is to be formatted according to the following schema:
         "delete"
       ]
     },
-    "nonce": {
-      "$id": "#/properties/nonce",
-      "type": "string"
-    },
     "signatures": {
       "$id": "#/properties/signatures",
       "type": "array",
@@ -166,8 +162,6 @@ i.e.:
   ]
 }
 ```
-
-_Updates_ require a _nonce_ to prevent replay attacks.
 
 ##### Document
 
@@ -273,6 +267,14 @@ Response:
  - The API will respond with status `404` for a request with an unknown ID.
 
 ##### Update (`POST {did}`)
+
+Updates use the optional [created](https://w3c-ccg.github.io/did-spec/#created-optional) and [updated](https://w3c-ccg.github.io/did-spec/#updated-optional) concepts to mitigate replay attacks.
+This means an update will only be successful if the `updated` field *in the DID document* is set to an instant that is later than the instant previously saved with that field.
+Should no previous update be recorded, the update will only be successful if the `created` field *in the document* is set to an instant that is later than the instant provided with the update.
+
+The calculation of the current time is done by the DID owner without verification of its accuracy by the consortium.
+This is appropriate since this field is only used to determine a before/after relationship.
+Consumers of the DID document need to take into account that this value is potentially inaccurate.
 
 ##### Delete (`DELETE {did}`)
 

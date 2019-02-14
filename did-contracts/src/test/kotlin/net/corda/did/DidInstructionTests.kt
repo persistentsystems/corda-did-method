@@ -1,6 +1,5 @@
 package net.corda.did
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
@@ -26,20 +25,17 @@ class DidInstructionTests {
 		val actual = DidInstruction(instruction)
 
 		assertThat(actual.action(), equalTo(Read))
-		assertThat(actual.nonce(), absent())
 	}
 
 	@Test
 	fun `Can parse a "update" instruction`() {
 		val instruction = """{
-		  "action": "update",
-		  "nonce": "foobar"
+		  "action": "update"
 		}""".trimIndent()
 
 		val actual = DidInstruction(instruction)
 
 		assertThat(actual.action(), equalTo(Update))
-		assertThat(actual.nonce(), equalTo("foobar"))
 	}
 
 	@Test
@@ -84,14 +80,12 @@ class DidInstructionTests {
 	@Test
 	fun `Can parse a "delete" instruction`() {
 		val instruction = """{
-		  "action": "delete",
-		  "nonce": "foobar"
+		  "action": "delete"
 		}""".trimIndent()
 
 		val actual = DidInstruction(instruction)
 
 		assertThat(actual.action(), equalTo(Delete))
-		assertThat(actual.nonce(), equalTo("foobar"))
 	}
 
 	@Test
