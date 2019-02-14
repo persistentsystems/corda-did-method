@@ -42,17 +42,17 @@ class DidEnvelopeTests {
 		 * 5. Build a valid DID document using the parameters generated
 		 */
 		val document = """{
-		  "@context": "https://w3id.org/did/v1",
-		  "id": "${id.toExternalForm()}",
-		  "publicKey": [
-			{
-			  "id": "$keyUri",
-			  "type": "${Ed25519.keyID}",
-			  "controller": "${id.toExternalForm()}",
-			  "publicKeyBase58": "$pubKeyBase58"
-			}
-		  ]
-		}""".trimIndent()
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${id.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${id.toExternalForm()}",
+		|	  "publicKeyBase58": "$pubKeyBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
 
 		/*
 		 * 6. Sign the DID generated in (5) with the key generated in (1)
@@ -64,15 +64,15 @@ class DidEnvelopeTests {
 		 * 7. Build a valid instruction set for the DID generated
 		 */
 		val instruction = """{
-		  "action": "create",
-		  "signatures": [
-			{
-			  "id": "$keyUri",
-			  "type": "Ed25519Signature2018",
-			  "signatureBase58": "$base58Signature"
-			}
-		  ]
-		}""".trimIndent()
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$base58Signature"
+		|	}
+		|  ]
+		|}""".trimMargin()
 
 		val actual = DidEnvelope(instruction, document).validate()
 
