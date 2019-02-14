@@ -154,7 +154,7 @@ The instruction data is to be formatted according to the following schema:
 
 i.e.:
  
- ```json
+```json
 {
   "action": "create",
   "signatures": [
