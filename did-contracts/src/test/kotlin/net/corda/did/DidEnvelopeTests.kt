@@ -7,7 +7,6 @@ import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidValidationResult.Success
-import net.corda.did.Network.CordaNetwork
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
@@ -21,7 +20,7 @@ class DidEnvelopeTests {
 		/*
 		 * 1. Generate a valid ID
 		 */
-		val id = CordaDid(CordaNetwork, UUID.randomUUID())
+		val id = Did("did:corda:tcn:${UUID.randomUUID()}")
 
 		/*
 		 * 2. Generate a key pair

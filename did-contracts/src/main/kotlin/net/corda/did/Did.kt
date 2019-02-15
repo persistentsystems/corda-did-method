@@ -1,9 +1,8 @@
 package net.corda.did
 
 import java.net.URI
-import java.util.UUID
 
-open class Did(
+class Did(
 		externalForm: String
 ) {
 	private val did = URI.create(externalForm)
@@ -15,12 +14,4 @@ open class Did(
 
 	fun toUri() = did
 	fun toExternalForm() = did.toString()
-}
-
-class CordaDid(network: Network, id: UUID) : Did("did:corda:${network.externalForm}:$id")
-
-enum class Network(val externalForm: String) {
-	Testnet("testnet"),
-	CordaNetworkUAT("tcn-uat"),
-	CordaNetwork("tcn")
 }
