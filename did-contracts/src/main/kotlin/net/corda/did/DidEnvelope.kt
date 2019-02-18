@@ -3,9 +3,11 @@ package net.corda.did
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
+import com.natpryce.mapFailure
 import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.did.Action.Create
+import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
 import net.corda.did.CryptoSuite.RSA
@@ -13,8 +15,10 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.DuplicatePublicKeyIdFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedDocumentFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingTemporalInformationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
@@ -61,12 +65,61 @@ class DidEnvelope(
 	 * Validates that the envelope presented represents a valid update to the [precursor] provided.
 	 */
 	fun validateUpdate(precursor: DidDocument): Result<Unit, ValidationFailure> {
-		TODO()
-		// ensure temporal relationship is correct
-		// ensure all of the previous keys are signed
+		instruction.action().onFailure {
+			return Failure(MalformedInstructionFailure(it.reason))
+		}.ensureIs(Update)
+
+		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
+		validate().onFailure { return it }
+
+		// perform temporal validation, ensuring the created/updated times are sound
+		validateTemporal(precursor).onFailure { return it }
+
+		return Success(Unit)
+	}
+
+	private fun validateTemporal(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		// temporal validation
+		val precursorCreated = precursor.created().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val precursorUpdated = precursor.updated().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val created = document.created().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val updated = document.updated().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it } ?: return Failure(MissingTemporalInformationFailure())
+
+		// fail if the created timestamp has been modified with an update
+		if (precursorCreated != created)
+			return Failure(InvalidTemporalRelationFailure())
+
+		// TODO moritzplatt 2019-02-18 -- ensure update date is after precursor creation date
+
+		// TODO moritzplatt 2019-02-18 -- ensure update date us after precursor update date
+
+		return Success(Unit)
 	}
 
 	private fun validate(): Result<Unit, ValidationFailure> {
+		// extract temporal information
+		val created = document.created().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val updated = document.updated().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		if (updated != null && created != null && !updated.isAfter(created))
+			return Failure(InvalidTemporalRelationFailure())
+
 		// Try to extract the signatures from the `instruction` block.
 		// Fail in case this is not possible (i.e. data provided is not JSON or is not well-formed).
 		val signatures = instruction.signatures().onFailure {
@@ -143,7 +196,7 @@ class DidEnvelope(
 
 	private fun Action.ensureIs(expected: Action) {
 		if (this != expected)
-			throw IllegalArgumentException("Can't validate a ${this} action")
+			throw IllegalArgumentException("Can't validate a $this action using a $expected method.")
 	}
 }
 
@@ -160,5 +213,7 @@ sealed class DidEnvelopeFailure : FailureCode() {
 		class UntargetedPublicKeyFailure(target: URI) : ValidationFailure("No signature was provided for target $target")
 		class CryptoSuiteMismatchFailure(target: URI, keySuite: CryptoSuite, signatureSuite: CryptoSuite) : ValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
 		class InvalidSignatureFailure(target: URI) : ValidationFailure("Signature for $target was invalid.")
+		class MissingTemporalInformationFailure : ValidationFailure("The document is missing information about its creation")
+		class InvalidTemporalRelationFailure : ValidationFailure("Documents temporal relation is incorrect")
 	}
 }

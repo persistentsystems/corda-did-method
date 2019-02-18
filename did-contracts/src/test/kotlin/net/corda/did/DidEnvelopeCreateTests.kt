@@ -11,6 +11,7 @@ import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
@@ -434,7 +435,7 @@ class DidEnvelopeCreateTests {
 	}
 
 	@Test
-	fun `Validation succeeds for an envelope with invalid signature`() {
+	fun `Validation fails for an envelope with invalid signature`() {
 		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
 
 		val keyPair = KeyPairGenerator().generateKeyPair()
@@ -493,5 +494,102 @@ class DidEnvelopeCreateTests {
 		val instruction = "Bogus"
 
 		assertThat(DidEnvelope(document, instruction).validateCreate(), isA<Failure<MalformedInstructionFailure>>())
+	}
+
+	@Test
+	fun `Validation succeeds for an envelope with a created date only`() {
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0#keys-1",
+		|	  "type": "Ed25519VerificationKey2018",
+		|	  "controller": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0",
+		|	  "publicKeyBase58": "GfHq2tTVk9z4eXgyFWjZCLwoH9C7qZb3KvhZVfj2J2wti62dnrH9Hv4HvxZG"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0#keys-1",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "3jSNdLMeFmsXKy6155d2xSvSzkRcTYSMpXHefYFmGvUg72N3SveezRNbyTaVqvaZ8nD5MA8zGbznWzXdt54e5k8H"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreate()
+
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `validation succeeds for an envelope with an update date but only`() {
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118",
+		|  "updated": "2019-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118#keys-1",
+		|	  "type": "Ed25519VerificationKey2018",
+		|	  "controller": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118",
+		|	  "publicKeyBase58": "GfHq2tTVk9z4eXgyL5csGiHtwEydbBvQF4VgygSjxWYUM5sE34qe5Sf2ALk5"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118#keys-1",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "g4MgSetbN2YsR4bZe4qDeoxDXgyBqKWyfh2UjoRm8wQPnEhQjEuV46ttzH7XGFViBkL9tenTg7tfaAs6j61AAFD"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreate()
+
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `validation fails for an envelope stating it was updated before it was created`() {
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
+		|  "created": "2019-01-02T00:00:00Z",
+		|  "updated": "2019-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781#keys-1",
+		|	  "type": "Ed25519VerificationKey2018",
+		|	  "controller": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
+		|	  "publicKeyBase58": "GfHq2tTVk9z4eXgyTPxte7rrotCf1ueoXyJfRob7vTv9kGDhed6ESWnjLXav"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781#keys-1",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "2CDG4wegz92QBRAEdZsy4Wc4Tyij6FjnPKrDNcsaM73azWPPLy7vcSi2zyaP9Sqo4PNKWgw4YzY38f5HCpSEvLiL"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+
+		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
 }
