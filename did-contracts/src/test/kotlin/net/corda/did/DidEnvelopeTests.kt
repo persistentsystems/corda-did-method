@@ -74,7 +74,7 @@ class DidEnvelopeTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validate()
+		val actual = DidEnvelope(instruction, document).validateCreate()
 
 		/*
 		 * 8. Test Instruction
@@ -99,6 +99,6 @@ class DidEnvelopeTests {
 
 		val instruction = "Bogus"
 
-		assertThat(DidEnvelope(document, instruction).validate(), isA<Failure<MalformedInstructionFailure>>())
+		assertThat(DidEnvelope(document, instruction).validateCreate(), isA<Failure<MalformedInstructionFailure>>())
 	}
 }

@@ -46,7 +46,18 @@ class DidEnvelope(
 	val instruction = DidInstruction(instruction)
 	val document = DidDocument(document)
 
-	fun validate(): Result<Unit, ValidationFailure> {
+	/**
+	 * Validate that the presented envelope is formatted in a valid way to _create_ a DID.
+	 */
+	fun validateCreate(): Result<Unit, ValidationFailure> {
+		instruction.action().onFailure {
+			return Failure(MalformedInstructionFailure(it.reason))
+		}.ensureIs(Create)
+
+		return validate()
+	}
+
+	private fun validate(): Result<Unit, ValidationFailure> {
 		// Try to extract the signatures from the `instruction` block.
 		// Fail in case this is not possible (i.e. data provided is not JSON or is not well-formed).
 		val signatures = instruction.signatures().onFailure {
@@ -58,14 +69,6 @@ class DidEnvelope(
 		// Ensure each signature targets one distinct key
 		if (signatures.size > distinctSignatureTargets.size)
 			return Failure(SignatureTargetFailure())
-
-		// Try to extract the action from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
-		val action = instruction.action().onFailure {
-			return Failure(MalformedInstructionFailure(it.reason))
-		}
-
-		if (action != Create)
-			throw IllegalArgumentException("Can't validate a $action action")
 
 		// Try to extract the public keys from the `instruction` block. Fail if not possible (i.e. malformed JSON or inappropriate structure).
 		val publicKeys = document.publicKeys().onFailure {
@@ -83,7 +86,7 @@ class DidEnvelope(
 			return Failure(NoKeysFailure())
 
 		// Exactly one signature per key is required.
-		if (signatures.size != publicKeys.size)
+		if (signatures.size < publicKeys.size)
 			return Failure(SignatureCountFailure())
 
 		// Temporary: Fail is there is at least one RSA or EdDsaSASecp256k1 key
@@ -127,6 +130,11 @@ class DidEnvelope(
 		}
 
 		return Success(Unit)
+	}
+
+	private fun Action.ensureIs(expected: Action) {
+		if (this != expected)
+			throw IllegalArgumentException("Can't validate a ${this} action")
 	}
 }
 

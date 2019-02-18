@@ -31,8 +31,8 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	}
 
 	/**
-	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an unknown
-	 * crypto suite is detected.
+	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an
+	 * unknown crypto suite is detected.
 	 */
 	fun signatures(): DidInstructionResult<Set<QualifiedSignature>> = json().flatMap {
 		it.getMandatoryArray("signatures")
