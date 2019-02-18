@@ -10,6 +10,7 @@ import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
@@ -389,62 +390,89 @@ class DidEnvelopeCreateTests {
 	}
 
 	@Test
-	fun `Validation fails for an envelope containing signatures for keys that are not contained in the document`() {
+	fun `Validation fails for an envelope with mismatched crypto suites`() {
 		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
 
-		val keyPair1 = KeyPairGenerator().generateKeyPair()
-		val keyPair2 = KeyPairGenerator().generateKeyPair()
+		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
 
-		val encodedPubKey1 = keyPair1.public.encoded.toBase58()
-		val encodedPubKey2 = keyPair2.public.encoded.toBase58()
+		val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()
 
-		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
 
 		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
 		|	{
-		|	  "id": "$keyUri2",
+		|	  "id": "$keyUri",
 		|	  "type": "${Ed25519.keyID}",
 		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedPubKey2"
-		|	},
-		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedPubKey1"
+		|	  "publicKeyBase58": "$ed25519PubKey"
 		|	}
 		|  ]
 		|}""".trimMargin()
 
-		val signature1 = keyPair1.private.sign(document.toByteArray(UTF_8))
-		val signature2 = keyPair2.private.sign(document.toByteArray(UTF_8))
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
 
-		val encodedSignature1 = signature1.bytes.toBase58()
-		val encodedSignature2 = signature2.bytes.toBase58()
+		val encodedRsaSignature = rsaSignature.bytes.toBase58()
 
 		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$encodedSignature1"
-		|	},
-		|	{
-		|	  "id": "$keyUri2",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$encodedSignature2"
+		|	  "id": "$keyUri",
+		|	  "type": "${RSA.signatureID}",
+		|	  "signatureBase58": "$encodedRsaSignature"
 		|	}
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate()
+		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
 
-		assertThat(actual, isA<Success<Unit>>())
+		assertThat(actual, isA<CryptoSuiteMismatchFailure>())
+	}
+
+	@Test
+	fun `Validation succeeds for an envelope with invalid signature`() {
+		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+
+		val keyPair = KeyPairGenerator().generateKeyPair()
+
+		val pubKeyBase58 = keyPair.public.encoded.toBase58()
+
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$pubKeyBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val wrongSignature = keyPair.private.sign("nonsense".toByteArray(UTF_8))
+		val encodedWrongSignature = wrongSignature.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedWrongSignature"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+
+		assertThat(actual, isA<InvalidSignatureFailure>())
 	}
 
 	@Test

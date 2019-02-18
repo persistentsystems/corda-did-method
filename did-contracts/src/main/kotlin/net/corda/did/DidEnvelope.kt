@@ -19,7 +19,7 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UnsupportedCryptoSuiteFailure
-import net.corda.did.DidEnvelopeFailure.ValidationFailure.UntargetedSignatureFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.UntargetedPublicKeyFailure
 import net.corda.isValidEd25519Signature
 import net.corda.toEd25519PublicKey
 import java.net.URI
@@ -106,11 +106,11 @@ class DidEnvelope(
 			return Failure(UnsupportedCryptoSuiteFailure(it.type))
 		}
 
-		// Fail if there are signatures that do not target a public key contained in the document
+		// Fail if there are public keys that do not have a corresponding signature
 		val pairings = publicKeys.map { publicKey ->
 			val signature = signatures.singleOrNull {
 				it.target == publicKey.id
-			} ?: return Failure(UntargetedSignatureFailure(publicKey.id))
+			} ?: return Failure(UntargetedPublicKeyFailure(publicKey.id))
 			publicKey to signature
 		}
 
@@ -157,7 +157,7 @@ sealed class DidEnvelopeFailure : FailureCode() {
 		class DuplicatePublicKeyIdFailure : ValidationFailure("Multiple public keys have the same ID")
 		class SignatureCountFailure : ValidationFailure("The number of keys in the DID document does not match the number of signatures")
 		class UnsupportedCryptoSuiteFailure(suite: CryptoSuite) : ValidationFailure("$suite is no a supported cryptographic suite")
-		class UntargetedSignatureFailure(target: URI) : ValidationFailure("No signature was provided for target $target")
+		class UntargetedPublicKeyFailure(target: URI) : ValidationFailure("No signature was provided for target $target")
 		class CryptoSuiteMismatchFailure(target: URI, keySuite: CryptoSuite, signatureSuite: CryptoSuite) : ValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
 		class InvalidSignatureFailure(target: URI) : ValidationFailure("Signature for $target was invalid.")
 	}
