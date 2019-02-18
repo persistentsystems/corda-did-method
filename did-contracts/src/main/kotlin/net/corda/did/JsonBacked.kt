@@ -4,9 +4,9 @@ import com.grack.nanojson.JsonObject
 import com.grack.nanojson.JsonParser
 import com.grack.nanojson.JsonParserException
 import com.natpryce.Failure
-import com.natpryce.Result
 import com.natpryce.Success
-import net.corda.JsonFailure
+import net.corda.JsonFailure.ParserFailure
+import net.corda.JsonResult
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -17,9 +17,14 @@ abstract class JsonBacked(private val source: String) {
 
 	fun source(): String = source
 
-	fun json(): Result<JsonObject, JsonFailure> = try {
+	fun json(): JsonResult<JsonObject> = try {
 		Success(JsonParser.`object`().from(source))
 	} catch (e: JsonParserException) {
-		Failure(JsonFailure)
+		Failure(ParserFailure(
+				message = e.message,
+				linePosition = e.linePosition,
+				characterPosition = e.charPosition,
+				characterOffset = e.charOffset
+		))
 	}
 }

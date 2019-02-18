@@ -1,12 +1,13 @@
 package net.corda.did
 
+import com.natpryce.Failure
+import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.isA
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
-import net.corda.did.DidValidationResult.DidValidationFailure.MalformedInstructionFailure
-import net.corda.did.DidValidationResult.Success
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
@@ -78,7 +79,7 @@ class DidEnvelopeTests {
 		/*
 		 * 8. Test Instruction
 		 */
-		assertThat(actual, isA<Success>())
+		assertThat(actual, isA<Success<Unit>>())
 	}
 
 	@Test
@@ -98,6 +99,6 @@ class DidEnvelopeTests {
 
 		val instruction = "Bogus"
 
-		assertThat(DidEnvelope(document, instruction).validate(), isA<MalformedInstructionFailure>())
+		assertThat(DidEnvelope(document, instruction).validate(), isA<Failure<MalformedInstructionFailure>>())
 	}
 }

@@ -2,14 +2,16 @@ package net.corda.did
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
-import com.natpryce.hamkrest.throws
+import net.corda.assertFailure
+import net.corda.assertSuccess
 import net.corda.core.crypto.Base58
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Read
 import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.DidInstructionFailure.InvalidInstructionJsonFailure
+import net.corda.did.DidInstructionFailure.UnknownActionFailure
 import org.junit.Test
 import java.net.URI
 import kotlin.test.fail
@@ -22,9 +24,9 @@ class DidInstructionTests {
 		  "action": "read"
 		}""".trimIndent()
 
-		val actual = DidInstruction(instruction)
+		val actual = DidInstruction(instruction).action().assertSuccess()
 
-		assertThat(actual.action(), equalTo(Read))
+		assertThat(actual, equalTo(Read))
 	}
 
 	@Test
@@ -33,9 +35,9 @@ class DidInstructionTests {
 		  "action": "update"
 		}""".trimIndent()
 
-		val actual = DidInstruction(instruction)
+		val actual = DidInstruction(instruction).action().assertSuccess()
 
-		assertThat(actual.action(), equalTo(Update))
+		assertThat(actual, equalTo(Update))
 	}
 
 	@Test
@@ -51,7 +53,8 @@ class DidInstructionTests {
 		  ]
 		}""".trimIndent()
 
-		val actual = DidInstruction(instruction).signatures().singleOrNull() ?: fail("No signature found")
+		val actual = DidInstruction(instruction).signatures().assertSuccess().singleOrNull()
+				?: fail("No signature found")
 
 		assertThat(actual.suite, equalTo(Ed25519))
 		assertThat(actual.target, equalTo(URI("did:corda:tcn:d51924e1-66bb-4971-ab62-ec4910a1fb98#keys-1")))
@@ -59,7 +62,7 @@ class DidInstructionTests {
 	}
 
 	@Test
-	fun `Rejects "create" instruction using an unknown well-known crypto suite`() {
+	fun `Rejects "create" instruction using an unknown crypto suite`() {
 		val instruction = """{
 		  "action": "create",
 		  "signatures": [
@@ -71,10 +74,10 @@ class DidInstructionTests {
 		  ]
 		}""".trimIndent()
 
-		@Suppress("RemoveExplicitTypeArguments")
-		assertThat({ DidInstruction(instruction).signatures() }, throws(isA<IllegalArgumentException>(
-				has(IllegalArgumentException::message, equalTo("Unknown ID")))
-		))
+		val actual = DidInstruction(instruction).signatures().assertFailure()
+
+		// TODO moritzplatt 2019-02-18 -- should be a more specific error code
+		assertThat(actual, isA<InvalidInstructionJsonFailure>())
 	}
 
 	@Test
@@ -83,9 +86,9 @@ class DidInstructionTests {
 		  "action": "delete"
 		}""".trimIndent()
 
-		val actual = DidInstruction(instruction)
+		val actual = DidInstruction(instruction).action().assertSuccess()
 
-		assertThat(actual.action(), equalTo(Delete))
+		assertThat(actual, equalTo(Delete))
 	}
 
 	@Test
@@ -94,11 +97,8 @@ class DidInstructionTests {
 		  "action": "doTheBartman"
 		}""".trimIndent()
 
-		val actual = DidInstruction(instruction)
+		val actual = DidInstruction(instruction).action().assertFailure()
 
-		@Suppress("RemoveExplicitTypeArguments")
-		assertThat({ actual.action() }, throws(isA<IllegalArgumentException>(
-				has(IllegalArgumentException::message, equalTo("Unknown action doTheBartman.")))
-		))
+		assertThat(actual, isA<UnknownActionFailure>())
 	}
 }

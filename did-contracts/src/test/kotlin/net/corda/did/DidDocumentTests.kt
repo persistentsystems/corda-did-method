@@ -2,6 +2,7 @@ package net.corda.did
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import net.corda.assertSuccess
 import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.SpecExamples.`Minimal self-managed DID Document`
@@ -18,7 +19,7 @@ class DidDocumentTests {
 		val example = DidDocument(`Minimal self-managed DID Document`)
 
 		assertThat(
-				actual = example.id().toExternalForm(),
+				actual = example.id().assertSuccess().toExternalForm(),
 				criteria = equalTo(Did("did:example:123456789abcdefghi").toExternalForm())
 		)
 	}
@@ -40,7 +41,7 @@ class DidDocumentTests {
 
 		val actual = DidDocument(example)
 
-		val actualKey = actual.publicKeys().singleOrNull() ?: fail("Public Key cannot be extracted")
+		val actualKey = actual.publicKeys().assertSuccess().singleOrNull() ?: fail("Public Key cannot be extracted")
 
 		assertThat(actualKey.controller, equalTo(URI("did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5")))
 		assertThat(actualKey.id, equalTo(URI("did:corda:tcn:4ff0fc2f-bc97-4c0c-8b64-46b2f68131f5#keys-1")))
@@ -67,7 +68,10 @@ class DidDocumentTests {
 
 		val actual = DidDocument(example)
 
-		assertThat(actual.created(), equalTo(EPOCH))
-		assertThat(actual.updated(), equalTo(Instant.parse("2019-02-14T14:00:00Z")))
+		val created = actual.created().assertSuccess()
+		val updated = actual.updated().assertSuccess()
+
+		assertThat(created, equalTo(EPOCH))
+		assertThat(updated, equalTo(Instant.parse("2019-02-14T14:00:00Z")))
 	}
 }

@@ -1,13 +1,22 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonObject
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
 import com.natpryce.flatMap
 import com.natpryce.map
+import com.natpryce.mapFailure
 import com.natpryce.onFailure
-import net.corda.core.crypto.Base58
+import net.corda.FailureCode
+import net.corda.JsonFailure
+import net.corda.did.DidDocumentFailure.InvalidDocumentJsonFailure
+import net.corda.did.DidDocumentFailure.InvalidTimeStampFormatFailure
 import net.corda.getMandatoryArray
+import net.corda.getMandatoryBase58Bytes
+import net.corda.getMandatoryCryptoSuiteFromKeyID
 import net.corda.getMandatoryString
-import java.net.URI
+import net.corda.getMandatoryUri
 import java.time.Instant
 import javax.xml.bind.DatatypeConverter
 
@@ -22,51 +31,63 @@ import javax.xml.bind.DatatypeConverter
  */
 class DidDocument(document: String) : JsonBacked(document) {
 
-	fun id(): Did {
-		return json().flatMap {
-			it.getMandatoryString("id")
-		}.map {
-			Did(it)
-		}.onFailure {
-			throw IllegalArgumentException()
-		}
+	fun id(): DidDocumentResult<Did> = json().flatMap {
+		it.getMandatoryString("id")
+	}.map {
+		Did(it)
+	}.mapFailure {
+		InvalidDocumentJsonFailure(it)
 	}
 
-	fun publicKeys(): Set<QualifiedPublicKey> = json().flatMap {
+	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json().flatMap {
 		it.getMandatoryArray("publicKey")
 	}.map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
-			val id = key.getMandatoryString("id")
-					.map(::URI)
-					.onFailure { throw IllegalArgumentException("No key ID provided") }
+			val id = key.getMandatoryUri("id").mapFailure {
+				InvalidDocumentJsonFailure(it)
+			}.onFailure { return it }
 
-			val suite = key.getMandatoryString("type")
-					.map { CryptoSuite.fromKeyID(it) }
-					.onFailure { throw IllegalArgumentException("No signature type provided") }
+			val suite = key.getMandatoryCryptoSuiteFromKeyID("type").mapFailure {
+				InvalidDocumentJsonFailure(it)
+			}.onFailure { return it }
 
-			val controller = key.getMandatoryString("controller")
-					.map(::URI)
-					.onFailure { throw IllegalArgumentException("No controller ID provided") }
+			val controller = key.getMandatoryUri("controller").mapFailure {
+				InvalidDocumentJsonFailure(it)
+			}.onFailure { return it }
 
 			// TODO moritzplatt 2019-02-13 -- Support other encodings
-			val value = key.getMandatoryString("publicKeyBase58")
-					.map { Base58.decode(it) }
-					.onFailure { throw IllegalArgumentException("No signature in Base58 format provided") }
+			val value = key.getMandatoryBase58Bytes("publicKeyBase58").mapFailure {
+				InvalidDocumentJsonFailure(it)
+			}.onFailure { return it }
 
 			QualifiedPublicKey(id, suite, controller, value)
 		}.toSet()
-	}.onFailure { throw IllegalArgumentException() }
+	}.mapFailure { InvalidDocumentJsonFailure(it) }
 
 	// These (by design) drop time zone information as we are only interested in a before/after relationship of
 	// instants.
-	fun created(): Instant? = getTimestamp("created").onFailure { throw IllegalArgumentException() }
+	fun created(): DidDocumentResult<Instant?> = getTimestamp("created")
 
-	fun updated(): Instant? = getTimestamp("updated").onFailure { throw IllegalArgumentException() }
+	fun updated(): DidDocumentResult<Instant?> = getTimestamp("updated")
 
-	private fun getTimestamp(field: String) = json().map {
-		it.getString(field)?.let {
-			DatatypeConverter.parseDateTime(it)
-		}?.toInstant()
+	private fun getTimestamp(field: String): DidDocumentResult<Instant?> = json().mapFailure {
+		InvalidDocumentJsonFailure(it)
+	}.flatMap { json ->
+		json.getString(field)?.let {
+			try {
+				Success(DatatypeConverter.parseDateTime(it).toInstant())
+			} catch (e: IllegalArgumentException) {
+				Failure(InvalidTimeStampFormatFailure(it))
+			}
+		} ?: Success(null)
 	}
 }
+
+@Suppress("UNUSED_PARAMETER")
+sealed class DidDocumentFailure : FailureCode() {
+	class InvalidDocumentJsonFailure(underlying: JsonFailure) : DidDocumentFailure()
+	class InvalidTimeStampFormatFailure(input: String) : DidDocumentFailure()
+}
+
+private typealias DidDocumentResult<T> = Result<T, DidDocumentFailure>
 

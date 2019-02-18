@@ -1,5 +1,10 @@
 package net.corda.did
 
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import net.corda.FailureCode
+
 /**
  * Supported Crypto Suites as registered in the "Linked Data Cryptographic Suite Registry" Draft Community Group Report
  * 09 December 2018
@@ -21,15 +26,21 @@ enum class CryptoSuite(
 	EdDsaSASecp256k1("EdDsaSAPublicKeySecp256k1", "EdDsaSASignatureSecp256k1");
 
 	companion object {
-		fun fromSignatureID(signatureID: String): CryptoSuite = filter {
+		fun fromSignatureID(signatureID: String): Result<CryptoSuite, CryptoSuiteFailure> = values().firstOrNull {
 			it.signatureID == signatureID
-		}
+		}?.let {
+			Success(it)
+		} ?: Failure(CryptoSuiteFailure.UnknownCryptoSuiteIDFailure(signatureID))
 
-		fun fromKeyID(keyID: String): CryptoSuite = filter {
+		fun fromKeyID(keyID: String): Result<CryptoSuite, CryptoSuiteFailure> = values().firstOrNull {
 			it.keyID == keyID
-		}
-
-		private fun filter(function: (CryptoSuite) -> Boolean) = values()
-				.firstOrNull(function) ?: throw IllegalArgumentException("Unknown ID")
+		}?.let {
+			Success(it)
+		} ?: Failure(CryptoSuiteFailure.UnknownCryptoSuiteIDFailure(keyID))
 	}
+}
+
+@Suppress("UNUSED_PARAMETER")
+sealed class CryptoSuiteFailure : FailureCode() {
+	class UnknownCryptoSuiteIDFailure(id: String) : CryptoSuiteFailure()
 }
