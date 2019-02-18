@@ -11,6 +11,7 @@ import net.corda.did.contract.DidContract.Commands.Update
 class DidContract : Contract {
 
 	companion object {
+
 		@JvmStatic
 		val IOU_CONTRACT_ID = "net.corda.didDocument.node.contract.DidContract"
 	}
@@ -19,7 +20,7 @@ class DidContract : Contract {
 		val command = tx.commandsOfType(Commands::class.java).single()
 
 		when (command.value) {
-			is Create,
+			is Create -> TODO()
 			is Update -> TODO()
 			is Delete -> TODO()
 		}

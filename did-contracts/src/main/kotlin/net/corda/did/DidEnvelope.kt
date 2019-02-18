@@ -47,7 +47,7 @@ class DidEnvelope(
 	val document = DidDocument(document)
 
 	/**
-	 * Validate that the presented envelope is formatted in a valid way to _create_ a DID.
+	 * Validates that the envelope presented is formatted in a valid way to _create_ a DID.
 	 */
 	fun validateCreate(): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
@@ -55,6 +55,15 @@ class DidEnvelope(
 		}.ensureIs(Create)
 
 		return validate()
+	}
+
+	/**
+	 * Validates that the envelope presented represents a valid update to the [precursor] provided.
+	 */
+	fun validateUpdate(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		TODO()
+		// ensure temporal relationship is correct
+		// ensure all of the previous keys are signed
 	}
 
 	private fun validate(): Result<Unit, ValidationFailure> {
@@ -85,7 +94,7 @@ class DidEnvelope(
 		if (publicKeys.isEmpty())
 			return Failure(NoKeysFailure())
 
-		// Exactly one signature per key is required.
+		// At least one signature per key is required.
 		if (signatures.size < publicKeys.size)
 			return Failure(SignatureCountFailure())
 
