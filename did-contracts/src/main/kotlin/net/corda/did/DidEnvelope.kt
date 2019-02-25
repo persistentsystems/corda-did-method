@@ -100,9 +100,8 @@ class DidEnvelope(
 		if (precursorCreated != created)
 			return Failure(InvalidTemporalRelationFailure())
 
-		// TODO moritzplatt 2019-02-18 -- ensure update date is after precursor creation date
-
-		// TODO moritzplatt 2019-02-18 -- ensure update date us after precursor update date
+		if (precursorUpdated != null && !updated.isAfter(precursorUpdated))
+			return Failure(InvalidTemporalRelationFailure())
 
 		return Success(Unit)
 	}

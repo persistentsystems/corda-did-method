@@ -97,7 +97,7 @@ class DidEnvelopeUpdateTests {
 	}
 
 	@Test
-	fun `Validation fails for an update that does not respect the creation date`() {
+	fun `Validation fails for an update that tampers with the creation date`() {
 		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
@@ -302,6 +302,147 @@ class DidEnvelopeUpdateTests {
 		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<MissingTemporalInformationFailure>())
+	}
+
+	@Test
+	fun `Validation fails for an update that occurs before the creation date`() {
+		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+
+		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val originalKeyPair = KeyPairGenerator().generateKeyPair()
+		val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
+
+		val originalDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "2019-02-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$originalKeyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$originalKeyPairEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val newKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val newKeyPair = KeyPairGenerator().generateKeyPair()
+		val newKeyPairEncoded = newKeyPair.public.encoded.toBase58()
+
+		val newDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "2019-02-01T00:00:00Z",
+		|  "updated": "2019-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$newKeyPairEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signatureFromOldKey = originalKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
+
+		val signatureFromNewKey = newKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromNewKeyEncoded = signatureFromNewKey.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$originalKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
+		|	},
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromNewKeyEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val envelope = DidEnvelope(instruction, newDocument)
+
+		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+
+		assertThat(actual, isA<InvalidTemporalRelationFailure>())
+	}
+
+	@Test
+	fun `Validation fails for a potential replay attack`() {
+		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+
+		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val originalKeyPair = KeyPairGenerator().generateKeyPair()
+		val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
+
+		val originalDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "2017-01-01T00:00:00Z",
+		|  "updated": "2019-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$originalKeyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$originalKeyPairEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val newKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val newKeyPair = KeyPairGenerator().generateKeyPair()
+		val newKeyPairEncoded = newKeyPair.public.encoded.toBase58()
+
+		val newDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "2017-01-01T00:00:00Z",
+		|  "updated": "2018-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$newKeyPairEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signatureFromOldKey = originalKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
+
+		val signatureFromNewKey = newKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromNewKeyEncoded = signatureFromNewKey.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$originalKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
+		|	},
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromNewKeyEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val envelope = DidEnvelope(instruction, newDocument)
+
+		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+
+		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
 
 }
