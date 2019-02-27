@@ -87,7 +87,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate()
+		val actual = DidEnvelope(instruction, document).validateCreation()
 
 		/*
 		 * 8. Test Instruction
@@ -149,7 +149,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate()
+		val actual = DidEnvelope(instruction, document).validateCreation()
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -199,7 +199,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		assertThat(actual, isA<SignatureTargetFailure>())
 	}
@@ -257,7 +257,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		assertThat(actual, isA<SignatureTargetFailure>())
 	}
@@ -277,7 +277,7 @@ class DidEnvelopeCreateTests {
 		|  "signatures": [ ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		assertThat(actual, isA<NoKeysFailure>())
 	}
@@ -329,7 +329,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		assertThat(actual, isA<SignatureCountFailure>())
 	}
@@ -390,7 +390,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<CryptoSuiteMismatchFailure>(
@@ -439,7 +439,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<CryptoSuiteMismatchFailure>(
@@ -487,7 +487,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<InvalidSignatureFailure>(has(InvalidSignatureFailure::target, equalTo(keyUri))))
@@ -547,7 +547,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate()
+		val actual = DidEnvelope(instruction, document).validateCreation()
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -579,7 +579,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate()
+		val actual = DidEnvelope(instruction, document).validateCreation()
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -612,7 +612,7 @@ class DidEnvelopeCreateTests {
 		|  ]
 		|}""".trimMargin()
 
-		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}

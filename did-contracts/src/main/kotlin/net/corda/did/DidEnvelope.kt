@@ -7,6 +7,7 @@ import com.natpryce.mapFailure
 import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.did.Action.Create
+import net.corda.did.Action.Delete
 import net.corda.did.Action.Update
 import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EdDsaSASecp256k1
@@ -22,6 +23,7 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedPrecursorFail
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingTemporalInformationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoMatchingSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UnsupportedCryptoSuiteFailure
@@ -55,7 +57,7 @@ class DidEnvelope(
 	/**
 	 * Validates that the envelope presented is formatted in a valid way to _create_ a DID.
 	 */
-	fun validateCreate(): Result<Unit, ValidationFailure> {
+	fun validateCreation(): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
 		}.ensureIs(Create)
@@ -64,12 +66,12 @@ class DidEnvelope(
 	}
 
 	/**
-	 * Validates that the envelope presented represents a valid update to the [precursor] provided.
+	 * Validates that the envelope presented represents a valid update/deletion of the [precursor] provided.
 	 */
-	fun validateUpdate(precursor: DidDocument): Result<Unit, ValidationFailure> {
+	fun validateModification(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
-		}.ensureIs(Update)
+		}.ensureIs(Update, Delete)
 
 		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
 		validate().onFailure { return it }
@@ -77,8 +79,8 @@ class DidEnvelope(
 		// perform temporal validation, ensuring the created/updated times are sound
 		validateTemporal(precursor).onFailure { return it }
 
-		// perform key ownership validation
-		validateKeysForUpdate(precursor).onFailure { return it }
+		// perform key ownership for deletion (i.e. prove ownership of ALL keys)
+		validateKeysForModification(precursor).onFailure { return it }
 
 		return Success(Unit)
 	}
@@ -185,7 +187,7 @@ class DidEnvelope(
 	}
 
 	// validate that _each_ key in the precursor document has a signature in the current one
-	private fun validateKeysForUpdate(precursor: DidDocument): Result<Unit, ValidationFailure> {
+	private fun validateKeysForModification(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		// standard validation has been performed prior to this so we know the keys in the precursor document have a
 		// valid signature
 		val precursorKeys = precursor.publicKeys().mapFailure {
@@ -204,24 +206,48 @@ class DidEnvelope(
 		}.verifySignatures()
 	}
 
+	// validate that _at least one_ key in the precursor document has a signature in the current one
+	private fun validateKeysForDelete(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		val precursorKeys = precursor.publicKeys().mapFailure {
+			MalformedPrecursorFailure(it)
+		}.onFailure { return it }
+
+		val currentSignatures = instruction.signatures().mapFailure {
+			MalformedInstructionFailure(it)
+		}.onFailure { return it }
+
+		return precursorKeys.map { precursorKey ->
+			precursorKey to currentSignatures.firstOrNull { signature ->
+				signature.target == precursorKey.id
+			}
+		}.firstOrNull { it.second != null }?.let { (pk, sig) ->
+			if (sig!!.value.isValidSignature(document.raw, pk)) {
+				Success(Unit)
+			} else {
+				Failure(InvalidSignatureFailure(pk.id))
+			}
+		} ?: Failure(NoMatchingSignatureFailure())
+	}
+
 	private fun List<Pair<QualifiedPublicKey, QualifiedSignature>>.verifySignatures(): Result<Unit, ValidationFailure> {
 		forEach { (publicKey, signature) ->
-			when (signature.suite) {
-				Ed25519          -> {
-					if (!signature.value.isValidEd25519Signature(document.raw, publicKey.value.toEd25519PublicKey()))
-						return Failure(InvalidSignatureFailure(publicKey.id))
-				}
-
-				// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
-				RSA              -> TODO()
-				EdDsaSASecp256k1 -> TODO()
-			}
+			if (!signature.value.isValidSignature(document.raw, publicKey)) return Failure(InvalidSignatureFailure(publicKey.id))
 		}
 		return Success(Unit)
 	}
 
-	private fun Action.ensureIs(expected: Action) {
-		if (this != expected)
+	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
+		return when (publicKey.type) {
+			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
+
+			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+			RSA              -> TODO()
+			EdDsaSASecp256k1 -> TODO()
+		}
+	}
+
+	private fun Action.ensureIs(vararg expected: Action) {
+		if (!expected.contains(this))
 			throw IllegalArgumentException("Can't validate a $this action using a $expected method.")
 	}
 
@@ -241,6 +267,7 @@ sealed class DidEnvelopeFailure : FailureCode() {
 		class UntargetedPublicKeyFailure(val target: URI) : ValidationFailure("No signature was provided for target $target")
 		class CryptoSuiteMismatchFailure(val target: URI, val keySuite: CryptoSuite, val signatureSuite: CryptoSuite) : ValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
 		class InvalidSignatureFailure(val target: URI) : ValidationFailure("Signature for $target is invalid.")
+		class NoMatchingSignatureFailure : ValidationFailure("No signature is provided for any of the keys.")
 		class MissingSignatureFailure(val target: URI) : ValidationFailure("Signature for $target is missing.")
 		class MissingTemporalInformationFailure : ValidationFailure("The document is missing information about its creation")
 		class InvalidTemporalRelationFailure : ValidationFailure("Documents temporal relation is incorrect")

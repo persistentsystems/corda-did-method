@@ -94,7 +94,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument))
+		val actual = envelope.validateModification(DidDocument(originalDocument))
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -197,7 +197,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(oldDocument))
+		val actual = envelope.validateModification(DidDocument(oldDocument))
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -270,7 +270,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(oldDocument))
+		val actual = envelope.validateModification(DidDocument(oldDocument))
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -340,7 +340,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
@@ -409,7 +409,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
@@ -478,7 +478,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<MissingTemporalInformationFailure>())
 	}
@@ -548,7 +548,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
@@ -619,7 +619,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
@@ -702,7 +702,7 @@ class DidEnvelopeUpdateTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateUpdate(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<MissingSignatureFailure>(has(MissingSignatureFailure::target, equalTo(keyUri2))))
