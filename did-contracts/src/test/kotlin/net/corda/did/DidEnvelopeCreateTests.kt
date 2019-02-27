@@ -34,7 +34,7 @@ class DidEnvelopeCreateTests {
 		/*
 		 * 1. Generate a valid ID
 		 */
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		/*
 		 * 2. Generate a key pair
@@ -97,7 +97,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation succeeds for an envelope with multiple keys`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val keyPair1 = KeyPairGenerator().generateKeyPair()
 		val keyPair2 = KeyPairGenerator().generateKeyPair()
@@ -156,7 +156,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope with multiple signatures targeting the same key`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val kp = KeyPairGenerator().generateKeyPair()
 
@@ -206,7 +206,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope clashing key IDs`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val keyPair1 = KeyPairGenerator().generateKeyPair()
 		val keyPair2 = KeyPairGenerator().generateKeyPair()
@@ -264,7 +264,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope without keys`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -284,7 +284,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope with fewer signatures than keys`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val keyPair1 = KeyPairGenerator().generateKeyPair()
 		val keyPair2 = KeyPairGenerator().generateKeyPair()
@@ -336,7 +336,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope using a non-Ed25519 key`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
 
@@ -402,7 +402,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope with mismatched crypto suites`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
 		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
@@ -452,7 +452,7 @@ class DidEnvelopeCreateTests {
 
 	@Test
 	fun `Validation fails for an envelope with invalid signature`() {
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		val keyPair = KeyPairGenerator().generateKeyPair()
 

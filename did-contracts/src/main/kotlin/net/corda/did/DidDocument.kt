@@ -30,8 +30,8 @@ import javax.xml.bind.DatatypeConverter
  */
 class DidDocument(document: String) : JsonBacked(document) {
 
-	fun id(): DidDocumentResult<Did> = json.getMandatoryString("id").map {
-		Did(it)
+	fun id(): DidDocumentResult<CordaDid> = json.getMandatoryString("id").map {
+		CordaDid(it)
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}

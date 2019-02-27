@@ -24,7 +24,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		/*
 		 * Generate a key pair for the original document
@@ -88,7 +88,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		/*
 		 * Generate a key pair for the original document
@@ -156,7 +156,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
 
 		/*
 		 * Generate a key pair for the original document

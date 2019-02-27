@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import net.corda.assertSuccess
 import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite.Ed25519
-import net.corda.did.SpecExamples.`Minimal self-managed DID Document`
 import org.junit.Test
 import java.net.URI
 import java.time.Instant
@@ -16,11 +15,28 @@ class DidDocumentTests {
 
 	@Test
 	fun `ID can be extracted from a DID document`() {
-		val example = DidDocument(`Minimal self-managed DID Document`)
+		val example = DidDocument("""{
+			  "@context": "https://w3id.org/did/v1",
+			  "id": "did:corda:tcn:0e61ab14-73a3-4a7b-846b-15d6bca78b31",
+			  "publicKey": [{
+				"id": "did:example:123456789abcdefghi#keys-1",
+				"type": "RsaVerificationKey2018",
+				"controller": "did:example:123456789abcdefghi",
+				"publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
+			  }],
+			  "authentication": [{
+				"type": "RsaSignatureAuthentication2018",
+				"publicKey": "did:example:123456789abcdefghi#keys-1"
+			  }],
+			  "service": [{
+				"type": "ExampleService",
+				"serviceEndpoint": "https://example.com/endpoint/8377464"
+			  }]
+			}""".trimIndent())
 
 		assertThat(
 				actual = example.id().assertSuccess().toExternalForm(),
-				criteria = equalTo(Did("did:example:123456789abcdefghi").toExternalForm())
+				criteria = equalTo(CordaDid("did:corda:tcn:0e61ab14-73a3-4a7b-846b-15d6bca78b31").toExternalForm())
 		)
 	}
 
