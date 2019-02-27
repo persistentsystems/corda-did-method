@@ -4,7 +4,6 @@ import com.grack.nanojson.JsonObject
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
-import com.natpryce.flatMap
 import com.natpryce.map
 import com.natpryce.mapFailure
 import com.natpryce.onFailure
@@ -31,17 +30,13 @@ import javax.xml.bind.DatatypeConverter
  */
 class DidDocument(document: String) : JsonBacked(document) {
 
-	fun id(): DidDocumentResult<Did> = json().flatMap {
-		it.getMandatoryString("id")
-	}.map {
+	fun id(): DidDocumentResult<Did> = json.getMandatoryString("id").map {
 		Did(it)
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}
 
-	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json().flatMap {
-		it.getMandatoryArray("publicKey")
-	}.map { keys ->
+	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json.getMandatoryArray("publicKey").map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
 			val id = key.getMandatoryUri("id").mapFailure {
 				InvalidDocumentJsonFailure(it)
@@ -70,17 +65,13 @@ class DidDocument(document: String) : JsonBacked(document) {
 
 	fun updated(): DidDocumentResult<Instant?> = getTimestamp("updated")
 
-	private fun getTimestamp(field: String): DidDocumentResult<Instant?> = json().mapFailure {
-		InvalidDocumentJsonFailure(it)
-	}.flatMap { json ->
-		json.getString(field)?.let {
-			try {
-				Success(DatatypeConverter.parseDateTime(it).toInstant())
-			} catch (e: IllegalArgumentException) {
-				Failure(InvalidTimeStampFormatFailure(it))
-			}
-		} ?: Success(null)
-	}
+	private fun getTimestamp(field: String): DidDocumentResult<Instant?> = json.getString(field)?.let {
+		try {
+			Success(DatatypeConverter.parseDateTime(it).toInstant())
+		} catch (e: IllegalArgumentException) {
+			Failure(InvalidTimeStampFormatFailure(it))
+		}
+	} ?: Success(null)
 }
 
 @Suppress("UNUSED_PARAMETER")

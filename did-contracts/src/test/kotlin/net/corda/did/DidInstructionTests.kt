@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
+import net.corda.JsonFailure.InvalidCryptoSuiteFailure
 import net.corda.assertFailure
 import net.corda.assertSuccess
 import net.corda.core.crypto.Base58
@@ -69,7 +70,7 @@ class DidInstructionTests {
 		  "signatures": [
 			{
 			  "id": "did:corda:tcn:d51924e1-66bb-4971-ab62-ec4910a1fb98#keys-1",
-			  "type": "Ed25519Signature2525",
+			  "type": "NonSenseCypherSignature1997",
 			  "signatureBase58": "54CnhKVqE63rMAeM1b8CyQjL4c8teS1DoyTfZnKXRvEEGWK81YA6BAgQHRah4z1VV4aJpd2iRHCrPoNTxGXBBoFw"
 			}
 		  ]
@@ -77,8 +78,12 @@ class DidInstructionTests {
 
 		val actual = DidInstruction(instruction).signatures().assertFailure()
 
-		// TODO moritzplatt 2019-02-18 -- should be a more specific error code
-		assertThat(actual, isA<InvalidInstructionJsonFailure>())
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<InvalidInstructionJsonFailure>(
+				has(InvalidInstructionJsonFailure::underlying, isA<InvalidCryptoSuiteFailure>(
+						has(InvalidCryptoSuiteFailure::value, equalTo("NonSenseCypherSignature1997"))
+				))
+		))
 	}
 
 	@Test

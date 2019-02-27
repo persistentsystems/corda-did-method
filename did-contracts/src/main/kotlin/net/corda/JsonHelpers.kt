@@ -64,7 +64,6 @@ typealias JsonResult<T> = Result<T, JsonFailure>
 
 @Suppress("UNUSED_PARAMETER", "unused")
 sealed class JsonFailure : FailureCode() {
-	class ParserFailure(val message: String?, val linePosition: Int, val characterPosition: Int, val characterOffset: Int) : JsonFailure()
 	class MissingPropertyFailure(val key: String) : JsonFailure()
 	class InvalidUriFailure(val value: String) : JsonFailure()
 	class InvalidBase58Representation(val value: String) : JsonFailure()

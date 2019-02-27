@@ -208,7 +208,7 @@ class DidEnvelope(
 		forEach { (publicKey, signature) ->
 			when (signature.suite) {
 				Ed25519          -> {
-					if (!signature.value.isValidEd25519Signature(document.raw(), publicKey.value.toEd25519PublicKey()))
+					if (!signature.value.isValidEd25519Signature(document.raw, publicKey.value.toEd25519PublicKey()))
 						return Failure(InvalidSignatureFailure(publicKey.id))
 				}
 

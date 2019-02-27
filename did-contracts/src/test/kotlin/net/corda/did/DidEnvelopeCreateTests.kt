@@ -1,12 +1,14 @@
 package net.corda.did
 
+import com.grack.nanojson.JsonParserException
 import com.natpryce.Success
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
-import net.corda.JsonFailure.MissingPropertyFailure
+import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.throws
 import net.corda.assertFailure
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
@@ -15,11 +17,9 @@ import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure
-import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
-import net.corda.did.DidInstructionFailure.InvalidInstructionJsonFailure
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
@@ -339,6 +339,7 @@ class DidEnvelopeCreateTests {
 		val documentId = Did("did:corda:tcn:${UUID.randomUUID()}")
 
 		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
+
 		// TODO moritzplatt 2019-02-18 -- this will become valid once the crypto suite limitation is removed
 		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
 
@@ -509,16 +510,14 @@ class DidEnvelopeCreateTests {
 
 		val instruction = "Bogus"
 
-		val actual = DidEnvelope(document, instruction).validateCreate().assertFailure()
-
 		@Suppress("RemoveExplicitTypeArguments")
-		assertThat(actual, isA<MalformedInstructionFailure>(
-				has(MalformedInstructionFailure::underlying, isA<InvalidInstructionJsonFailure>(
-						has(InvalidInstructionJsonFailure::underlying, isA<MissingPropertyFailure>(
-								has(MissingPropertyFailure::key, equalTo("action"))
-						))
-				))
-		))
+		assertThat({
+			DidEnvelope(document, instruction)
+		}, throws(isA<IllegalArgumentException>(
+				has(IllegalArgumentException::cause, present(isA<JsonParserException>(
+						has(JsonParserException::message, equalTo("Unexpected token 'Bogus' on line 1, char 1"))
+				)))
+		)))
 	}
 
 	@Test
@@ -554,7 +553,7 @@ class DidEnvelopeCreateTests {
 	}
 
 	@Test
-	fun `validation succeeds for an envelope with an update date but only`() {
+	fun `validation succeeds for an envelope with an update date only`() {
 		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118",

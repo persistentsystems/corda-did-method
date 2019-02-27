@@ -3,28 +3,25 @@ package net.corda.did
 import com.grack.nanojson.JsonObject
 import com.grack.nanojson.JsonParser
 import com.grack.nanojson.JsonParserException
-import com.natpryce.Failure
-import com.natpryce.Success
-import net.corda.JsonFailure.ParserFailure
-import net.corda.JsonResult
+import net.corda.core.serialization.CordaSerializable
 import kotlin.text.Charsets.UTF_8
 
 /**
- * An abstract class that allows for ad-hoc parsing of JSON, storing the canonical string representation.
+ * An abstract class that allows for ad-hoc parsing of JSON, serialising the canonical string representation only.
  */
-abstract class JsonBacked(private val source: String) {
-	fun raw(): ByteArray = source.toByteArray(UTF_8)
+@Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
+@CordaSerializable
+abstract class JsonBacked(val source: String) {
+	// Corda serialisation dictates these won't be serialised. Only the fields in the constructor that have getters are.
+	// This means there is no volume overhead in storing these as fields.
+	val raw: ByteArray = source.toByteArray(UTF_8)
+	val json: JsonObject
 
-	fun source(): String = source
-
-	fun json(): JsonResult<JsonObject> = try {
-		Success(JsonParser.`object`().from(source))
-	} catch (e: JsonParserException) {
-		Failure(ParserFailure(
-				message = e.message,
-				linePosition = e.linePosition,
-				characterPosition = e.charPosition,
-				characterOffset = e.charOffset
-		))
+	init {
+		json = try {
+			JsonParser.`object`().from(source)
+		} catch (e: JsonParserException) {
+			throw IllegalArgumentException(e)
+		}
 	}
 }

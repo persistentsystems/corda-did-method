@@ -22,9 +22,7 @@ import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
 
 class DidInstruction(json: String) : JsonBacked(json) {
-	fun action(): DidInstructionResult<Action> = json().flatMap {
-		it.getMandatoryString("action")
-	}.mapFailure {
+	fun action(): DidInstructionResult<Action> = json.getMandatoryString("action").mapFailure {
 		InvalidInstructionJsonFailure(it)
 	}.flatMap {
 		it.toAction()
@@ -34,9 +32,7 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an
 	 * unknown crypto suite is detected.
 	 */
-	fun signatures(): DidInstructionResult<Set<QualifiedSignature>> = json().flatMap {
-		it.getMandatoryArray("signatures")
-	}.mapFailure {
+	fun signatures(): DidInstructionResult<Set<QualifiedSignature>> = json.getMandatoryArray("signatures").mapFailure {
 		InvalidInstructionJsonFailure(it)
 	}.map { signatures ->
 		signatures.filterIsInstance(JsonObject::class.java).map { signature ->
