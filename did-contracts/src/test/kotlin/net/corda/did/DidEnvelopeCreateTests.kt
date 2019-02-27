@@ -1,9 +1,12 @@
 package net.corda.did
 
-import com.natpryce.Failure
 import com.natpryce.Success
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
+import net.corda.JsonFailure.MissingPropertyFailure
 import net.corda.assertFailure
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
@@ -16,6 +19,7 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFa
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
+import net.corda.did.DidInstructionFailure.InvalidInstructionJsonFailure
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
@@ -387,7 +391,12 @@ class DidEnvelopeCreateTests {
 
 		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
 
-		assertThat(actual, isA<CryptoSuiteMismatchFailure>())
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<CryptoSuiteMismatchFailure>(
+				has(CryptoSuiteMismatchFailure::target, equalTo(rasKeyUri)) and
+						has(CryptoSuiteMismatchFailure::keySuite, equalTo(Ed25519)) and
+						has(CryptoSuiteMismatchFailure::signatureSuite, equalTo(RSA))
+		))
 	}
 
 	@Test
@@ -431,7 +440,13 @@ class DidEnvelopeCreateTests {
 
 		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
 
-		assertThat(actual, isA<CryptoSuiteMismatchFailure>())
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<CryptoSuiteMismatchFailure>(
+				has(CryptoSuiteMismatchFailure::target, equalTo(keyUri)) and
+						has(CryptoSuiteMismatchFailure::keySuite, equalTo(Ed25519)) and
+						has(CryptoSuiteMismatchFailure::signatureSuite, equalTo(RSA))
+		))
+
 	}
 
 	@Test
@@ -473,7 +488,8 @@ class DidEnvelopeCreateTests {
 
 		val actual = DidEnvelope(instruction, document).validateCreate().assertFailure()
 
-		assertThat(actual, isA<InvalidSignatureFailure>())
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<InvalidSignatureFailure>(has(InvalidSignatureFailure::target, equalTo(keyUri))))
 	}
 
 	@Test
@@ -493,7 +509,16 @@ class DidEnvelopeCreateTests {
 
 		val instruction = "Bogus"
 
-		assertThat(DidEnvelope(document, instruction).validateCreate(), isA<Failure<MalformedInstructionFailure>>())
+		val actual = DidEnvelope(document, instruction).validateCreate().assertFailure()
+
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<MalformedInstructionFailure>(
+				has(MalformedInstructionFailure::underlying, isA<InvalidInstructionJsonFailure>(
+						has(InvalidInstructionJsonFailure::underlying, isA<MissingPropertyFailure>(
+								has(MissingPropertyFailure::key, equalTo("action"))
+						))
+				))
+		))
 	}
 
 	@Test

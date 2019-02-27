@@ -62,11 +62,11 @@ fun JsonObject.getMandatoryBase58Bytes(key: String): JsonResult<ByteArray> = get
 
 typealias JsonResult<T> = Result<T, JsonFailure>
 
-@Suppress("UNUSED_PARAMETER")
+@Suppress("UNUSED_PARAMETER", "unused")
 sealed class JsonFailure : FailureCode() {
-	class ParserFailure(message: String?, linePosition: Int, characterPosition: Int, characterOffset: Int) : JsonFailure()
-	class MissingPropertyFailure(key: String) : JsonFailure()
-	class InvalidUriFailure(value: String) : JsonFailure()
-	class InvalidBase58Representation(value: String) : JsonFailure()
-	class InvalidCryptoSuiteFailure(value: String) : JsonFailure()
+	class ParserFailure(val message: String?, val linePosition: Int, val characterPosition: Int, val characterOffset: Int) : JsonFailure()
+	class MissingPropertyFailure(val key: String) : JsonFailure()
+	class InvalidUriFailure(val value: String) : JsonFailure()
+	class InvalidBase58Representation(val value: String) : JsonFailure()
+	class InvalidCryptoSuiteFailure(val value: String) : JsonFailure()
 }

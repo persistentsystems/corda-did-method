@@ -18,6 +18,8 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailur
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedDocumentFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.MalformedPrecursorFailure
+import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingTemporalInformationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.NoKeysFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
@@ -75,33 +77,8 @@ class DidEnvelope(
 		// perform temporal validation, ensuring the created/updated times are sound
 		validateTemporal(precursor).onFailure { return it }
 
-		return Success(Unit)
-	}
-
-	private fun validateTemporal(precursor: DidDocument): Result<Unit, ValidationFailure> {
-		// temporal validation
-		val precursorCreated = precursor.created().mapFailure {
-			MalformedDocumentFailure(it)
-		}.onFailure { return it }
-
-		val precursorUpdated = precursor.updated().mapFailure {
-			MalformedDocumentFailure(it)
-		}.onFailure { return it }
-
-		val created = document.created().mapFailure {
-			MalformedDocumentFailure(it)
-		}.onFailure { return it }
-
-		val updated = document.updated().mapFailure {
-			MalformedDocumentFailure(it)
-		}.onFailure { return it } ?: return Failure(MissingTemporalInformationFailure())
-
-		// fail if the created timestamp has been modified with an update
-		if (precursorCreated != created)
-			return Failure(InvalidTemporalRelationFailure())
-
-		if (precursorUpdated != null && !updated.isAfter(precursorUpdated))
-			return Failure(InvalidTemporalRelationFailure())
+		// perform key ownership validation
+		validateKeysForUpdate(precursor).onFailure { return it }
 
 		return Success(Unit)
 	}
@@ -176,8 +153,59 @@ class DidEnvelope(
 				))
 		}
 
-		// Fail is a signature is invalid
-		pairings.forEach { (publicKey, signature) ->
+		return pairings.verifySignatures()
+	}
+
+	private fun validateTemporal(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		// temporal validation
+		val precursorCreated = precursor.created().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val precursorUpdated = precursor.updated().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val created = document.created().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+
+		val updated = document.updated().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it } ?: return Failure(MissingTemporalInformationFailure())
+
+		// fail if the created timestamp has been modified with an update
+		if (precursorCreated != created)
+			return Failure(InvalidTemporalRelationFailure())
+
+		if (precursorUpdated != null && !updated.isAfter(precursorUpdated))
+			return Failure(InvalidTemporalRelationFailure())
+
+		return Success(Unit)
+	}
+
+	// validate that _each_ key in the precursor document has a signature in the current one
+	private fun validateKeysForUpdate(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		// standard validation has been performed prior to this so we know the keys in the precursor document have a
+		// valid signature
+		val precursorKeys = precursor.publicKeys().mapFailure {
+			MalformedPrecursorFailure(it)
+		}.onFailure { return it }
+
+		val currentSignatures = instruction.signatures().mapFailure {
+			MalformedInstructionFailure(it)
+		}.onFailure { return it }
+
+		return precursorKeys.map { precursorKey ->
+			val qualifiedSignature = currentSignatures.firstOrNull { signature ->
+				signature.target == precursorKey.id
+			} ?: return Failure(MissingSignatureFailure(precursorKey.id))
+			precursorKey to qualifiedSignature
+		}.verifySignatures()
+	}
+
+	private fun List<Pair<QualifiedPublicKey, QualifiedSignature>>.verifySignatures(): Result<Unit, ValidationFailure> {
+		forEach { (publicKey, signature) ->
 			when (signature.suite) {
 				Ed25519          -> {
 					if (!signature.value.isValidEd25519Signature(document.raw(), publicKey.value.toEd25519PublicKey()))
@@ -189,7 +217,6 @@ class DidEnvelope(
 				EdDsaSASecp256k1 -> TODO()
 			}
 		}
-
 		return Success(Unit)
 	}
 
@@ -197,21 +224,24 @@ class DidEnvelope(
 		if (this != expected)
 			throw IllegalArgumentException("Can't validate a $this action using a $expected method.")
 	}
+
 }
 
-@Suppress("UNUSED_PARAMETER")
+@Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
 sealed class DidEnvelopeFailure : FailureCode() {
 	sealed class ValidationFailure(description: String) : DidEnvelopeFailure() {
-		class MalformedInstructionFailure(underlying: DidInstructionFailure) : ValidationFailure("The instruction document is invalid: $underlying")
-		class MalformedDocumentFailure(underlying: DidDocumentFailure) : ValidationFailure("The DID is invalid: $underlying")
+		class MalformedInstructionFailure(val underlying: DidInstructionFailure) : ValidationFailure("The instruction document is invalid: $underlying")
+		class MalformedDocumentFailure(val underlying: DidDocumentFailure) : ValidationFailure("The DID is invalid: $underlying")
+		class MalformedPrecursorFailure(val underlying: DidDocumentFailure) : ValidationFailure("The precursor DID is invalid: $underlying")
 		class NoKeysFailure : ValidationFailure("The DID does not contain any public keys")
 		class SignatureTargetFailure : ValidationFailure("Multiple Signatures target the same key")
 		class DuplicatePublicKeyIdFailure : ValidationFailure("Multiple public keys have the same ID")
 		class SignatureCountFailure : ValidationFailure("The number of keys in the DID document does not match the number of signatures")
-		class UnsupportedCryptoSuiteFailure(suite: CryptoSuite) : ValidationFailure("$suite is no a supported cryptographic suite")
-		class UntargetedPublicKeyFailure(target: URI) : ValidationFailure("No signature was provided for target $target")
-		class CryptoSuiteMismatchFailure(target: URI, keySuite: CryptoSuite, signatureSuite: CryptoSuite) : ValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
-		class InvalidSignatureFailure(target: URI) : ValidationFailure("Signature for $target was invalid.")
+		class UnsupportedCryptoSuiteFailure(val suite: CryptoSuite) : ValidationFailure("$suite is no a supported cryptographic suite")
+		class UntargetedPublicKeyFailure(val target: URI) : ValidationFailure("No signature was provided for target $target")
+		class CryptoSuiteMismatchFailure(val target: URI, val keySuite: CryptoSuite, val signatureSuite: CryptoSuite) : ValidationFailure("$target is a key using $keySuite but is signed with $signatureSuite.")
+		class InvalidSignatureFailure(val target: URI) : ValidationFailure("Signature for $target is invalid.")
+		class MissingSignatureFailure(val target: URI) : ValidationFailure("Signature for $target is missing.")
 		class MissingTemporalInformationFailure : ValidationFailure("The document is missing information about its creation")
 		class InvalidTemporalRelationFailure : ValidationFailure("Documents temporal relation is incorrect")
 	}

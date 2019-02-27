@@ -2,6 +2,7 @@ package net.corda.did
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
 import net.corda.assertFailure
 import net.corda.assertSuccess
@@ -99,6 +100,9 @@ class DidInstructionTests {
 
 		val actual = DidInstruction(instruction).action().assertFailure()
 
-		assertThat(actual, isA<UnknownActionFailure>())
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<UnknownActionFailure>(
+				has(UnknownActionFailure::action, equalTo("doTheBartman"))
+		))
 	}
 }

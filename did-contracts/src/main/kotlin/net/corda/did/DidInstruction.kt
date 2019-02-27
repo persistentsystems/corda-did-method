@@ -72,10 +72,10 @@ private fun String.toAction(): DidInstructionResult<Action> = when (this) {
 	else     -> Failure(DidInstructionFailure.UnknownActionFailure(this))
 }
 
-@Suppress("UNUSED_PARAMETER")
+@Suppress("UNUSED_PARAMETER", "unused")
 sealed class DidInstructionFailure : FailureCode() {
-	class InvalidInstructionJsonFailure(underlying: JsonFailure) : DidInstructionFailure()
-	class UnknownActionFailure(action: String) : DidInstructionFailure()
+	class InvalidInstructionJsonFailure(val underlying: JsonFailure) : DidInstructionFailure()
+	class UnknownActionFailure(val action: String) : DidInstructionFailure()
 }
 
 private typealias DidInstructionResult<T> = Result<T, DidInstructionFailure>
