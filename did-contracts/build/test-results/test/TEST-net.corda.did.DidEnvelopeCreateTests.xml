@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="net.corda.did.DidEnvelopeCreateTests" tests="13" skipped="0" failures="0" errors="0" timestamp="2019-05-14T08:52:33" hostname="GOL010676" time="7.487">
+  <properties/>
+  <testcase name="Validation fails for an envelope with invalid signature" classname="net.corda.did.DidEnvelopeCreateTests" time="2.059"/>
+  <testcase name="Validation succeeds for an envelope with multiple keys" classname="net.corda.did.DidEnvelopeCreateTests" time="0.052"/>
+  <testcase name="Validation fails for an envelope with multiple signatures targeting the same key" classname="net.corda.did.DidEnvelopeCreateTests" time="0.023"/>
+  <testcase name="Validation fails for an envelope with mismatched crypto suites" classname="net.corda.did.DidEnvelopeCreateTests" time="0.873"/>
+  <testcase name="validation fails for an envelope stating it was updated before it was created" classname="net.corda.did.DidEnvelopeCreateTests" time="0.009"/>
+  <testcase name="Validation fails for an envelope using a non-Ed25519 key" classname="net.corda.did.DidEnvelopeCreateTests" time="3.247"/>
+  <testcase name="Validation fails for an envelope without keys" classname="net.corda.did.DidEnvelopeCreateTests" time="0.019"/>
+  <testcase name="Validation fails for an envelope with fewer signatures than keys" classname="net.corda.did.DidEnvelopeCreateTests" time="0.025"/>
+  <testcase name="Validation fails for an envelope clashing key IDs" classname="net.corda.did.DidEnvelopeCreateTests" time="0.048"/>
+  <testcase name="Validation succeeds for an envelope with a created date only" classname="net.corda.did.DidEnvelopeCreateTests" time="0.015"/>
+  <testcase name="validation succeeds for an envelope with an update date only" classname="net.corda.did.DidEnvelopeCreateTests" time="0.023"/>
+  <testcase name="Validation fails for an envelope with malformed instructions" classname="net.corda.did.DidEnvelopeCreateTests" time="1.049"/>
+  <testcase name="Validation succeeds for a valid envelope" classname="net.corda.did.DidEnvelopeCreateTests" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
