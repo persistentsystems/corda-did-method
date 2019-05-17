@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.atomix.catalyst:catalyst-buffer:1.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-buffer/1.1.2/76c3092fa11ca08469b18569fe9a5ff8547b9217/catalyst-buffer-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-buffer/1.1.2/6b4904b1537b6e7a9419e3a49ee5da80df24544f/catalyst-buffer-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

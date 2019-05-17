@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.sshd:sshd-core:1.6.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.sshd/sshd-core/1.6.0/548e2da643e88cda9d313efb2564a74f9943e491/sshd-core-1.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.sshd/sshd-core/1.6.0/852c1191df408bcfc0cbc739839a55cdb1be71e9/sshd-core-1.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

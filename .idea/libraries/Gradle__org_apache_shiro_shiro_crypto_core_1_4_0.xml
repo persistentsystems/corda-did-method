@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.shiro:shiro-crypto-core:1.4.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.shiro/shiro-crypto-core/1.4.0/7049325bba697985eee924eda03cb7971af1b808/shiro-crypto-core-1.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.shiro/shiro-crypto-core/1.4.0/1c4d9ef0228e85aeae95f56109eb4001354fc86e/shiro-crypto-core-1.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.atomix.copycat:copycat-client:1.2.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.copycat/copycat-client/1.2.3/76a0202498e5836196bfacdba8a85353fb790be0/copycat-client-1.2.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.copycat/copycat-client/1.2.3/755fee010ab5fa9c207a54c6fbb8079a9a72097a/copycat-client-1.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

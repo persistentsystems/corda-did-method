@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.atomix.catalyst:catalyst-serializer:1.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-serializer/1.1.2/25ab6195c729ffb79f51102d979a0bb1af31100f/catalyst-serializer-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-serializer/1.1.2/654078874e763beaeceaa6e73dd9ed7e5445ecfa/catalyst-serializer-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

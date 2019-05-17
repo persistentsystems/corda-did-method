@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.atomix.catalyst:catalyst-concurrent:1.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-concurrent/1.1.2/f7323bc5a1ebfd4710574cf5485956c949eec20b/catalyst-concurrent-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-concurrent/1.1.2/6336fcd8bb3816ababc8e0134944f0351140cf69/catalyst-concurrent-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,17 +1,52 @@
-apply plugin: "kotlin"
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+    id 'net.corda.plugins.quasar-utils'
+    id 'net.corda.plugins.cordformation'
+}
+
+ext {
+    spring_boot_version = '1.5.7.RELEASE'
+    spring_version = '4.3.11.RELEASE'
+    log4j_version = '2.10.0'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/kotlin/exposed' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
+}
+
+dependencyManagement {
+    dependencies {
+        dependency "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_version"
+    }
+}
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    compile "org.http4k:http4k-core:$http4k_version"
-    compile "org.http4k:http4k-server-jetty:$http4k_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile "junit:junit:$junit_version"
+
+    // Corda dependencies.
+    compile "net.corda:corda-core:$corda_release_version"
+    compile "net.corda:corda-jackson:$corda_release_version"
+    compile "net.corda:corda-rpc:$corda_release_version"
+    compile "net.corda:corda:$corda_release_version"
+    testCompile "net.corda:corda-node-driver:$corda_release_version"
+
+    compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version") {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+    compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
+    compile "org.apache.logging.log4j:log4j-web:$log4j_version"
 
     compile project(":did-contracts")
     compile project(":did-flows")
-
-    testCompile "junit:junit:$junit_version"
-    testCompile "com.natpryce:hamkrest:$hamkrest_version"
-    testCompile "org.http4k:http4k-testing-hamkrest:$http4k_version"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -20,4 +55,10 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         apiVersion = "1.2"
         jvmTarget = "1.8"
     }
+}
+
+task runPartyAServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'net.corda.did.api.ServerKt'
+    args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
 }

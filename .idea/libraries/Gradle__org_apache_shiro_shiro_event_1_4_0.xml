@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.shiro:shiro-event:1.4.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.shiro/shiro-event/1.4.0/df4e83b5200940439e0c7ba4fc145902900e2cd/shiro-event-1.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.shiro/shiro-event/1.4.0/4bf84d53d8b88885f289b3537596b22e417ac2ea/shiro-event-1.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

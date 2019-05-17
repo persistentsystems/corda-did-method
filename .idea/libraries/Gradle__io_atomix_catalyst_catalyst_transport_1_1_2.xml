@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.atomix.catalyst:catalyst-transport:1.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-transport/1.1.2/4a50b74deb6601d7fdca34e873a016c83db7bebf/catalyst-transport-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.atomix.catalyst/catalyst-transport/1.1.2/ea41457726ad87a4b3ce126ae201dc6bb25a9ba5/catalyst-transport-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

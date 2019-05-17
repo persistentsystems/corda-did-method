@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.natpryce:hamkrest:1.4.2.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.natpryce/hamkrest/1.4.2.2/41d18053bcc41f41ce2de934369d2f485a40c198/hamkrest-1.4.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.natpryce/hamkrest/1.4.2.2/c274f18a7e185074fea0fbe598917c911b84eefb/hamkrest-1.4.2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

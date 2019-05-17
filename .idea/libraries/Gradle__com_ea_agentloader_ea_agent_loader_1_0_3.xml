@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.ea.agentloader:ea-agent-loader:1.0.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ea.agentloader/ea-agent-loader/1.0.3/8de2c2da51edfcde8377e077b206fdd8c88bc7c6/ea-agent-loader-1.0.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ea.agentloader/ea-agent-loader/1.0.3/d8b6925bd899ccd6a45fffb70e53d89e7370bcc7/ea-agent-loader-1.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.palominolabs.metrics:metrics-new-relic:1.1.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.palominolabs.metrics/metrics-new-relic/1.1.1/144df72a532c94a5f94f61dda7633cc7535b6615/metrics-new-relic-1.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.palominolabs.metrics/metrics-new-relic/1.1.1/f3162db97fbe7041d4bff0eeb35ad3573f63a807/metrics-new-relic-1.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

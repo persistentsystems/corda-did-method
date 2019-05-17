@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/corda_did_method.iml" filepath="$PROJECT_DIR$/corda_did_method.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-api/did-api.iml" filepath="$PROJECT_DIR$/.idea/modules/did-api/did-api.iml" group="did-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-api/did-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/did-api/did-api_main.iml" group="did-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-api/did-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/did-api/did-api_test.iml" group="did-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts.iml" filepath="$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts.iml" group="did-contracts" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts_main.iml" filepath="$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts_main.iml" group="did-contracts" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts_test.iml" filepath="$PROJECT_DIR$/.idea/modules/did-contracts/did-contracts_test.iml" group="did-contracts" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-flows/did-flows.iml" filepath="$PROJECT_DIR$/.idea/modules/did-flows/did-flows.iml" group="did-flows" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-flows/did-flows_main.iml" filepath="$PROJECT_DIR$/.idea/modules/did-flows/did-flows_main.iml" group="did-flows" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-flows/did-flows_test.iml" filepath="$PROJECT_DIR$/.idea/modules/did-flows/did-flows_test.iml" group="did-flows" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver.iml" filepath="$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver.iml" group="did-resolver" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver_main.iml" filepath="$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver_main.iml" group="did-resolver" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver_test.iml" filepath="$PROJECT_DIR$/.idea/modules/did-resolver/did-resolver_test.iml" group="did-resolver" />
+    </modules>
+  </component>
+</project>

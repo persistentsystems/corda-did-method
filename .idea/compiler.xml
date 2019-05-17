@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="did-api_main" target="1.8" />
+      <module name="did-api_test" target="1.8" />
+      <module name="did-contracts_main" target="1.8" />
+      <module name="did-contracts_test" target="1.8" />
+      <module name="did-flows_main" target="1.8" />
+      <module name="did-flows_test" target="1.8" />
+      <module name="did-resolver_main" target="1.8" />
+      <module name="did-resolver_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
