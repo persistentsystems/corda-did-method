@@ -1,3 +1,8 @@
+/**
+* R3 copy
+*
+*/
+
 package net.corda.did
 
 import net.corda.did.Network.CordaNetwork

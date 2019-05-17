@@ -1,5 +1,8 @@
 package net.corda.did.contract
 
+import com.natpryce.Success
+import com.natpryce.get
+import com.natpryce.mapFailure
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.transactions.LedgerTransaction
@@ -46,5 +49,6 @@ class DidContract : Contract {
 		// https://w3c-ccg.github.io/did-spec/#delete-revoke
 		// TODO moritzplatt 2019-02-14 -- should this require a fully formed envelope?
 		class Delete(val envelope: DidEnvelope) : Commands
+
 	}
 }

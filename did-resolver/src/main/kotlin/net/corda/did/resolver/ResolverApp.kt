@@ -1,3 +1,8 @@
+/**
+ * R3 copy
+ *
+ */
+
 package net.corda.did.resolver
 
 import net.corda.did.resolver.registry.IdentityNodeProxy

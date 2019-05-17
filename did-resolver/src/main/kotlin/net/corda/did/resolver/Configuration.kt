@@ -1,3 +1,8 @@
+/**
+ * R3 copy
+ *
+ */
+
 package net.corda.did.resolver
 
 import com.natpryce.konfig.ParseResult

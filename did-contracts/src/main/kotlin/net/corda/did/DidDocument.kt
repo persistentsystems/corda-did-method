@@ -1,3 +1,8 @@
+/**
+ * R3 copy
+ *
+ */
+
 package net.corda.did
 
 import com.grack.nanojson.JsonObject
@@ -35,8 +40,6 @@ class DidDocument(document: String) : JsonBacked(document) {
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}
-
-	//fun authentication(): DidDocumentResult<Set<Qualifi>>
 
 	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json.getMandatoryArray("publicKey").map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
