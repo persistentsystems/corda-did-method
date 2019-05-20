@@ -6,12 +6,7 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonObject
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.map
-import com.natpryce.mapFailure
-import com.natpryce.onFailure
+import com.natpryce.*
 import net.corda.FailureCode
 import net.corda.JsonFailure
 import net.corda.did.DidDocumentFailure.InvalidDocumentJsonFailure
@@ -22,6 +17,7 @@ import net.corda.getMandatoryCryptoSuiteFromKeyID
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
 import java.time.Instant
+import java.util.*
 import javax.xml.bind.DatatypeConverter
 
 /**
@@ -40,6 +36,12 @@ class DidDocument(document: String) : JsonBacked(document) {
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}
+
+	fun UUID(): DidDocumentResult<UUID?> = id().map{
+			return Success(it.uuid)
+		}.mapFailure {
+			return Failure(DidDocumentFailure.InvalidUUIDFormatFailure(it.toString()))
+		}
 
 	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json.getMandatoryArray("publicKey").map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
@@ -83,6 +85,7 @@ class DidDocument(document: String) : JsonBacked(document) {
 sealed class DidDocumentFailure : FailureCode() {
 	class InvalidDocumentJsonFailure(underlying: JsonFailure) : DidDocumentFailure()
 	class InvalidTimeStampFormatFailure(input: String) : DidDocumentFailure()
+	class InvalidUUIDFormatFailure(input: String) : DidDocumentFailure()
 }
 
 private typealias DidDocumentResult<T> = Result<T, DidDocumentFailure>
