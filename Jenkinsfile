@@ -7,7 +7,7 @@ pipeline {
     agent {
         docker {
             image 'gradle:jdk8-slim'
-            args '-v /root/book_management:/home/gradle/.gradle'
+            args '-v /root/corda_did_method:/home/gradle/.gradle'
 
         }
     }
