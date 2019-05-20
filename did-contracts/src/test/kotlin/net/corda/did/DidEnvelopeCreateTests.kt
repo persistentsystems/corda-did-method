@@ -621,4 +621,37 @@ class DidEnvelopeCreateTests {
 
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
+
+	@Test
+	fun `validation fails if publicKey id does not contain did as prefix`() {
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
+		|  "created": "1970-01-01T00:00:00Z",
+		|
+		|  "publicKey": [
+		|	{
+		|	  "id": "did:corda:tcn:11f4e420-95dc-4969-91ea-4795883fa781#keys-1",
+		|	  "type": "Ed25519VerificationKey2018",
+		|	  "controller": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
+		|	  "publicKeyBase58": "GfHq2tTVk9z4eXgyTPxte7rrotCf1ueoXyJfRob7vTv9kGDhed6ESWnjLXav"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "did:corda:tcn:11f4e420-95dc-4969-91ea-4795883fa781#keys-1",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "2CDG4wegz92QBRAEdZsy4Wc4Tyij6FjnPKrDNcsaM73azWPPLy7vcSi2zyaP9Sqo4PNKWgw4YzY38f5HCpSEvLiL"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreation().assertFailure()
+
+		assertThat(actual, isA<DidEnvelopeFailure.ValidationFailure.InvalidPublicKeyId>())
+	}
 }
