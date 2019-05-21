@@ -10,6 +10,7 @@ import net.corda.core.identity.Party
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import net.corda.core.schemas.QueryableState
+import net.corda.core.serialization.CordaSerializable
 import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract
 
@@ -40,6 +41,7 @@ data class DidState(
 	fun isValid() = status == DidStatus.VALID
 }
 
+@CordaSerializable
 enum class DidStatus {
 	VALID,
 	INVALID

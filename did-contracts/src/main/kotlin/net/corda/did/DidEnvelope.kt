@@ -7,6 +7,8 @@ package net.corda.did
 
 import com.natpryce.*
 import net.corda.FailureCode
+import net.corda.core.serialization.ConstructorForDeserialization
+import net.corda.core.serialization.CordaSerializable
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Update
@@ -48,12 +50,13 @@ import java.net.URI
  * @param document The DID Document string to be written/updated
  */
 @Suppress("MemberVisibilityCanBePrivate")
+@CordaSerializable
 class DidEnvelope(
-		instruction: String,
-		document: String
+		val rawInstruction: String,
+		val rawDocument: String
 ) {
-	val instruction = DidInstruction(instruction)
-	val document = DidDocument(document)
+	 val instruction = DidInstruction(rawInstruction)
+	 val document = DidDocument(rawDocument)
 
 	/**
 	 * Validates that the envelope presented is formatted in a valid way to _create_ a DID.

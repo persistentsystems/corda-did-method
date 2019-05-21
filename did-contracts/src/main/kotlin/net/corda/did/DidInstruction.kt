@@ -15,6 +15,7 @@ import com.natpryce.mapFailure
 import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.JsonFailure
+import net.corda.core.serialization.CordaSerializable
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Read
@@ -26,6 +27,7 @@ import net.corda.getMandatoryCryptoSuiteFromSignatureID
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
 
+@CordaSerializable
 class DidInstruction(json: String) : JsonBacked(json) {
 	fun action(): DidInstructionResult<Action> = json.getMandatoryString("action").mapFailure {
 		InvalidInstructionJsonFailure(it)

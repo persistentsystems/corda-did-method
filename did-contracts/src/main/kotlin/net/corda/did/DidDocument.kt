@@ -9,6 +9,7 @@ import com.grack.nanojson.JsonObject
 import com.natpryce.*
 import net.corda.FailureCode
 import net.corda.JsonFailure
+import net.corda.core.serialization.CordaSerializable
 import net.corda.did.DidDocumentFailure.InvalidDocumentJsonFailure
 import net.corda.did.DidDocumentFailure.InvalidTimeStampFormatFailure
 import net.corda.getMandatoryArray
@@ -29,6 +30,7 @@ import javax.xml.bind.DatatypeConverter
  * that the document tree these operations work on will not be stored in a field to keep serialisation size small. This
  * means that usage of the convenience methods has a high computational overhead.
  */
+@CordaSerializable
 class DidDocument(document: String) : JsonBacked(document) {
 
 	fun id(): DidDocumentResult<CordaDid> = json.getMandatoryString("id").map {

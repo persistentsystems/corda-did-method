@@ -44,7 +44,7 @@ abstract class AbstractContractsStatesTestUtils {
 	val envelope = net.corda.did.DidEnvelope(instruction, document)
 	val ORIGINATOR = TestIdentity(CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US"))
 	var W1 = TestIdentity(CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US"))
-	var W2 = TestIdentity(CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US"))
+	var W2 = TestIdentity(CordaX500Name(organisation = "Binh", locality = "TestVillage", country = "US"))
 	val CordaDid = DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.VALID, UniqueIdentifier.fromString("77ccbf5e-4ddd-4092-b813-ac06084a3eb0"))
 }
 
