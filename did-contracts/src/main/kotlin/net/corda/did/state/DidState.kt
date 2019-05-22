@@ -1,5 +1,8 @@
+/**
+ * R3 copy
+ *
+ */
 package net.corda.did.state
-
 
 import com.natpryce.valueOrNull
 import net.corda.core.contracts.BelongsToContract
@@ -23,6 +26,10 @@ data class DidState(
 		override val linearId: UniqueIdentifier = UniqueIdentifier.fromString(envelope.document.UUID().valueOrNull().toString())
 ) : LinearState, QueryableState {
 
+	/**
+	 * Persistent code
+	 *
+	 */
 	override fun generateMappedObject(schema : MappedSchema) : PersistentState {
 		return when (schema) {
 			is DidStateSchemaV1 -> DidStateSchemaV1.PersistentDidState(
@@ -41,6 +48,10 @@ data class DidState(
 	fun isValid() = status == DidStatus.VALID
 }
 
+/**
+ * Persistent code
+ *
+ */
 @CordaSerializable
 enum class DidStatus {
 	VALID,

@@ -54,6 +54,10 @@ open class DidContract : Contract {
         class Delete(val envelope: DidEnvelope) : Commands
     }
 
+    /**
+     * Persistent code
+     *
+     */
     open fun verifyDidCreate(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
         val DIDState = tx.outputsOfType<DidState>().single()
@@ -67,5 +71,9 @@ open class DidContract : Contract {
     }
 }
 
+/**
+ * Persistent code
+ *
+ */
 sealed class DidContractException(message: String) : CordaRuntimeException(message)
 class InvalidDidEnvelopeException(override val message: String) : DidContractException(message)

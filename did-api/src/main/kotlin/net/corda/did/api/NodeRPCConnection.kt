@@ -1,3 +1,8 @@
+/**
+ * Persistent code
+ *
+ */
+
 package net.corda.did.api
 
 import net.corda.client.rpc.CordaRPCClient

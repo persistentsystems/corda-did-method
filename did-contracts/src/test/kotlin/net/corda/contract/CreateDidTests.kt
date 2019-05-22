@@ -1,3 +1,8 @@
+/**
+ * Persistent code
+ *
+ */
+
 package net.corda.contract
 
 import net.corda.AbstractContractsStatesTestUtils

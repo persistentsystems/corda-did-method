@@ -149,20 +149,17 @@ class DidEnvelope(
 			publicKey to signature
 		}
 
+
+		/**
+		 * Persistent code
+		 *
+		 */
 		// Fail if the id of the public key do not contain did as a prefix
 		publicKeys.map { publicKey ->
 			val publicKeyId = publicKey.id.toString()
 			val did = this.document.id().valueOrNull() as CordaDid
 			if (!publicKeyId.subSequence(0, publicKeyId.indexOf("#")).equals(did.toExternalForm()))
 				return Failure(ValidationFailure.InvalidPublicKeyId(publicKey.id))
-		}
-
-		// Fail if controller field in publicKey does not contain did as value
-		publicKeys.map { publicKey ->
-			val publicKeyController = publicKey.controller.toString()
-			val did = this.document.id().valueOrNull() as CordaDid
-			if (!publicKeyController.equals(did.toExternalForm()))
-				return Failure(ValidationFailure.InvalidPublicKeyController(publicKey.controller))
 		}
 
 		// Fail if the crypto suite for any given signature doesn't match the corresponding key's crypto suite
@@ -292,6 +289,5 @@ sealed class DidEnvelopeFailure : FailureCode() {
 		class MissingTemporalInformationFailure : ValidationFailure("The document is missing information about its creation")
 		class InvalidTemporalRelationFailure : ValidationFailure("Documents temporal relation is incorrect")
 		class InvalidPublicKeyId(val target: URI) : ValidationFailure("PublicKey ID must contain did as prefix for target $target")
-		class InvalidPublicKeyController(val target: URI) : ValidationFailure("PublicKey Controller must be equal to did for target $target")
 	}
 }

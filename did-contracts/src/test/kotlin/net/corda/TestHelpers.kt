@@ -1,7 +1,3 @@
-/**
- * R3 copy
- *
- */
 
 package net.corda
 
@@ -15,6 +11,10 @@ import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.testing.core.TestIdentity
 
+/**
+ * Persistent code
+ *
+ */
 abstract class AbstractContractsStatesTestUtils {
 	val instruction = """{
 		|  "action": "create",
@@ -48,12 +48,19 @@ abstract class AbstractContractsStatesTestUtils {
 	val CordaDid = DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.VALID, UniqueIdentifier.fromString("77ccbf5e-4ddd-4092-b813-ac06084a3eb0"))
 }
 
-
+/**
+ * R3 code
+ *
+ */
 fun <T, E> Result<T, E>.assertSuccess(): T = when (this) {
 	is Success -> this.value
 	is Failure -> throw AssertionFailedError("Expected result to be a success but it failed: ${this.reason}")
 }
 
+/**
+ * R3 code
+ *
+ */
 fun <T, E> Result<T, E>.assertFailure(): E = when (this) {
 	is Success -> throw AssertionFailedError("Expected result to be a failure but was a success")
 	is Failure -> this.reason

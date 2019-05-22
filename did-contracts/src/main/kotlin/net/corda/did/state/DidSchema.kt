@@ -1,3 +1,7 @@
+/**
+ * Persistent code
+ *
+ */
 package net.corda.did.state
 
 import net.corda.core.identity.Party
