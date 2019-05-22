@@ -2,10 +2,17 @@ package net.corda.contract
 
 import net.corda.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.TypeOnlyCommandData
+import net.corda.core.crypto.sign
+import net.corda.core.utilities.toBase58
+import net.corda.did.CryptoSuite
+import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract
 import net.corda.testing.node.MockServices
 import net.corda.testing.node.ledger
+import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
+import java.net.URI
+import java.util.*
 
 class CreateDidTests: AbstractContractsStatesTestUtils() {
 
@@ -75,6 +82,61 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
                 this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun `transaction validation fails for an envelope with multiple signatures targeting the same key`() {
+
+        val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uri = URI("${documentId.toExternalForm()}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+        val signature2 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+        val encodedSignature2 = signature2.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	},
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature2"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        ledgerServices.ledger {
+            transaction {
+                output(DidContract.DID_CONTRACT_ID, CordaDid.copy(envelope = DidEnvelope(instruction, document)))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                this.fails()
             }
         }
     }

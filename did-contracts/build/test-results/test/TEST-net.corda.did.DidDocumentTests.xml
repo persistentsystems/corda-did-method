@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="net.corda.did.DidDocumentTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2019-05-14T08:52:32" hostname="GOL010676" time="1.085">
-  <properties/>
-  <testcase name="timestamps can be extracted from a DID" classname="net.corda.did.DidDocumentTests" time="0.96"/>
-  <testcase name="ID can be extracted from a DID document" classname="net.corda.did.DidDocumentTests" time="0.08"/>
-  <testcase name="A supported public key can be extracted from a DID document" classname="net.corda.did.DidDocumentTests" time="0.041"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -86,6 +86,11 @@ lib/quasar.jar
 # IntelliJ
 **/out/
 /classes/
+/out/
+./did-flows/out/
+./did-contracts/out/
+./did-api/out/
+./did-resolver/out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

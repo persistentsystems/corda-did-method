@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="net.corda.did.DidEnvelopeDeleteTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2019-05-14T08:52:41" hostname="GOL010676" time="0.183">
-  <properties/>
-  <testcase name="Deletion succeeds for a valid envelope" classname="net.corda.did.DidEnvelopeDeleteTests" time="0.033"/>
-  <testcase name="Deletion fails for an envelope with irrelevant signatures" classname="net.corda.did.DidEnvelopeDeleteTests" time="0.022"/>
-  <testcase name="Deletion fails for an envelope with wrong signature" classname="net.corda.did.DidEnvelopeDeleteTests" time="0.127"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

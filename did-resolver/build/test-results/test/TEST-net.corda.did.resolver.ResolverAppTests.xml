@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="net.corda.did.resolver.ResolverAppTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2019-05-14T08:52:59" hostname="GOL010676" time="0.079">
-  <properties/>
-  <testcase name="resolver will return error for invalid input DID" classname="net.corda.did.resolver.ResolverAppTests" time="0.043"/>
-  <testcase name="resolver will return proxied content for valid request" classname="net.corda.did.resolver.ResolverAppTests" time="0.032"/>
-  <testcase name="resolver will return error when source fails" classname="net.corda.did.resolver.ResolverAppTests" time="0.003"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
