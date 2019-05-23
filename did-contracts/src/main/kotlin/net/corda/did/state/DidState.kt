@@ -23,7 +23,8 @@ data class DidState(
 		val originator: Party,
 		val witnesses: Set<Party>,
 		val status: DidStatus,
-		override val linearId: UniqueIdentifier = UniqueIdentifier.fromString(envelope.document.UUID().valueOrNull().toString())
+		override val linearId: UniqueIdentifier = UniqueIdentifier.fromString(envelope.document.UUID().valueOrNull().toString()) ,
+		override val participants: List<AbstractParty> = (witnesses + originator).toList()
 ) : LinearState, QueryableState {
 
 	/**
@@ -43,8 +44,6 @@ data class DidState(
 	}
 
 	override fun supportedSchemas() = listOf(DidStateSchemaV1)
-	override val participants: List<AbstractParty> = (witnesses + originator).toList()
-	fun isInvalid() = status == DidStatus.INVALID
 	fun isValid() = status == DidStatus.VALID
 }
 
