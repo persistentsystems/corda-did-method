@@ -7,6 +7,7 @@ package net.corda.contract
 
 import net.corda.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.TypeOnlyCommandData
+import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
@@ -250,58 +251,80 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
         }
     }
 
-   /*@Test
-   fun `transaction validation fails for an envelope with multiple signatures targeting the same key`() {
+    @Test
+    fun `linearId of did state should not change when updating did`() {
+        val envelope = getUpdatedEnvelope()
+        ledgerServices.ledger {
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, linearId = UniqueIdentifier()))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.fails()
+            }
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.verifies()
+            }
+        }
+    }
 
-       val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+    @Test
+    fun `did originator should not change when updating did`() {
+        val envelope = getUpdatedEnvelope()
+        ledgerServices.ledger {
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, originator = W1.party))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.fails()
+            }
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.verifies()
+            }
+        }
+    }
 
-       val kp = KeyPairGenerator().generateKeyPair()
+    @Test
+    fun `witness node list should not change when updating did`() {
+        val envelope = getUpdatedEnvelope()
+        ledgerServices.ledger {
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, witnesses = setOf()))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.fails()
+            }
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.verifies()
+            }
+        }
+    }
 
-       val pub = kp.public.encoded.toBase58()
 
-       val uri = URI("${documentId.toExternalForm()}#keys-1")
-
-       val document = """{
-       |  "@context": "https://w3id.org/did/v1",
-       |  "id": "${documentId.toExternalForm()}",
-       |  "publicKey": [
-       |	{
-       |	  "id": "$uri",
-       |	  "type": "${CryptoSuite.Ed25519.keyID}",
-       |	  "controller": "${documentId.toExternalForm()}",
-       |	  "publicKeyBase58": "$pub"
-       |	}
-       |  ]
-       |}""".trimMargin()
-
-       val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
-       val signature2 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
-
-       val encodedSignature1 = signature1.bytes.toBase58()
-       val encodedSignature2 = signature2.bytes.toBase58()
-
-       val instruction = """{
-       |  "action": "create",
-       |  "signatures": [
-       |	{
-       |	  "id": "$uri",
-       |	  "type": "Ed25519Signature2018",
-       |	  "signatureBase58": "$encodedSignature1"
-       |	},
-       |	{
-       |	  "id": "$uri",
-       |	  "type": "Ed25519Signature2018",
-       |	  "signatureBase58": "$encodedSignature2"
-       |	}
-       |  ]
-       |}""".trimMargin()
-
-       ledgerServices.ledger {
-           transaction {
-               output(DidContract.DID_CONTRACT_ID, CordaDid.copy(envelope = DidEnvelope(instruction, document)))
-               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
-               this.fails()
-           }
-       }
-   }*/
+    @Test
+    fun `participants list should not change while updating did`() {
+        val envelope = getUpdatedEnvelope()
+        ledgerServices.ledger {
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, participants = listOf()))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.fails()
+            }
+            transaction {
+                input(DidContract.DID_CONTRACT_ID, getDidState())
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                this.verifies()
+            }
+        }
+    }
 }
