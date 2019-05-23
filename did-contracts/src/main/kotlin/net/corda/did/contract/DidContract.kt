@@ -7,12 +7,14 @@ import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
 import net.corda.core.transactions.LedgerTransaction
+import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract.Commands.Create
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import java.security.PublicKey
 
+// Make the contract open for inheritance
 open class DidContract : Contract {
 
     companion object {
@@ -26,7 +28,7 @@ open class DidContract : Contract {
 
         when (command.value) {
             is Create -> verifyDidCreate(tx, command.signers.toSet())
-            //is Update -> TODO()
+            is Commands.Update -> verifyDidUpdate(tx, command.signers.toSet())
             //is Delete -> TODO()
             else -> throw IllegalArgumentException("Unrecognized command")
         }
@@ -63,11 +65,42 @@ open class DidContract : Contract {
         val DIDState = tx.outputsOfType<DidState>().single()
         "DID Create transaction should have zero inputs" using (tx.inputs.isEmpty())
         "DID Create transaction should have only one output" using (tx.outputs.size == 1)
+        // TODO need to discuss this
         "DID Create transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(DIDState.originator.owningKey))
 
         // validate did envelope
-        DIDState.envelope.validateCreation().map {  require(it == Unit) }.onFailure { throw InvalidDidEnvelopeException("Invalid Did envelope") }
-        "Status of newly created did must be 'VALID'" using(DIDState.status == DidStatus.VALID)
+        DIDState.envelope.validateCreation().map {  require(it == Unit) }.onFailure { throw InvalidDidEnvelopeException("Invalid Did envelope $it") }
+        "Status of newly created did must be 'VALID'" using(DIDState.isValid())
+    }
+
+    /**
+     * Persistent code
+     *
+     */
+    open fun verifyDidUpdate(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
+
+        val oldDIDState = tx.inputsOfType<DidState>().single()
+        val newDIDState = tx.outputsOfType<DidState>().single()
+        "DID Update transaction should have 1 input" using (tx.inputs.size == 1)
+        "DID Update transaction should have only one output" using (tx.outputs.size == 1)
+        // TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
+        "DID Update transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
+
+        // validate did document update
+        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentUpdateFailure("Failed to update DID document $it") }
+        "Status of the precursor DID must be 'VALID'" using(oldDIDState.isValid())
+        "Status of the updated DID must be 'VALID'" using(newDIDState.isValid())
+
+        val oldDid = oldDIDState.envelope.document.id().valueOrNull() as CordaDid
+        val newDid = newDIDState.envelope.document.id().valueOrNull() as CordaDid
+        "ID in the updated did document should not change" using(oldDid.toExternalForm().equals(newDid.toExternalForm()))
+
+        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId.equals(newDIDState.linearId))
+
+        // TODO state participants [List] and witness nodes [Set] changes is considered as a separate update transaction and hence separate command(DIDState update)--? should this be purely DID document update transaction
+        "DidState Originator should not change when updating DID document" using (oldDIDState.originator.equals(newDIDState.originator))
+        "DidState witness nodes list should not change when updating DID document" using (oldDIDState.witnesses.equals(newDIDState.witnesses))
+        "Participants list should not change when updating DID document" using(oldDIDState.participants.equals(newDIDState.participants))
     }
 }
 
@@ -77,3 +110,4 @@ open class DidContract : Contract {
  */
 sealed class DidContractException(message: String) : CordaRuntimeException(message)
 class InvalidDidEnvelopeException(override val message: String) : DidContractException(message)
+class DidDocumentUpdateFailure(override val message: String) : DidContractException(message)

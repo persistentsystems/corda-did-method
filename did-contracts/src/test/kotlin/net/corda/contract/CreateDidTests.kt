@@ -94,8 +94,6 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
     @Test
     fun `transaction validation fails for an envelope with multiple signatures targeting the same key`() {
 
-        val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID.randomUUID()}")
-
         val kp = KeyPairGenerator().generateKeyPair()
 
         val pub = kp.public.encoded.toBase58()

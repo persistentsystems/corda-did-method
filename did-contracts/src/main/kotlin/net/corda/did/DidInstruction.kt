@@ -35,6 +35,12 @@ class DidInstruction(json: String) : JsonBacked(json) {
 		it.toAction()
 	}
 
+	fun id(): DidInstructionResult<CordaDid> = json.getMandatoryString("id").map {
+		CordaDid(it)
+	}.mapFailure {
+		InvalidInstructionJsonFailure(it)
+	}
+
 	/**
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an
 	 * unknown crypto suite is detected.
