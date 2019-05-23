@@ -187,7 +187,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
 
     @Test
     fun `id of the updated did document should not change`() {
-
+        val envelope = getUpdatedEnvelope()
         /*
         * Generate a new key pair
         */
