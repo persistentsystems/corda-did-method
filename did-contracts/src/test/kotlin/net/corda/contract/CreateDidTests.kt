@@ -92,6 +92,22 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
     }
 
     @Test
+    fun `originator must be added to the participants list`() {
+        ledgerServices.ledger {
+            transaction {
+                output(DidContract.DID_CONTRACT_ID, CordaDid.copy(participants = listOf()))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                this.fails()
+            }
+            transaction {
+                output(DidContract.DID_CONTRACT_ID, CordaDid)
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
     fun `transaction validation fails for an envelope with multiple signatures targeting the same key`() {
 
         val kp = KeyPairGenerator().generateKeyPair()

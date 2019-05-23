@@ -71,6 +71,7 @@ open class DidContract : Contract {
         // validate did envelope
         DIDState.envelope.validateCreation().map {  require(it == Unit) }.onFailure { throw InvalidDidEnvelopeException("Invalid Did envelope $it") }
         "Status of newly created did must be 'VALID'" using(DIDState.isValid())
+        "Originator and witness nodes should be added to the participants list" using(DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
     }
 
     /**
