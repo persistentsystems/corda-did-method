@@ -20,6 +20,11 @@ import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
 
+/**
+ * Test cases for DIDState evolution (Update command). Envelope test are covered in DIDEnvelope test files
+ *
+ */
+
 class UpdateDidTests: AbstractContractsStatesTestUtils() {
 
     class DummyCommand : TypeOnlyCommandData()
@@ -189,6 +194,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
     @Test
     fun `id of the updated did document should not change`() {
         val envelope = getUpdatedEnvelope()
+
         /*
         * Generate a new key pair
         */
@@ -307,7 +313,6 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             }
         }
     }
-
 
     @Test
     fun `participants list should not change while updating did`() {

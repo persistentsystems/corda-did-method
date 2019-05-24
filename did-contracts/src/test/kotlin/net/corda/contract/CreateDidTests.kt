@@ -7,6 +7,7 @@ package net.corda.contract
 
 import net.corda.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.TypeOnlyCommandData
+import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
@@ -19,6 +20,10 @@ import org.junit.Test
 import java.net.URI
 import java.util.*
 
+/**
+ * Test cases for DIDState evolution (Create command). Envelope test are covered in DIDEnvelope test files
+ *
+ */
 class CreateDidTests: AbstractContractsStatesTestUtils() {
 
     class DummyCommand : TypeOnlyCommandData()
@@ -156,6 +161,22 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
                 output(DidContract.DID_CONTRACT_ID, CordaDid.copy(envelope = DidEnvelope(instruction, document)))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
                 this.fails()
+            }
+        }
+    }
+
+    @Test
+    fun `Linear Id of DidState must be equal to the UUID component of did`() {
+        ledgerServices.ledger {
+            transaction {
+                output(DidContract.DID_CONTRACT_ID, CordaDid.copy(linearId = UniqueIdentifier()))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                this.fails()
+            }
+            transaction {
+                output(DidContract.DID_CONTRACT_ID, CordaDid)
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                this.verifies()
             }
         }
     }

@@ -11,10 +11,10 @@ import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract.Commands.Create
 import net.corda.did.state.DidState
-import net.corda.did.state.DidStatus
 import java.security.PublicKey
+import java.util.*
 
-// Make the contract open for inheritance
+// Make the contract open for inheritance--?
 open class DidContract : Contract {
 
     companion object {
@@ -72,6 +72,8 @@ open class DidContract : Contract {
         DIDState.envelope.validateCreation().map {  require(it == Unit) }.onFailure { throw InvalidDidEnvelopeException("Invalid Did envelope $it") }
         "Status of newly created did must be 'VALID'" using(DIDState.isValid())
         "Originator and witness nodes should be added to the participants list" using(DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
+        val UUID = DIDState.envelope.document.UUID().valueOrNull() as UUID
+        "LinearId of the DidState must be equal to the UUID component of did" using(UUID.equals(DIDState.linearId.id))
     }
 
     /**
