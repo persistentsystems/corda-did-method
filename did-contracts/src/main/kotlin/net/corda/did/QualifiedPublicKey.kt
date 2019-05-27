@@ -17,4 +17,14 @@ class QualifiedPublicKey(
 		// TODO moritzplatt 2019-02-13 -- what validation to apply here?
 		val controller: URI,
 		val value: ByteArray
-)
+){
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (other == null || javaClass != other.javaClass) return false
+		val otherKey = other as QualifiedPublicKey
+		return id == otherKey.id &&
+				type == otherKey.type &&
+				controller == otherKey.controller &&
+				java.util.Arrays.equals(value, otherKey.value)
+	}
+}

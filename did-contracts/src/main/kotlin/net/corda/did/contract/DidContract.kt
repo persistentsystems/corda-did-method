@@ -9,6 +9,7 @@ import net.corda.core.contracts.Requirements.using
 import net.corda.core.transactions.LedgerTransaction
 import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
+import net.corda.did.QualifiedPublicKey
 import net.corda.did.contract.DidContract.Commands.Create
 import net.corda.did.state.DidState
 import java.security.PublicKey
@@ -29,7 +30,7 @@ open class DidContract : Contract {
         when (command.value) {
             is Create -> verifyDidCreate(tx, command.signers.toSet())
             is Commands.Update -> verifyDidUpdate(tx, command.signers.toSet())
-            //is Delete -> TODO()
+            is Commands.Delete -> verifyDidDelete(tx, command.signers.toSet())
             else -> throw IllegalArgumentException("Unrecognized command")
         }
 
@@ -89,14 +90,14 @@ open class DidContract : Contract {
         // TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
         "DID Update transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
 
-        // validate did document update
-        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentUpdateFailure("Failed to update DID document $it") }
+        // validate modification
+        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentModificationFailure("Failed to update DID document $it") }
         "Status of the precursor DID must be 'VALID'" using(oldDIDState.isValid())
         "Status of the updated DID must be 'VALID'" using(newDIDState.isValid())
 
         val oldDid = oldDIDState.envelope.document.id().valueOrNull() as CordaDid
         val newDid = newDIDState.envelope.document.id().valueOrNull() as CordaDid
-        "ID in the updated did document should not change" using(oldDid.toExternalForm().equals(newDid.toExternalForm()))
+        "ID of the updated did document should not change" using(oldDid.toExternalForm().equals(newDid.toExternalForm()))
 
         "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId.equals(newDIDState.linearId))
 
@@ -104,6 +105,37 @@ open class DidContract : Contract {
         "DidState Originator should not change when updating DID document" using (oldDIDState.originator.equals(newDIDState.originator))
         "DidState witness nodes list should not change when updating DID document" using (oldDIDState.witnesses.equals(newDIDState.witnesses))
         "Participants list should not change when updating DID document" using(oldDIDState.participants.equals(newDIDState.participants))
+    }
+
+    /**
+     * Persistent code
+     *
+     */
+
+    // Delete will just mark the state as INVALID
+    open fun verifyDidDelete(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
+
+        val oldDIDState = tx.inputsOfType<DidState>().single()
+        val newDIDState = tx.outputsOfType<DidState>().single()
+        "DID Delete transaction should have 1 input" using (tx.inputs.size == 1)
+        "DID Delete transaction should have only one output" using (tx.outputs.size == 1)
+        // TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
+        "DID Delete transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
+
+        // validate modification
+        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentModificationFailure("Failed to delete DID document $it") }
+        "Status of the precursor DID must be 'VALID'" using(oldDIDState.isValid())
+        "Status of the updated DID must be 'INVALID'" using(!newDIDState.isValid())
+
+        val oldDidKeys = oldDIDState.envelope.document.publicKeys().valueOrNull() as Set<QualifiedPublicKey>
+        val newDidKeys = newDIDState.envelope.document.publicKeys().valueOrNull() as Set<QualifiedPublicKey>
+        "Delete transaction should not change the public Keys in DID document" using(oldDidKeys.equals(newDidKeys))
+
+        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId.equals(newDIDState.linearId))
+
+        "DidState Originator should not change when deleting DID" using (oldDIDState.originator.equals(newDIDState.originator))
+        "DidState witness nodes list should not change when deleting DID" using (oldDIDState.witnesses.equals(newDIDState.witnesses))
+        "Participants list should not change when deleting DID" using(oldDIDState.participants.equals(newDIDState.participants))
     }
 }
 
@@ -113,4 +145,4 @@ open class DidContract : Contract {
  */
 sealed class DidContractException(message: String) : CordaRuntimeException(message)
 class InvalidDidEnvelopeException(override val message: String) : DidContractException(message)
-class DidDocumentUpdateFailure(override val message: String) : DidContractException(message)
+class DidDocumentModificationFailure(override val message: String) : DidContractException(message)
