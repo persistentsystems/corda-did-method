@@ -28,26 +28,37 @@ dependencyManagement {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
+    compile 'com.google.code.gson:gson:2.2.+'
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile "junit:junit:$junit_version"
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.7.RELEASE'
 
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-test
     // Corda dependencies.
     compile "net.corda:corda-core:$corda_release_version"
     compile "net.corda:corda-jackson:$corda_release_version"
     compile "net.corda:corda-rpc:$corda_release_version"
     compile "net.corda:corda:$corda_release_version"
     testCompile "net.corda:corda-node-driver:$corda_release_version"
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude module: 'junit'
+        exclude module: 'mockito-core'
+    }
+    testImplementation 'com.ninja-squad:springmockk:1.1.0'
 
     compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
     compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
     compile "org.apache.logging.log4j:log4j-web:$log4j_version"
-
+    
     compile project(":did-contracts")
     compile project(":did-flows")
 }
+
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
