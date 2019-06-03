@@ -318,7 +318,7 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val altered_document="""{
+        val alteredDocument="""{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0",
 		|  "created": "1970-01-01T00:00:00Z",
@@ -331,7 +331,7 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val signature1 = kp.private.sign(altered_document.toByteArray(Charsets.UTF_8))
+        val signature1 = kp.private.sign(alteredDocument.toByteArray(Charsets.UTF_8))
 
         val encodedSignature1 = signature1.bytes.toBase58()
 
@@ -342,6 +342,49 @@ class DIDAPITest{
 		|	  "id": "$uri",
 		|	  "type": "Ed25519Signature2018",
 		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val builder = MockMvcRequestBuilders.fileUpload("http://localhost:50005/did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+
+    }
+    @Test
+    fun `Create a DID with no signature should fail` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uuid=UUID.randomUUID()
+
+        val documentId="did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018"
 		|	}
 		|  ]
 		|}""".trimMargin()

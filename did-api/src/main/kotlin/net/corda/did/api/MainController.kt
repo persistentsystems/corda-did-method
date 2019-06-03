@@ -5,6 +5,7 @@
 
 package net.corda.did.api
 import com.natpryce.map
+import com.natpryce.onFailure
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
@@ -64,7 +65,7 @@ class MainController(rpc: NodeRPCConnection) {
     /**
      * Create DID
      */
-    //@RequestParam("instruction") instruction: String,@RequestParam("document") document: String
+
     @PostMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun createDID(@PathVariable(value = "did") did: String,@RequestParam("instruction") instruction: String,@RequestParam("document") document: String ) : ResponseEntity<Any?> {
@@ -72,35 +73,30 @@ class MainController(rpc: NodeRPCConnection) {
 
             val envelope = net.corda.did.DidEnvelope(instruction,document)
             val documentId = net.corda.did.CordaDid(did).uuid
-            try{
-                queryUtils.getDIDDocumentByLinearId(documentId.toString())
-                return ResponseEntity(HttpStatus.CONFLICT)
-            }
-            catch(e:NullPointerException) {
-                /**
-                 * Validate  creation envelope
-                 */
-                try {
-                    envelope.validateCreation()
-                }
-                catch(e:Exception){
-                    return ResponseEntity.badRequest().body(e.message)
-                }
 
-                logger.info("document id=" + documentId)
-                val originator = proxy.nodeInfo().legalIdentities.first()
-                /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
-                var w1 = proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyB,L=New York,C=US"))!!
-                var w2 = proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyB,L=New York,C=US"))!!
-                try {
-                    val cordaDid = DidState(envelope, originator, setOf(w1, w2), DidStatus.VALID, UniqueIdentifier.fromString(documentId.toString()))
-                    val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, cordaDid)
-                    val result = flowHandler.use { it.returnValue.getOrThrow() }
-                    return ResponseEntity.ok().body(result.toString())
-                } catch (e: IllegalArgumentException) {
-                    return ResponseEntity.badRequest().body(e.message)
-                }
+            val queriedDid=queryUtils.getDIDDocumentByLinearId(documentId.toString())
+            if( !queriedDid.isEmpty() ){
+                return ResponseEntity ( HttpStatus.CONFLICT )
             }
+            /**
+            * Validate envelope
+            */
+            val envelopeVerifed=envelope.validateCreation()
+            envelopeVerifed.onFailure { logger.error("verification of enveloped failed"+it.reason);return ResponseEntity.badRequest().body(it.reason) }
+            logger.info("document id" + documentId)
+            val originator = proxy.nodeInfo().legalIdentities.first()
+            /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
+            var w1 = proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyB,L=New York,C=US"))!!
+            var w2 = proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyB,L=New York,C=US"))!!
+            try {
+            val cordaDid = DidState(envelope, originator, setOf(w1, w2), DidStatus.VALID, UniqueIdentifier.fromString(documentId.toString()))
+            val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, cordaDid)
+            val result = flowHandler.use { it.returnValue.getOrThrow() }
+            return ResponseEntity.ok().body(result.toString())
+            } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(e.message)
+            }
+
 
         }
         catch(e:Exception){
@@ -119,14 +115,13 @@ class MainController(rpc: NodeRPCConnection) {
         try {
             val documentId = net.corda.did.CordaDid(did).uuid
             builder {
-                val responseData = queryUtils.getDIDDocumentByLinearId(documentId.toString())
-                return ResponseEntity.ok().body(responseData)
-            }
-        }
-        catch (e:NullPointerException){
-            logger.error(e.toString())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requested DID not found");
+                val queriedData = queryUtils.getDIDDocumentByLinearId(documentId.toString())
+                if(queriedData.isEmpty()){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requested DID not found");
 
+                }
+                return ResponseEntity.ok().body(queriedData)
+            }
         }
         catch (e:Exception){
             logger.error(e.toString())

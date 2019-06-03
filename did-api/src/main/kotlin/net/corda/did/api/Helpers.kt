@@ -12,8 +12,15 @@ class QueryUtil(private val proxy: CordaRPCOps) {
     fun getDIDDocumentByLinearId(linearId: String): String {
         val criteria= QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
         val results = proxy.vaultQueryBy<DidState>(criteria).states
-        val responseData = results.singleOrNull()!!.state.data.envelope.document.json
-        return responseData.toString()
+        try {
+            val responseData = results.singleOrNull()!!.state.data.envelope.document.json
+            return responseData.toString()
+        }
+        catch(e:NullPointerException){
+             return ""
+        }
+
+
     }
 
 
