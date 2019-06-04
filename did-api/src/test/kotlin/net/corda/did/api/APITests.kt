@@ -24,9 +24,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.net.URI
 import java.util.*
 import java.io.FileInputStream
-import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.test.web.servlet.request.RequestPostProcessor
-
 
 
 class DIDAPITest{
