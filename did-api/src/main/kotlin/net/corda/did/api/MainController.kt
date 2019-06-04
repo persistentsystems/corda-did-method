@@ -72,6 +72,21 @@ class MainController(rpc: NodeRPCConnection) {
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun createDID(@PathVariable(value = "did") did: String,@RequestParam("instruction") instruction: String,@RequestParam("document") document: String ) : ResponseEntity<Any?> {
         try {
+            if ( instruction.isEmpty() ){
+                logger.error("instruction is empty")
+                return ResponseEntity ( ApiResponse("Instruction is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+
+            }
+            if ( document.isEmpty() ){
+                logger.error("document is empty")
+                return ResponseEntity ( ApiResponse("Document is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+
+            }
+            if( did.isEmpty() ){
+                logger.error("did is empty")
+                return ResponseEntity ( ApiResponse("DID is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+
+            }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
             val documentId = net.corda.did.CordaDid(did).uuid
 
@@ -187,7 +202,7 @@ class MainController(rpc: NodeRPCConnection) {
             val documentId = net.corda.did.CordaDid(did).uuid
             builder {
                 val queriedData = queryUtils.getDIDDocumentByLinearId(documentId.toString())
-                if(queriedData.isEmpty()){
+                if( queriedData.isEmpty() ){
                     val response=ApiResponse("Requested DID not found")
                     return ResponseEntity(response.toResponseObj(),HttpStatus.NOT_FOUND)
 
