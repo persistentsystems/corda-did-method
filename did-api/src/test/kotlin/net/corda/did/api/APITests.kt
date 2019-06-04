@@ -17,6 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.net.URI
 import java.util.*
 import java.io.FileInputStream
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.test.web.servlet.request.RequestPostProcessor
+
+
 
 class DIDAPITest{
     lateinit var mockMvc: MockMvc
@@ -40,6 +44,11 @@ class DIDAPITest{
     @Test
     fun `Fetch a DID that does not exist`() {
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:6aaa437d-b62a-4170-b357-7a1c5ede2364")).andExpect(status().isNotFound()).andReturn()
+
+    }
+    @Test
+    fun `Fetch a DID with incorrect format`() {
+        mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"99")).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -82,7 +91,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
 
     }
@@ -124,7 +136,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString().substring(0,2)).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString().substring(0,2)).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
     }
     @Test
@@ -164,7 +179,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -207,7 +225,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
     }
     @Test
@@ -250,7 +271,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
         mockMvc.perform(builder).andExpect(status().isConflict()).andReturn()
 
@@ -295,7 +319,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(status().isOk()).andReturn()
 
@@ -353,7 +380,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -396,7 +426,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -440,7 +473,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -493,7 +529,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -527,7 +566,10 @@ class DIDAPITest{
         val encodedSignature1 = signature1.bytes.toBase58()
 
         val instruction = "".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -559,7 +601,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -603,7 +648,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"").param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"").param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -647,7 +695,10 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document)
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }

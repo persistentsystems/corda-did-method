@@ -68,7 +68,7 @@ class MainController(rpc: NodeRPCConnection) {
      * Create DID
      */
 
-    @PostMapping(value = "{did}",
+    @PutMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun createDID(@PathVariable(value = "did") did: String,@RequestParam("instruction") instruction: String,@RequestParam("document") document: String ) : ResponseEntity<Any?> {
         try {
@@ -209,6 +209,11 @@ class MainController(rpc: NodeRPCConnection) {
                 }
                 return ResponseEntity.ok().body(queriedData)
             }
+        }
+        catch (e:IllegalArgumentException){
+            logger.error(e.toString())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse("The DID requested is not in the correct format").toResponseObj())
+
         }
         catch (e:Exception){
             logger.error(e.toString())
