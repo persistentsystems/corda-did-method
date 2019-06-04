@@ -2,6 +2,13 @@
  * Persistent code
  *
  */
+
+/*
+* The tests need a corda node to be running. The configuration can be found in config.properties
+*
+* */
+
+//TODO is there a way to mock a Corda node so it can be tested via these tests?
 package net.corda.did.api
 
 import net.corda.core.crypto.sign
