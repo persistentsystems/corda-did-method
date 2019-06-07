@@ -1,7 +1,10 @@
 package net.corda.did.api
 
 import net.corda.did.state.DidState
-
+/**
+ * Persistent code
+ *
+ */
 data class ApiResponse (
 
      var message: String? = null
