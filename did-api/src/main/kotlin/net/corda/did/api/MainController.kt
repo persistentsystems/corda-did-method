@@ -25,6 +25,8 @@ import net.corda.did.state.DidStatus
 import net.corda.did.flows.UpdateDidFlow
 
 
+
+
 val SERVICE_NAMES = listOf("Notary", "Network Map Service")
 
 /**
@@ -69,7 +71,7 @@ class MainController(rpc: NodeRPCConnection) {
 
     @PutMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
-    fun createDID(@PathVariable(value = "did") did: String,@RequestParam("instruction") instruction: String,@RequestParam("document") document: String ) : ResponseEntity<Any?> {
+    fun createDID(@PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : ResponseEntity<Any?> {
         try {
             logger.info("inside create function")
             if ( instruction.isEmpty() ){

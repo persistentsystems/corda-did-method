@@ -26,6 +26,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.net.URI
 import java.util.*
 import java.io.FileInputStream
+import org.springframework.mock.web.MockMultipartFile
+
+
 
 
 class DIDAPITest{
@@ -96,7 +99,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -142,7 +147,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -186,7 +193,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString().substring(0,2)).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString().substring(0,2)).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -229,7 +238,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -275,7 +286,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -321,7 +334,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -369,7 +384,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -430,7 +447,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -472,7 +491,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -519,7 +540,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -575,7 +598,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -610,7 +635,9 @@ class DIDAPITest{
 
 
         val instruction = "".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -644,7 +671,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -691,7 +720,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"").param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"").file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -736,7 +767,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -786,7 +819,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -889,7 +924,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -989,7 +1026,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1087,7 +1126,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1188,7 +1229,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1286,7 +1329,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1387,7 +1432,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1485,7 +1532,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1582,7 +1631,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1724,7 +1775,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
@@ -1824,7 +1877,9 @@ class DIDAPITest{
 		|	}
 		|  ]
 		|}""".trimMargin()
-        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
             request.method = "PUT"
             request
         }
