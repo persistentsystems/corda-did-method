@@ -183,7 +183,7 @@ class MainController(rpc: NodeRPCConnection) {
                  queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
             catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse("DID does not exists").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse(" Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**

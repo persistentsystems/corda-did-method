@@ -58,6 +58,51 @@ class DIDAPITest{
 
     }
     @Test
+    fun `Create a DID with no context should fail` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uuid = UUID.randomUUID()
+
+        val documentId = "did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
+        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+    }
+    @Test
     fun `Create a DID` () {
         val kp = KeyPairGenerator().generateKeyPair()
 
@@ -1505,7 +1550,7 @@ class DIDAPITest{
 
         val uuid = UUID.randomUUID()
 
-        val documentId="did:corda:tcn:"+uuid
+        val documentId = "did:corda:tcn:"+uuid
 
         val uri = URI("${documentId}#keys-1")
 
@@ -1598,6 +1643,245 @@ class DIDAPITest{
 
     }
 
+    @Test
+    fun `Update a DID that does not exist should fail` () {
 
+        val uuid = UUID.randomUUID()
+
+        val documentId="did:corda:tcn:"+uuid
+        val kp = KeyPairGenerator().generateKeyPair()
+        val uri = URI("${documentId}#keys-1")
+        val pub = kp.public.encoded.toBase58()
+        val documentNew = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+        |  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1New = kp.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+        val encodedSignature1New = signature1New.bytes.toBase58()
+        val instructionNew = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1New"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
+        mockMvc.perform(updateBuilder).andExpect(status().isNotFound())
+
+
+    }
+    @Test
+    fun `Update of a document with wrong uri should fail` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uuid = UUID.randomUUID()
+
+        val documentId = "did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
+        mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
+
+
+        /* update test*/
+        val kpNew = KeyPairGenerator().generateKeyPair()
+
+        val pubNew = kpNew.public.encoded.toBase58()
+
+        val uriNew = URI("${documentId}#keys-2")
+
+        val documentNew = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+        |  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uriNew",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	},
+        | {
+		|	  "id": "$uriNew",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pubNew"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1New = kp.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+        val signature2New = kpNew.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+        val encodedSignature1New = signature1New.bytes.toBase58()
+        val encodedSignature2New = signature2New.bytes.toBase58()
+        val instructionNew = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1New"
+		|	},
+		|	{
+		|	  "id": "$uriNew",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature2New"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
+        mockMvc.perform(updateBuilder).andExpect(status().is4xxClientError())
+
+
+
+    }
+    @Test
+    fun `Update of a document without context should fail` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uuid = UUID.randomUUID()
+
+        val documentId = "did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instruction).param("document",document).with { request ->
+            request.method = "PUT"
+            request
+        }
+        mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
+
+
+        /* update test*/
+        val kpNew = KeyPairGenerator().generateKeyPair()
+
+        val pubNew = kpNew.public.encoded.toBase58()
+
+        val uriNew = URI("${documentId}#keys-2")
+
+        val documentNew = """{
+		|  "id": "${documentId}",
+        |  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	},
+        | {
+		|	  "id": "$uriNew",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pubNew"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1New = kp.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+        val signature2New = kpNew.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+        val encodedSignature1New = signature1New.bytes.toBase58()
+        val encodedSignature2New = signature2New.bytes.toBase58()
+        val instructionNew = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1New"
+		|	},
+		|	{
+		|	  "id": "$uriNew",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature2New"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
+        mockMvc.perform(updateBuilder).andExpect(status().is4xxClientError())
+
+
+
+    }
 
     }

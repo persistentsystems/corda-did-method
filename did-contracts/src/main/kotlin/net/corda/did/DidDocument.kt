@@ -44,7 +44,11 @@ class DidDocument(document: String) : JsonBacked(document) {
 		}.mapFailure {
 			return Failure(DidDocumentFailure.InvalidUUIDFormatFailure(it.toString()))
 		}
-
+	fun context()= json.getMandatoryString("@context").map {
+		 it.isNotEmpty()
+	}.mapFailure {
+		InvalidDocumentJsonFailure(it)
+	}
 	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json.getMandatoryArray("publicKey").map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
 			val id = key.getMandatoryUri("id").mapFailure {

@@ -7,7 +7,6 @@ package net.corda.did
 
 import com.natpryce.*
 import net.corda.FailureCode
-import net.corda.core.serialization.ConstructorForDeserialization
 import net.corda.core.serialization.CordaSerializable
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
@@ -90,7 +89,11 @@ class DidEnvelope(
 	}
 
 	private fun validate(): Result<Unit, ValidationFailure> {
-		// extract temporal information
+
+		document.context().mapFailure {
+			MalformedDocumentFailure(it)
+		}.onFailure { return it }
+// extract temporal information
 		val created = document.created().mapFailure {
 			MalformedDocumentFailure(it)
 		}.onFailure { return it }
@@ -107,6 +110,7 @@ class DidEnvelope(
 		val signatures = instruction.signatures().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
 		}
+
 
 		val distinctSignatureTargets = signatures.map { it.target }.distinct()
 
