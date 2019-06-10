@@ -25,3 +25,4 @@ interface FlowLogicCommonMethods {
 
 class NotaryNotFoundException(override val message: String) : CordaRuntimeException(message)
 class DIDAlreadyExist(override val message: String) : CordaRuntimeException(message)
+class DIDNotFound(override val message: String) : CordaRuntimeException(message)
