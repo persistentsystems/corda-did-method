@@ -10,11 +10,11 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 
     @Test
     fun `create new did successfully`() {
-        // crete did
-        val tx = createDID()!!.tx
+        // create did
+        createDID()!!.tx
         mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on both all 3 nodes
+        // confirm did state with status as 'VALID' on all 3 nodes
         w1.transaction {
             val states = w1.services.vaultService.queryBy(DidState::class.java).states
             assert(states.size == 1)
@@ -59,8 +59,6 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
             assert(states[0].state.data.status == DidStatus.VALID)
         }
 
-
-       // mockNetwork.waitQuiescent()
         assertFailsWith<DIDAlreadyExist> { createDID() }
     }
 }
