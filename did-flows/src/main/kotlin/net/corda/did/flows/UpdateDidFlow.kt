@@ -16,6 +16,7 @@ import net.corda.did.utils.DIDAlreadyExist
 import net.corda.did.utils.FlowLogicCommonMethods
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
+import net.corda.did.utils.DIDNotFound
 import java.util.*
 
 @InitiatingFlow
@@ -53,7 +54,7 @@ class UpdateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
         val did = didState.envelope.document.id().valueOrNull() as CordaDid
 
         if( didStates.isEmpty() ) {
-            throw DIDAlreadyExist("DID with id ${did.toExternalForm()} does not exist")
+            throw DIDNotFound("DID with id ${did.toExternalForm()} does not exist")
         }
         val inputDidState = didStates.singleOrNull()!!
 
@@ -90,7 +91,7 @@ class UpdateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
 }
 
 @InitiatedBy(UpdateDidFlow::class)
-class DidUpdateFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
+class UpdateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         subFlow(ReceiveFinalityFlow(otherPartySession))

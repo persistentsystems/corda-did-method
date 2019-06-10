@@ -85,7 +85,7 @@ class CreateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
 }
 
 @InitiatedBy(CreateDidFlow::class)
-class DidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
+class CreateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         subFlow(ReceiveFinalityFlow(otherPartySession))
