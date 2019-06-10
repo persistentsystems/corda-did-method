@@ -10,6 +10,8 @@ import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.did.DidDocument
 import net.corda.did.state.DidState
+import net.corda.did.state.DidStatus
+
 class QueryUtil(private val proxy: CordaRPCOps) {
 
 
@@ -17,8 +19,12 @@ class QueryUtil(private val proxy: CordaRPCOps) {
         val criteria= QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
         val results = proxy.vaultQueryBy<DidState>(criteria).states
         try {
-            val responseData = results.singleOrNull()!!.state.data.envelope.document.json
-            return responseData
+            val responseState=results.singleOrNull()!!.state
+            if(responseState.data.status==DidStatus.DELETED){
+                throw  DIDDeletedException("Provided DID is deleted")
+            }
+            return responseState.data.envelope.document.json
+
         }
         catch(e:NullPointerException){
              return JsonObject()
@@ -29,7 +35,11 @@ class QueryUtil(private val proxy: CordaRPCOps) {
     fun getCompleteDIDDocumentByLinearId( linearId: String ): DidDocument {
         val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
         val results = proxy.vaultQueryBy<DidState>(criteria).states
-        return results.singleOrNull()!!.state.data.envelope.document
+        val responseState=results.singleOrNull()!!.state
+        if(responseState.data.status==DidStatus.DELETED){
+                throw  DIDDeletedException("Provided DID is deleted")
+        }
+        return responseState.data.envelope.document
 
     }
 
@@ -38,3 +48,5 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 
 
 }
+
+class DIDDeletedException(message:String):Exception(message)

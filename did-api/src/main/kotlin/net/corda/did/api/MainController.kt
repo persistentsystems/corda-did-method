@@ -149,6 +149,10 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse("The DID requested is not in the correct format").toResponseObj() )
 
         }
+        catch( e:DIDDeletedException ){
+            logger.info("DID no longer exists")
+            return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+        }
         catch ( e:Exception ){
             logger.error( e.toString() )
             return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body(ApiResponse("There was an error while fetching DID document").toResponseObj() )
@@ -187,6 +191,9 @@ class MainController(rpc: NodeRPCConnection) {
             }
             catch( e:NullPointerException ){
                 return ResponseEntity ( ApiResponse(" Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+            }
+            catch( e:DIDDeletedException ){
+                return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**
@@ -255,6 +262,9 @@ class MainController(rpc: NodeRPCConnection) {
             }
             catch( e:NullPointerException ){
                 return ResponseEntity ( ApiResponse(" Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+            }
+            catch( e:DIDDeletedException ){
+                return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**
