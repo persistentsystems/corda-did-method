@@ -34,6 +34,9 @@ abstract class AbstractFlowTestUtils {
 	val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 	val originalKeyPair = KeyPairGenerator().generateKeyPair()
 	val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
+	val newKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+	val newKeyPair = KeyPairGenerator().generateKeyPair()
+	val newKeyPairEncoded = newKeyPair.public.encoded.toBase58()
 	val originalDocument = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
@@ -63,7 +66,7 @@ abstract class AbstractFlowTestUtils {
 		mockNetwork.stopNodes()
 	}
 
-	private fun getDidStateForCreate() : DidState{
+	private fun getDidStateForCreateOperation(): DidState{
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 
@@ -82,7 +85,7 @@ abstract class AbstractFlowTestUtils {
 		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.VALID, UniqueIdentifier.fromString(UUID.toString()))
 	}
 
-	private fun getDidStateForDelete() : DidState{
+	protected fun getDidStateForDeleteOperation(): DidState {
 
 		val originalDocument = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -117,8 +120,50 @@ abstract class AbstractFlowTestUtils {
 		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.DELETED, UniqueIdentifier.fromString(UUID.toString()))
 	}
 
+	protected fun getDidStateForUpdateOperation(): DidState {
+		val newDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "2019-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$newKeyPairEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signatureFromOldKey = originalKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
+
+		val signatureFromNewKey = newKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signatureFromNewKeyEncoded = signatureFromNewKey.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$originalKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
+		|	},
+		|	{
+		|	  "id": "$newKeyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$signatureFromNewKeyEncoded"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val envelope = DidEnvelope(instruction, newDocument)
+		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.VALID, UniqueIdentifier.fromString(UUID.toString()))
+	}
+
 	protected fun createDID(): SignedTransaction? {
-		val didState = getDidStateForCreate()
+		val didState = getDidStateForCreateOperation()
 		val flow = CreateDidFlow(didState)
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
@@ -127,7 +172,15 @@ abstract class AbstractFlowTestUtils {
 	protected fun deleteDID(): SignedTransaction? {
 		createDID()!!.tx
 		mockNetwork.waitQuiescent()
-		val flow = DeleteDidFlow(getDidStateForDelete())
+		val flow = DeleteDidFlow(getDidStateForDeleteOperation())
+		val future = originator.startFlow(flow)
+		return future.getOrThrow()
+	}
+
+	protected fun updateDID(): SignedTransaction? {
+		createDID()!!.tx
+		mockNetwork.waitQuiescent()
+		val flow = UpdateDidFlow(getDidStateForUpdateOperation())
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
 	}

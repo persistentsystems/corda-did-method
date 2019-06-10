@@ -89,11 +89,11 @@ class DidEnvelope(
 	}
 
 	private fun validate(): Result<Unit, ValidationFailure> {
-
 		document.context().mapFailure {
 			MalformedDocumentFailure(it)
 		}.onFailure { return it }
-// extract temporal information
+
+		// extract temporal information
 		val created = document.created().mapFailure {
 			MalformedDocumentFailure(it)
 		}.onFailure { return it }

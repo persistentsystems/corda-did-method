@@ -3,6 +3,7 @@ package net.corda.did.flows
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.did.utils.DIDAlreadyExist
+import net.corda.testing.core.singleIdentity
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
@@ -36,11 +37,11 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 
     @Test
     fun `create did should fail if did already exist`() {
-        // crete did
-        val tx = createDID()!!.tx
+        // create did
+        createDID()!!.tx
         mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on both all 3 nodes
+        // confirm did state with status as 'VALID' on all 3 nodes
         w1.transaction {
             val states = w1.services.vaultService.queryBy(DidState::class.java).states
             assert(states.size == 1)
@@ -60,5 +61,11 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
         }
 
         assertFailsWith<DIDAlreadyExist> { createDID() }
+    }
+
+    @Test
+    fun `SignedTransaction returned by the flow is signed by the did originator`() {
+        val signedTx = createDID()!!
+        signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
     }
 }
