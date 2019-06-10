@@ -71,13 +71,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DeleteDidTests.DummyCommand())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -89,13 +89,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         val envelope = getUpdatedEnvelope()
         ledgerServices.ledger {
             transaction {
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -108,14 +108,14 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -127,14 +127,14 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         val envelope = getUpdatedEnvelope()
         ledgerServices.ledger {
             transaction {
-                input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.INVALID))
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.DELETED))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -153,7 +153,7 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -166,13 +166,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(W1.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -185,13 +185,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID, linearId = UniqueIdentifier()))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED, linearId = UniqueIdentifier()))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -204,13 +204,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID, originator = W1.party))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED, originator = W1.party))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -223,13 +223,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID, witnesses = setOf()))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED, witnesses = setOf()))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -242,13 +242,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID, participants = listOf()))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED, participants = listOf()))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }
@@ -308,13 +308,13 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = getUpdatedEnvelope(), status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = getUpdatedEnvelope(), status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Delete(envelope))
                 this.verifies()
             }

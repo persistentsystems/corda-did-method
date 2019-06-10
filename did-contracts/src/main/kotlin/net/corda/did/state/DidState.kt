@@ -54,5 +54,5 @@ data class DidState(
 @CordaSerializable
 enum class DidStatus {
 	VALID,
-	INVALID
+	DELETED
 }

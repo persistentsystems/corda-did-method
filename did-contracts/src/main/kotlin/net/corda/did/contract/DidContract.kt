@@ -112,7 +112,7 @@ open class DidContract : Contract {
      *
      */
 
-    // Delete will just mark the state as INVALID
+    // Delete will just mark the state as DELETED
     open fun verifyDidDelete(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
         val oldDIDState = tx.inputsOfType<DidState>().single()

@@ -139,7 +139,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
         val envelope = getUpdatedEnvelope()
         ledgerServices.ledger {
             transaction {
-                input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.INVALID))
+                input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.DELETED))
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
                 this.fails()
@@ -159,7 +159,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
-                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.INVALID))
+                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
                 command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
                 this.fails()
             }
