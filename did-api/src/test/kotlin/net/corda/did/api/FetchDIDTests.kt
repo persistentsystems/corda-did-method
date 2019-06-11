@@ -7,6 +7,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.io.FileInputStream
 import java.util.*
+/**
+ * Persistent code
+ *
+ */
 
 class FetchDIDAPITest {
     lateinit var mockMvc: MockMvc

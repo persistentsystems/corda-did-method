@@ -13,6 +13,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.io.FileInputStream
 import java.net.URI
 import java.util.*
+/**
+ * Persistent code
+ *
+ */
 
 class DeleteDIDAPITest {
     lateinit var mockMvc: MockMvc

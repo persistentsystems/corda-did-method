@@ -25,6 +25,10 @@ import java.net.URI
 import java.util.*
 import java.io.FileInputStream
 import org.springframework.mock.web.MockMultipartFile
+/**
+ * Persistent code
+ *
+ */
 
 class CreateDIDAPITest{
     lateinit var mockMvc: MockMvc

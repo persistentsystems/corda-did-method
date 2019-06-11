@@ -77,17 +77,17 @@ class MainController(rpc: NodeRPCConnection) {
             logger.info("inside create function")
             if ( instruction.isEmpty() ){
                 logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse("Instruction is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
                 logger.error("document is empty")
-                return ResponseEntity ( ApiResponse("Document is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
                 logger.error("did is empty")
-                return ResponseEntity ( ApiResponse("DID is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
@@ -95,7 +95,7 @@ class MainController(rpc: NodeRPCConnection) {
 
             val queriedDid = queryUtils.getDIDDocumentByLinearId(documentId.toString())
             if( !queriedDid.isEmpty() ){
-                return ResponseEntity ( ApiResponse(" Provided DID already exists").toResponseObj(),HttpStatus.CONFLICT )
+                return ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(),HttpStatus.CONFLICT )
             }
             /**
             * Validate envelope
@@ -121,7 +121,7 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch( e:DIDDeletedException ){
             logger.info("provided DID already exists and is deleted")
-            return ResponseEntity ( ApiResponse("Provided DID already exists but is not active").toResponseObj(),HttpStatus.CONFLICT )
+            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.CONFLICT )
         }
         catch( e:Exception ){
             logger.error( e.message )
@@ -141,7 +141,7 @@ class MainController(rpc: NodeRPCConnection) {
             builder {
                 val queriedData = queryUtils.getDIDDocumentByLinearId(documentId.toString())
                 if( queriedData.isEmpty() ){
-                    val response = ApiResponse("Requested DID not found")
+                    val response = ApiResponse( APIMessage.NOT_FOUND )
                     return ResponseEntity( response.toResponseObj() ,HttpStatus.NOT_FOUND )
 
                 }
@@ -150,16 +150,16 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch ( e:IllegalArgumentException ){
             logger.error(e.toString())
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse("The DID requested is not in the correct format").toResponseObj() )
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse(APIMessage.INCORRECT_FORMAT ).toResponseObj() )
 
         }
         catch( e:DIDDeletedException ){
             logger.info("DID no longer exists")
-            return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
         }
         catch ( e:Exception ){
             logger.error( e.toString() )
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body(ApiResponse("There was an error while fetching DID document").toResponseObj() )
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body(ApiResponse( e.message ).toResponseObj() )
 
         }
 
@@ -173,17 +173,17 @@ class MainController(rpc: NodeRPCConnection) {
             logger.info("inside the update DID function")
             if ( instruction.isEmpty() ){
                 logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse("Instruction is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
                 logger.error("document is empty")
-                return ResponseEntity ( ApiResponse("Document is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
                 logger.error("did is empty")
-                return ResponseEntity ( ApiResponse("DID is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
@@ -194,10 +194,10 @@ class MainController(rpc: NodeRPCConnection) {
                  queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
             catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse("Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(),HttpStatus.NOT_FOUND )
             }
             catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**
@@ -244,17 +244,17 @@ class MainController(rpc: NodeRPCConnection) {
             logger.info("inside the update DID function")
             if ( instruction.isEmpty() ){
                 logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse("Instruction is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
                 logger.error("document is empty")
-                return ResponseEntity ( ApiResponse("Document is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
                 logger.error("did is empty")
-                return ResponseEntity ( ApiResponse("DID is empty").toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
@@ -265,10 +265,10 @@ class MainController(rpc: NodeRPCConnection) {
                 queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
             catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse("Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(),HttpStatus.NOT_FOUND )
             }
             catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**

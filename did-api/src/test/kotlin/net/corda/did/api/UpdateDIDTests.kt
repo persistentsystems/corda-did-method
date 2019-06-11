@@ -13,6 +13,10 @@ import java.util.*
 import java.io.FileInputStream
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+/**
+ * Persistent code
+ *
+ */
 
 class UpdateDIDAPITest {
     lateinit var mockMvc: MockMvc
