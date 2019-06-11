@@ -95,7 +95,7 @@ class MainController(rpc: NodeRPCConnection) {
 
             val queriedDid = queryUtils.getDIDDocumentByLinearId(documentId.toString())
             if( !queriedDid.isEmpty() ){
-                return ResponseEntity ( ApiResponse("DID already exists").toResponseObj(),HttpStatus.CONFLICT )
+                return ResponseEntity ( ApiResponse(" Provided DID already exists").toResponseObj(),HttpStatus.CONFLICT )
             }
             /**
             * Validate envelope
@@ -118,6 +118,10 @@ class MainController(rpc: NodeRPCConnection) {
             }
 
 
+        }
+        catch( e:DIDDeletedException ){
+            logger.info("provided DID already exists and is deleted")
+            return ResponseEntity ( ApiResponse("Provided DID already exists but is not active").toResponseObj(),HttpStatus.CONFLICT )
         }
         catch( e:Exception ){
             logger.error( e.message )
@@ -151,7 +155,7 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch( e:DIDDeletedException ){
             logger.info("DID no longer exists")
-            return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+            return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
         }
         catch ( e:Exception ){
             logger.error( e.toString() )
@@ -190,10 +194,10 @@ class MainController(rpc: NodeRPCConnection) {
                  queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
             catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse(" Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse("Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
             }
             catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**
@@ -261,10 +265,10 @@ class MainController(rpc: NodeRPCConnection) {
                 queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
             catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse(" Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse("Provided DID does not exist").toResponseObj(),HttpStatus.NOT_FOUND )
             }
             catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse(" Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
+                return ResponseEntity ( ApiResponse("Provided DID is no longer active").toResponseObj(),HttpStatus.NOT_FOUND )
             }
 
             /**
