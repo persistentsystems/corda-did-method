@@ -79,6 +79,7 @@ class CreateDIDAPITest{
 
         val encodedSignature1 = signature1.bytes.toBase58()
 
+
         val instruction = """{
 		|  "action": "create",
 		|  "signatures": [

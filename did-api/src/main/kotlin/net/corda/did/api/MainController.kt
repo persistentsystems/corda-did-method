@@ -69,61 +69,59 @@ class MainController(rpc: NodeRPCConnection) {
     /**
      * Create DID
      */
-
     @PutMapping(value = "{did}",
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun createDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : ResponseEntity<Any?> {
         try {
-            logger.info("inside create function")
+            logger.info( "inside create function" )
             if ( instruction.isEmpty() ){
-                logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "instruction is empty" )
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
-                logger.error("document is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "document is empty" )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
-                logger.error("did is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "did is empty" )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
-            val envelope = net.corda.did.DidEnvelope(instruction,document)
+            val envelope = net.corda.did.DidEnvelope(instruction, document)
             val documentId = net.corda.did.CordaDid(did).uuid
 
-            val queriedDid = queryUtils.getDIDDocumentByLinearId(documentId.toString())
-            if( !queriedDid.isEmpty() ){
-                return ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(),HttpStatus.CONFLICT )
+            val didJson = queryUtils.getDIDDocumentByLinearId( documentId.toString() )
+            if( !didJson.isEmpty() ){
+                return ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(), HttpStatus.CONFLICT )
             }
             /**
             * Validate envelope
             */
-            val envelopeVerifed = envelope.validateCreation()
-            envelopeVerifed.onFailure {
-                return apiUtils.sendErrorResponse( it.reason )
-                 }
-            logger.info("document id" + documentId)
+            val envelopeVerified = envelope.validateCreation()
+            envelopeVerified.onFailure { return apiUtils.sendErrorResponse( it.reason ) }
+            logger.info( "document id" + documentId )
             val originator = proxy.nodeInfo().legalIdentities.first()
+
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
-            val listOfWitnesses = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
+
+            val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
             try {
-                val cordaDid = DidState(envelope, originator, listOfWitnesses.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID , UniqueIdentifier.fromString(documentId.toString() ))
-                val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, cordaDid)
+                val didState = DidState(envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID, UniqueIdentifier.fromString(documentId.toString()))
+                val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, didState)
                 val result = flowHandler.use { it.returnValue.getOrThrow() }
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {
                 return ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() )
             }
 
-
         }
-        catch( e:DIDDeletedException ){
+        catch( e : DIDDeletedException ){
             logger.info("provided DID already exists and is deleted")
-            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.CONFLICT )
+            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT)
         }
-        catch( e:Exception ){
+        catch( e : Exception ){
             logger.error( e.message )
             return ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() )
 
@@ -139,65 +137,62 @@ class MainController(rpc: NodeRPCConnection) {
         try {
             val documentId = net.corda.did.CordaDid(did).uuid
             builder {
-                val queriedData = queryUtils.getDIDDocumentByLinearId(documentId.toString())
-                if( queriedData.isEmpty() ){
+                val didJson = queryUtils.getDIDDocumentByLinearId(documentId.toString())
+                if( didJson.isEmpty() ){
                     val response = ApiResponse( APIMessage.NOT_FOUND )
-                    return ResponseEntity( response.toResponseObj() ,HttpStatus.NOT_FOUND )
+                    return ResponseEntity( response.toResponseObj(), HttpStatus.NOT_FOUND )
 
                 }
-                return ResponseEntity.ok().body(queriedData)
+                return ResponseEntity.ok().body(didJson)
             }
         }
-        catch ( e:IllegalArgumentException ){
-            logger.error(e.toString())
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse(APIMessage.INCORRECT_FORMAT ).toResponseObj() )
+        catch ( e : IllegalArgumentException ){
+            logger.error( e.toString())
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() )
 
         }
-        catch( e:DIDDeletedException ){
+        catch( e : DIDDeletedException ){
             logger.info("DID no longer exists")
-            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
+            return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.NOT_FOUND )
         }
-        catch ( e:Exception ){
+        catch ( e : Exception ){
             logger.error( e.toString() )
             return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body(ApiResponse( e.message ).toResponseObj() )
-
         }
-
-
     }
 
     @PostMapping(value = "{did}",
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun updateDID( @PathVariable(value = "did") did: String, @RequestParam("instruction") instruction: String, @RequestParam("document") document: String ) : ResponseEntity<Any?> {
         try {
             logger.info("inside the update DID function")
             if ( instruction.isEmpty() ){
                 logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
                 logger.error("document is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
                 logger.error("did is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
             val documentId = net.corda.did.CordaDid(did).uuid
-            var queriedDid:DidDocument
+            var didJson : DidDocument
 
             try {
-                 queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
+                didJson = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
-            catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(),HttpStatus.NOT_FOUND )
+            catch( e : NullPointerException ){
+                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND )
             }
-            catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
+            catch( e : DIDDeletedException ){
+                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.NOT_FOUND )
             }
 
             /**
@@ -205,106 +200,99 @@ class MainController(rpc: NodeRPCConnection) {
              */
 
 
-            val envelopeVerifed = envelope.validateModification( queriedDid )
-            envelopeVerifed.onFailure {
-                return apiUtils.sendErrorResponse(it.reason)
-            }
+            val envelopeVerified = envelope.validateModification( didJson )
+            envelopeVerified.onFailure { return apiUtils.sendErrorResponse(it.reason)}
             logger.info("document id" + documentId)
             val originator = proxy.nodeInfo().legalIdentities.first()
+
+
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
-            val listOfWitnesses = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
+
+            val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
             try {
-                logger.info("creating the corda state object")
-                val cordaDid = DidState(envelope, originator, listOfWitnesses.minus(proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID , UniqueIdentifier.fromString(documentId.toString()) )
-                logger.info("invoking the flow")
-                val flowHandler = proxy.startFlowDynamic(UpdateDidFlow::class.java, cordaDid)
-                logger.info("get result from the flow")
+                logger.info( "creating the corda state object" )
+                val didState = DidState(envelope, originator, witnessNodes.minus(proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID , UniqueIdentifier.fromString(documentId.toString()) )
+                logger.info( "invoking the flow" )
+                val flowHandler = proxy.startFlowDynamic(UpdateDidFlow::class.java, didState)
+                logger.info( "get result from the flow" )
                 val result = flowHandler.use { it.returnValue.getOrThrow() }
-                logger.info("flow successful")
+                logger.info( "flow successful" )
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {
                 return ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() )
             }
 
-
         }
-        catch( e:Exception ){
+        catch( e : Exception ){
             logger.error( e.message )
             return ResponseEntity.badRequest().body( ApiResponse( e.message ).toResponseObj() )
-
         }
-
     }
 
 
     @DeleteMapping(value = "{did}",
-            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE) ,consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
+            produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun deleteDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : ResponseEntity<Any?> {
         try {
-            logger.info("inside the update DID function")
+            logger.info( "inside the update DID function" )
             if ( instruction.isEmpty() ){
-                logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "instruction is empty")
+                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if ( document.isEmpty() ){
-                logger.error("document is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "document is empty" )
+                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             if( did.isEmpty() ){
-                logger.error("did is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(),HttpStatus.BAD_REQUEST )
+                logger.error( "did is empty" )
+                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
             val documentId = net.corda.did.CordaDid(did).uuid
-            var queriedDid:DidDocument
+            var didJson : DidDocument
 
             try {
-                queriedDid = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
+                didJson = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
             }
-            catch( e:NullPointerException ){
-                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(),HttpStatus.NOT_FOUND )
+            catch( e : NullPointerException ){
+                return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND )
             }
-            catch( e:DIDDeletedException ){
-                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(),HttpStatus.NOT_FOUND )
+            catch( e : DIDDeletedException ){
+                return ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.NOT_FOUND )
             }
 
             /**
              * Validate envelope
              */
 
-
-            val envelopeVerifed = envelope.validateModification( queriedDid )
-            envelopeVerifed.onFailure {
-                return apiUtils.sendErrorResponse(it.reason)
-            }
+            val envelopeVerified = envelope.validateModification( didJson )
+            envelopeVerified.onFailure {return apiUtils.sendErrorResponse(it.reason) }
             logger.info("document id" + documentId)
             val originator = proxy.nodeInfo().legalIdentities.first()
+
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
-            val listOfWitnesses = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
+
+            val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
+
             try {
-                logger.info("creating the corda state object")
-                val cordaDid = DidState(envelope, originator, listOfWitnesses.minus(proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.DELETED , UniqueIdentifier.fromString(documentId.toString()) )
-                logger.info("invoking the flow")
-                val flowHandler = proxy.startFlowDynamic(DeleteDidFlow::class.java, cordaDid)
-                logger.info("get result from the flow")
+                logger.info( "creating the corda state object" )
+                val didState = DidState( envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.DELETED, UniqueIdentifier.fromString(documentId.toString()))
+                logger.info( "invoking the flow" )
+                val flowHandler = proxy.startFlowDynamic( DeleteDidFlow::class.java, didState)
+                logger.info( "get result from the flow" )
                 val result = flowHandler.use { it.returnValue.getOrThrow() }
-                logger.info("flow successful")
+                logger.info( "flow successful" )
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {
                 return ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() )
             }
-
-
         }
-        catch( e:Exception ){
+        catch( e : Exception ){
             logger.error( e.message )
             return ResponseEntity.badRequest().body( ApiResponse( e.message ).toResponseObj() )
-
         }
-
     }
-
 }

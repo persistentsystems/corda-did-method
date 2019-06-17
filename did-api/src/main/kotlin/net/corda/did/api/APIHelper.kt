@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity
  */
 
 class APIUtils {
-    fun sendErrorResponse( reason: DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
+    fun sendErrorResponse( reason : DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
         when( reason ){
             is DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure ->  {
                 MainController.logger.info("Signature provided is invalid")
@@ -78,11 +78,6 @@ class APIUtils {
             else ->{
                 return ResponseEntity.badRequest().body( ApiResponse(reason.toString()).toResponseObj() )
             }
-
-
         }
-
     }
-
-
 }
