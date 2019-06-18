@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity
 import net.corda.core.utilities.loggerFor
-import net.corda.did.CordaDid
 import net.corda.did.DidDocument
 import net.corda.did.flows.CreateDidFlow
 import net.corda.did.flows.DeleteDidFlow
