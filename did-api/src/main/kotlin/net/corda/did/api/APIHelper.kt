@@ -8,81 +8,76 @@ import org.springframework.http.ResponseEntity
  */
 
 class APIUtils {
-    fun sendErrorResponse( reason: DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
+    fun sendErrorResponse( reason : DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
         when( reason ){
             is DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure ->  {
                 MainController.logger.info("Signature provided is invalid")
-                return ResponseEntity.badRequest().body( ApiResponse("Signature provided is invalid").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.INVALID_SIGNATURE ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.MalformedInstructionFailure ->  {
                 MainController.logger.info("Instruction provided is Malformed")
-                return ResponseEntity.badRequest().body( ApiResponse("Instruction provided is Malformed").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MALFORMED_INSTRUCTION ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.MalformedDocumentFailure -> {
                 MainController.logger.info("Document provided is Malformed")
-                return ResponseEntity.badRequest().body( ApiResponse("Document provided is Malformed").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MALFORMED_DOCUMENT ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.MalformedPrecursorFailure ->{
                 MainController.logger.info("The precursor DID is invalid")
-                return ResponseEntity.badRequest().body( ApiResponse("The precursor DID is invalid").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.PRECURSOR_DID ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.NoKeysFailure -> {
                 MainController.logger.info("The DID does not contain any public keys")
-                return ResponseEntity.badRequest().body( ApiResponse("The DID does not contain any public keys").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.NO_PUBLIC_KEYS ).toResponseObj() )
 
             }
             is DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure -> {
                 MainController.logger.info("Multiple Signatures target the same key")
-                return ResponseEntity.badRequest().body( ApiResponse("Multiple Signatures target the same key").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MULTIPLE_SIGNATURES ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.DuplicatePublicKeyIdFailure -> {
                 MainController.logger.info("Multiple public keys have the same ID")
-                return ResponseEntity.badRequest().body( ApiResponse("Multiple public keys have the same ID").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MULTIPLE_PUBLIC_KEY ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.SignatureCountFailure -> {
                 MainController.logger.info("The number of keys in the DID document does not match the number of signatures")
-                return ResponseEntity.badRequest().body( ApiResponse("The number of keys in the DID document does not match the number of signatures").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MISMATCH_SIGNATURE_TO_KEY_COUNT ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.UnsupportedCryptoSuiteFailure -> {
                 MainController.logger.info("unsupported cryptographic suite")
-                return ResponseEntity.badRequest().body( ApiResponse("unsupported cryptographic suite").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.UNSUPPORTED_CRYPTO_SUITE ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.UntargetedPublicKeyFailure -> {
                 MainController.logger.info("No signature was provided for target")
-                return ResponseEntity.badRequest().body( ApiResponse("No signature was provided for target").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.NO_SIGNATURE ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure -> {
                 MainController.logger.info("Cryptosuite mismatch")
-                return ResponseEntity.badRequest().body( ApiResponse("Signing key suite and signature are different").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.CRYPTOSUITE_MISMATCH ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.NoMatchingSignatureFailure -> {
                 MainController.logger.info("No signature is provided for any of the keys.")
-                return ResponseEntity.badRequest().body( ApiResponse("No signature is provided for any of the keys.").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.NO_MATCHING_SIGNATURE ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.MissingSignatureFailure -> {
                 MainController.logger.info("Signature is missing")
-                return ResponseEntity.badRequest().body( ApiResponse("Signature is missing for a target").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MISSING_SIGNATURE ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.MissingTemporalInformationFailure -> {
                 MainController.logger.info("The document is missing information about its creation")
-                return ResponseEntity.badRequest().body( ApiResponse("The document is missing information about its creation").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.MISSING_TEMPORAL_INFORMATION ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure -> {
                 MainController.logger.info("Documents temporal relation is incorrect")
-                return ResponseEntity.badRequest().body( ApiResponse("Documents temporal relation is incorrect").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.INVALID_TEMPORAL_INFORMATION ).toResponseObj() )
             }
             is DidEnvelopeFailure.ValidationFailure.InvalidPublicKeyId -> {
                 MainController.logger.info("PublicKey ID must contain did as prefix for target ")
-                return ResponseEntity.badRequest().body( ApiResponse("PublicKey ID must contain did as prefix for target ").toResponseObj() )
+                return ResponseEntity.badRequest().body( ApiResponse( APIMessage.INVALID_PUBLIC_KEY ).toResponseObj() )
             }
             else ->{
                 return ResponseEntity.badRequest().body( ApiResponse(reason.toString()).toResponseObj() )
             }
-
-
         }
-
     }
-
-
 }

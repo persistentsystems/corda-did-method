@@ -5,11 +5,11 @@ import net.corda.did.state.DidState
  * Persistent code
  *
  */
-data class ApiResponse (
+data class ApiResponse(val message:String?){
+    constructor(apiMessage:APIMessage) : this(apiMessage.message) {
 
-     var message: String? = null
-
-)
+    }
+}
 
 fun ApiResponse.toResponseObj(): ApiResponse {
 
