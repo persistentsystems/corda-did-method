@@ -1296,7 +1296,7 @@ class UpdateDIDAPITest {
 
     }
     @Test
-    fun ` update the document with mismatching DID should fail` () {
+    fun `Update the document with mismatching DID should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
 
         val pub = kp.public.encoded.toBase58()
