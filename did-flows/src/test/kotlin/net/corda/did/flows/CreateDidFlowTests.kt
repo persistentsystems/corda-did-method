@@ -2,7 +2,7 @@ package net.corda.did.flows
 
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
-import net.corda.did.utils.DIDAlreadyExist
+import net.corda.did.utils.DIDAlreadyExistException
 import net.corda.testing.core.singleIdentity
 import org.junit.Test
 import kotlin.test.assertFailsWith
@@ -60,7 +60,7 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
             assert(states[0].state.data.status == DidStatus.VALID)
         }
 
-        assertFailsWith<DIDAlreadyExist> { createDID() }
+        assertFailsWith<DIDAlreadyExistException> { createDID() }
     }
 
     @Test

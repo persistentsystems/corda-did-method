@@ -9,7 +9,7 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.did.CordaDid
-import net.corda.did.utils.DIDAlreadyExist
+import net.corda.did.utils.DIDAlreadyExistException
 import net.corda.did.utils.FlowLogicCommonMethods
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
@@ -50,11 +50,12 @@ class CreateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
         val did = didState.envelope.document.id().valueOrNull() as CordaDid
 
         if(didStates.isNotEmpty()) {
-            throw DIDAlreadyExist("DID with id ${did.toExternalForm()} already exist")
+            throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
         }
 
         // Obtain a reference to the notary we want to use.
         val notary = serviceHub.firstNotary()
+
 
         // Stage 1.
         progressTracker.currentStep = GENERATING_TRANSACTION

@@ -2,7 +2,7 @@ package net.corda.did.flows
 
 import net.corda.core.utilities.getOrThrow
 import net.corda.did.state.DidState
-import net.corda.did.utils.DIDNotFound
+import net.corda.did.utils.DIDNotFoundException
 import net.corda.testing.core.singleIdentity
 import org.junit.Test
 import kotlin.test.assertFailsWith
@@ -19,8 +19,6 @@ class UpdateDidFlowTests : AbstractFlowTestUtils() {
         w1.transaction {
             val states = w1.services.vaultService.queryBy(DidState::class.java).states
             assert(states.size == 1)
-            print(states[0].state.data.envelope.rawDocument)
-            print(getDidStateForUpdateOperation().envelope.rawDocument)
             assert(states[0].state.data.envelope.rawDocument.equals(getDidStateForUpdateOperation().envelope.rawDocument))
         }
 
@@ -48,6 +46,6 @@ class UpdateDidFlowTests : AbstractFlowTestUtils() {
         val flow = UpdateDidFlow(getDidStateForUpdateOperation())
         val future = originator.startFlow(flow)
         mockNetwork.waitQuiescent()
-        assertFailsWith<DIDNotFound> {  future.getOrThrow() }
+        assertFailsWith<DIDNotFoundException> {  future.getOrThrow() }
     }
 }
