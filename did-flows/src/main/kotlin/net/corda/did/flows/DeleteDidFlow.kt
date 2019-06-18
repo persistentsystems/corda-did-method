@@ -12,12 +12,10 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.did.CordaDid
-import net.corda.did.utils.DIDAlreadyExist
 import net.corda.did.utils.FlowLogicCommonMethods
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
-import net.corda.did.state.DidStatus
-import net.corda.did.utils.DIDNotFound
+import net.corda.did.utils.DIDNotFoundException
 import java.util.*
 
 @InitiatingFlow
@@ -54,7 +52,7 @@ class DeleteDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
 
         val did = didState.envelope.document.id().valueOrNull() as CordaDid
         if( didStates.isEmpty() ) {
-            throw DIDNotFound("DID with UUID ${did.toExternalForm()} does not exist")
+            throw DIDNotFoundException("DID with UUID ${did.toExternalForm()} does not exist")
         }
         val inputDidState = didStates.singleOrNull()!!
 

@@ -3,7 +3,7 @@ package net.corda.did.flows
 import net.corda.core.utilities.getOrThrow
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
-import net.corda.did.utils.DIDNotFound
+import net.corda.did.utils.DIDNotFoundException
 import net.corda.testing.core.singleIdentity
 import org.junit.Test
 import kotlin.test.assertFailsWith
@@ -47,6 +47,6 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
         val flow = DeleteDidFlow(getDidStateForDeleteOperation())
         val future = originator.startFlow(flow)
         mockNetwork.waitQuiescent()
-        assertFailsWith<DIDNotFound> {  future.getOrThrow() }
+        assertFailsWith<DIDNotFoundException> {  future.getOrThrow() }
     }
 }
