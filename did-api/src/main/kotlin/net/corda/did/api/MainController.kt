@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity
 import net.corda.core.utilities.loggerFor
+import net.corda.did.CordaDid
 import net.corda.did.DidDocument
 import net.corda.did.flows.CreateDidFlow
 import net.corda.did.flows.DeleteDidFlow
@@ -90,6 +91,10 @@ class MainController(rpc: NodeRPCConnection) {
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction, document)
+            if ( !envelope.document.json.get("id")!!.equals(did)){
+                logger.info("Mismatch occurred in DID in parameter and DID in document ")
+                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
+            }
             val documentId = net.corda.did.CordaDid(did).uuid
 
             val didJson = queryUtils.getDIDDocumentByLinearId( documentId.toString() )
@@ -182,6 +187,10 @@ class MainController(rpc: NodeRPCConnection) {
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
+            if ( !envelope.document.json.get("id")!!.equals(did)){
+                logger.info("Mismatch occurred in DID in parameter and DID in document ")
+                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
+            }
             val documentId = net.corda.did.CordaDid(did).uuid
             var didJson : DidDocument
 
@@ -251,6 +260,10 @@ class MainController(rpc: NodeRPCConnection) {
 
             }
             val envelope = net.corda.did.DidEnvelope(instruction,document)
+            if ( !envelope.document.json.get("id")!!.equals(did)){
+                logger.info("Mismatch occurred in DID in parameter and DID in document ")
+                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
+            }
             val documentId = net.corda.did.CordaDid(did).uuid
             var didJson : DidDocument
 

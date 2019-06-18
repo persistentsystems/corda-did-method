@@ -8,7 +8,7 @@ enum class APIMessage(val message: String) {
 
     NOT_FOUND( "The provided DID is not found." ),
     DID_DELETED( "The provided DID is no longer active." ),
-    CONFLICT( "The provided DID is already exists." ),
+    CONFLICT( "The provided DID already exists." ),
     DOCUMENT_EMPTY( "No document has been provided." ),
     INSTRUCTION_EMPTY( "No instruction has been provided." ),
     DID_EMPTY( "No DID has been provided." ),
@@ -28,6 +28,7 @@ enum class APIMessage(val message: String) {
     MISSING_TEMPORAL_INFORMATION( "The document is missing information about its creation." ),
     INVALID_TEMPORAL_INFORMATION( "Document's temporal relation is incorrect." ),
     INVALID_PUBLIC_KEY( "PublicKey ID must contain did as prefix for target." ),
-    INCORRECT_FORMAT( "The DID requested is not in the correct format." )
+    INCORRECT_FORMAT( "The DID requested is not in the correct format." ),
+    MISMATCH_DID ( "There is a mismatch in the DID provided in request parameter and one in document" )
 
 }

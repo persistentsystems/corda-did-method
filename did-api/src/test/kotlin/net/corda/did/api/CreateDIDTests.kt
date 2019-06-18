@@ -765,6 +765,52 @@ class CreateDIDAPITest{
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    @Test
+    fun `Create a DID with incorrect DID in parameter` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+        val uuid = UUID.randomUUID()
+        val documentId = "did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+UUID.randomUUID().toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+            request.method = "PUT"
+            request
+        }
+        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+    }
 
 
 

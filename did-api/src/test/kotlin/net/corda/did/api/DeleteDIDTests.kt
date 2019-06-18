@@ -442,4 +442,90 @@ class DeleteDIDAPITest {
 
 
     }
+    @Test
+    fun `Delete it with incorrect DID as request parameter` () {
+        val kp = KeyPairGenerator().generateKeyPair()
+
+        val pub = kp.public.encoded.toBase58()
+
+        val uuid = UUID.randomUUID()
+
+        val documentId = "did:corda:tcn:"+uuid
+
+        val uri = URI("${documentId}#keys-1")
+
+        val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+        val encodedSignature1 = signature1.bytes.toBase58()
+
+        val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+        val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val builder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+            request.method = "PUT"
+            request
+        }
+        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+
+        val documentDelete = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+        |  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+
+        val encodedSignatureDelete = signatureDelete.bytes.toBase58()
+        val instructionDelete = """{
+		|  "action": "delete",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignatureDelete"
+		|	}
+		|  ]
+		|}""".trimMargin()
+        val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
+        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
+        val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+UUID.randomUUID().toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
+            request.method = "DELETE"
+            request
+        }
+        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+
+
+    }
 }
