@@ -5,6 +5,8 @@ import com.natpryce.valueOrNull
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
+import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
@@ -14,6 +16,7 @@ import net.corda.did.utils.FlowLogicCommonMethods
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
 import java.util.*
+import kotlin.collections.ArrayList
 
 @InitiatingFlow
 @StartableByRPC
@@ -60,10 +63,17 @@ class CreateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
         // Stage 1.
         progressTracker.currentStep = GENERATING_TRANSACTION
 
+        val config = serviceHub.getAppContext().config
+        val nodes = config.get("nodes") as ArrayList<*>
+        val participantsList = arrayListOf<Party>()
+       for (any in nodes.toSet()) {
+           participantsList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(any.toString()))!!)
+       }
+
         // Generate an unsigned transaction.
         val txCommand = Command(DidContract.Commands.Create(didState.envelope), listOf(didState.originator.owningKey))
         val txBuilder = TransactionBuilder(notary)
-                .addOutputState(didState, DidContract.DID_CONTRACT_ID)
+                .addOutputState(didState.copy(witnesses = participantsList.toSet(), participants = listOf(didState.originator) + participantsList), DidContract.DID_CONTRACT_ID)
                 .addCommand(txCommand)
 
         // Stage 2.
