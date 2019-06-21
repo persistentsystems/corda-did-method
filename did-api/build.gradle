@@ -34,6 +34,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.7.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-test', version: '1.5.7.RELEASE'
 
 
     // https://mvnrepository.com/artifact/org.springframework/spring-test

@@ -9,7 +9,6 @@ package net.corda.did.api
 
 import com.natpryce.onFailure
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.identity.CordaX500Name
 import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.did.state.DidState
@@ -19,52 +18,30 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity
 import net.corda.core.utilities.loggerFor
-import net.corda.did.DidDocument
 import net.corda.did.flows.CreateDidFlow
 import net.corda.did.flows.DeleteDidFlow
 import net.corda.did.state.DidStatus
 import net.corda.did.flows.UpdateDidFlow
 
-
-
-
-val SERVICE_NAMES = listOf("Notary", "Network Map Service")
-
 /**
  *  A Spring Boot Server API controller for interacting with the node via RPC.
  */
-//@JsonAutoDetect(getterVisibility= JsonAutoDetect.Visibility.NONE)
+
 @RestController
 @RequestMapping("/")
+// ??? moritzplatt 2019-06-20 -- consider passing connection parameters instead so the controller can manage the connection
+// itself. i.e. re-establishing connection in case it fails or adding functionality to re-establish a connection in case of errors
 class MainController(rpc: NodeRPCConnection) {
 
     companion object {
          val logger = loggerFor<MainController>()
     }
 
-    private val myLegalName = rpc.proxy.nodeInfo().legalIdentities.first().name
     private val proxy = rpc.proxy
-    val queryUtils = QueryUtil(proxy)
-    val apiUtils = APIUtils()
+    private val queryUtils = QueryUtil(proxy)
+    private val apiUtils = APIUtils()
 
-    /**
-     * Returns the node's name.
-     */
-    @GetMapping(value = [ "me" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun whoami() = mapOf("me" to myLegalName)
 
-    /**
-     * Returns all parties registered with the network map service. These names can be used to look up identities using
-     * the identity service.
-     */
-    @GetMapping(value = [ "peers" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getPeers(): Map<String, List<CordaX500Name>> {
-        val nodeInfo = proxy.networkMapSnapshot()
-        return mapOf("peers" to nodeInfo
-                .map { it.legalIdentities.first().name }
-                //filter out myself, notary and eventual network map started by driver
-                .filter { it.organisation !in (SERVICE_NAMES + myLegalName.organisation) })
-    }
 
     /**
      * Create DID
@@ -74,29 +51,13 @@ class MainController(rpc: NodeRPCConnection) {
     fun createDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : ResponseEntity<Any?> {
         try {
             logger.info( "inside create function" )
-            if ( instruction.isEmpty() ){
-                logger.error( "instruction is empty" )
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
+            val envelope = apiUtils.generateEnvelope(instruction,document,did)
+            val uuid = net.corda.did.CordaDid(did).uuid
 
-            }
-            if ( document.isEmpty() ){
-                logger.error( "document is empty" )
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            if( did.isEmpty() ){
-                logger.error( "did is empty" )
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            val envelope = net.corda.did.DidEnvelope(instruction, document)
-            if ( !envelope.document.json.get("id")!!.equals(did)){
-                logger.info("Mismatch occurred in DID in parameter and DID in document ")
-                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
-            }
-            val documentId = net.corda.did.CordaDid(did).uuid
-
-            val didJson = queryUtils.getDIDDocumentByLinearId( documentId.toString() )
+            // ??? moritzplatt 2019-06-20 -- suggestion here would be to remove this block and instead of querying, rely on the output of the startFlowDynamic call only
+            // the current implementation introduces a race condition between the `getDIDDocumentByLinearId` call and the
+            // consumption of the `returnValue`
+            val didJson = queryUtils.getDIDDocumentByLinearId( uuid.toString() )
             if( !didJson.isEmpty() ){
                 return ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(), HttpStatus.CONFLICT )
             }
@@ -105,15 +66,23 @@ class MainController(rpc: NodeRPCConnection) {
             */
             val envelopeVerified = envelope.validateCreation()
             envelopeVerified.onFailure { return apiUtils.sendErrorResponse( it.reason ) }
-            logger.info( "document id" + documentId )
+            logger.info( "document id" + uuid )
+            // ??? moritzplatt 2019-06-20 -- as described in comments on the flow logic, this should not be passed from the API
             val originator = proxy.nodeInfo().legalIdentities.first()
 
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
 
+            // ??? moritzplatt 2019-06-20 -- the API should not be aware of the witnesses. The CorDapp should be aware
+            // of the set of witnesses by configuration. Considering all network members witnesses is incorrect.
             val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
             try {
-                val didState = DidState(envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID, UniqueIdentifier.fromString(documentId.toString()))
+                // ??? moritzplatt 2019-06-20 -- consider comments on the flow constructor
+                val didState = DidState(envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID, UniqueIdentifier.fromString(uuid.toString()))
                 val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, didState)
+
+                // ??? moritzplatt 2019-06-20 -- not familiar with Spring but `getOrThrow` is blocking.
+                // Maybe there is a pattern around futures (i.e. https://www.baeldung.com/spring-async)?
+                // Just a thought though
                 val result = flowHandler.use { it.returnValue.getOrThrow() }
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {
@@ -139,14 +108,15 @@ class MainController(rpc: NodeRPCConnection) {
     fun fetchDIDDocument( @PathVariable(value = "did") did: String ):ResponseEntity<Any?> {
         logger.info("Checking criteria against the Vault")
         try {
-            val documentId = net.corda.did.CordaDid(did).uuid
+            val uuid = net.corda.did.CordaDid(did).uuid
             builder {
-                val didJson = queryUtils.getDIDDocumentByLinearId(documentId.toString())
+                val didJson = queryUtils.getDIDDocumentByLinearId(uuid.toString())
                 if( didJson.isEmpty() ){
                     val response = ApiResponse( APIMessage.NOT_FOUND )
                     return ResponseEntity( response.toResponseObj(), HttpStatus.NOT_FOUND )
 
                 }
+                // ??? moritzplatt 2019-06-20 -- do not return the re-serialised version based on JsonObject. Signatures may not match
                 return ResponseEntity.ok().body(didJson)
             }
         }
@@ -161,7 +131,7 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch ( e : Exception ){
             logger.error( e.toString() )
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body(ApiResponse( e.message ).toResponseObj() )
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( ApiResponse( e.message ).toResponseObj() )
         }
     }
 
@@ -169,32 +139,14 @@ class MainController(rpc: NodeRPCConnection) {
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun updateDID( @PathVariable(value = "did") did: String, @RequestParam("instruction") instruction: String, @RequestParam("document") document: String ) : ResponseEntity<Any?> {
         try {
-            logger.info("inside the update DID function")
-            if ( instruction.isEmpty() ){
-                logger.error("instruction is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
+            val envelope = apiUtils.generateEnvelope(instruction,document,did)
+            val uuid = net.corda.did.CordaDid(did).uuid
 
-            }
-            if ( document.isEmpty() ){
-                logger.error("document is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            if( did.isEmpty() ){
-                logger.error("did is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            val envelope = net.corda.did.DidEnvelope(instruction,document)
-            if ( !envelope.document.json.get("id")!!.equals(did)){
-                logger.info("Mismatch occurred in DID in parameter and DID in document ")
-                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
-            }
-            val documentId = net.corda.did.CordaDid(did).uuid
-            var didJson : DidDocument
-
+            // ??? moritzplatt 2019-06-20 -- merge with assignment var didJson = try { ... }
             try {
-                didJson = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
+                val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.toString())
+                val envelopeVerified = envelope.validateModification( didJson )
+                envelopeVerified.onFailure {return apiUtils.sendErrorResponse(it.reason) }
             }
             catch( e : NullPointerException ){
                 return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND )
@@ -208,22 +160,24 @@ class MainController(rpc: NodeRPCConnection) {
              */
 
 
-            val envelopeVerified = envelope.validateModification( didJson )
-            envelopeVerified.onFailure { return apiUtils.sendErrorResponse(it.reason)}
-            logger.info("document id" + documentId)
+
+            logger.info("document id" + uuid)
+            // ??? moritzplatt 2019-06-20 -- should be done in flow
             val originator = proxy.nodeInfo().legalIdentities.first()
 
 
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
 
+            // ??? moritzplatt 2019-06-20 -- should be done in flow
             val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
             try {
                 logger.info( "creating the corda state object" )
-                val didState = DidState(envelope, originator, witnessNodes.minus(proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID , UniqueIdentifier.fromString(documentId.toString()) )
+                // ??? moritzplatt 2019-06-20 -- should be done in flow
+                val didState = DidState(envelope, originator, witnessNodes.minus(proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.VALID , UniqueIdentifier.fromString(uuid.toString()) )
                 logger.info( "invoking the flow" )
                 val flowHandler = proxy.startFlowDynamic(UpdateDidFlow::class.java, didState)
                 logger.info( "get result from the flow" )
-                val result = flowHandler.use { it.returnValue.getOrThrow() }
+                val result = flowHandler.use {  it.returnValue.getOrThrow()  }
                 logger.info( "flow successful" )
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {
@@ -238,36 +192,22 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
 
+    // ??? moritzplatt 2019-06-20 -- does a `DELETE` require a document at all? it could be an instruction set only?
     @DeleteMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun deleteDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : ResponseEntity<Any?> {
         try {
-            logger.info( "inside the update DID function" )
-            if ( instruction.isEmpty() ){
-                logger.error( "instruction is empty")
-                return ResponseEntity ( ApiResponse( APIMessage.INSTRUCTION_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
 
-            }
-            if ( document.isEmpty() ){
-                logger.error( "document is empty" )
-                return ResponseEntity ( ApiResponse( APIMessage.DOCUMENT_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            if( did.isEmpty() ){
-                logger.error( "did is empty" )
-                return ResponseEntity ( ApiResponse( APIMessage.DID_EMPTY ).toResponseObj(), HttpStatus.BAD_REQUEST )
-
-            }
-            val envelope = net.corda.did.DidEnvelope(instruction,document)
-            if ( !envelope.document.json.get("id")!!.equals(did)){
-                logger.info("Mismatch occurred in DID in parameter and DID in document ")
-                return ResponseEntity ( ApiResponse( APIMessage.MISMATCH_DID ).toResponseObj(), HttpStatus.BAD_REQUEST )
-            }
-            val documentId = net.corda.did.CordaDid(did).uuid
-            var didJson : DidDocument
+            // ??? moritzplatt 2019-06-20 -- consider factoring these checks out to a generic method
+            val envelope = apiUtils.generateEnvelope(instruction,document,did)
+            val uuid = net.corda.did.CordaDid(did).uuid
+            // ??? moritzplatt 2019-06-20 -- variable naming
+            // ??? moritzplatt 2019-06-20 -- merge assignment with try block
 
             try {
-                didJson = queryUtils.getCompleteDIDDocumentByLinearId(documentId.toString())
+                val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.toString())
+                val envelopeVerified = envelope.validateModification( didJson )
+                envelopeVerified.onFailure {return apiUtils.sendErrorResponse(it.reason) }
             }
             catch( e : NullPointerException ){
                 return ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND )
@@ -280,22 +220,24 @@ class MainController(rpc: NodeRPCConnection) {
              * Validate envelope
              */
 
-            val envelopeVerified = envelope.validateModification( didJson )
-            envelopeVerified.onFailure {return apiUtils.sendErrorResponse(it.reason) }
-            logger.info("document id" + documentId)
+
+            logger.info("document id" + uuid)
+            // ??? moritzplatt 2019-06-20 -- in flow
             val originator = proxy.nodeInfo().legalIdentities.first()
 
             /* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
 
+            // ??? moritzplatt 2019-06-20 -- see comment above (config in CorDapp)
             val witnessNodes = proxy.networkMapSnapshot().flatMap { it.legalIdentities }.toSet()
 
             try {
                 logger.info( "creating the corda state object" )
-                val didState = DidState( envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.DELETED, UniqueIdentifier.fromString(documentId.toString()))
+                // ??? moritzplatt 2019-06-20 -- assemble this in flow
+                val didState = DidState( envelope, originator, witnessNodes.minus( proxy.nodeInfo().legalIdentities.toSet() ), DidStatus.DELETED, UniqueIdentifier.fromString(uuid.toString()))
                 logger.info( "invoking the flow" )
                 val flowHandler = proxy.startFlowDynamic( DeleteDidFlow::class.java, didState)
                 logger.info( "get result from the flow" )
-                val result = flowHandler.use { it.returnValue.getOrThrow() }
+                val result = flowHandler.use { it.returnValue.getOrThrow()  }
                 logger.info( "flow successful" )
                 return ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() )
             } catch ( e: IllegalArgumentException ) {

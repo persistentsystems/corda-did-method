@@ -1,6 +1,9 @@
 package net.corda.did.api
 
+import com.natpryce.onFailure
+import net.corda.did.DidEnvelope
 import net.corda.did.DidEnvelopeFailure
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 /**
  * Persistent code
@@ -79,5 +82,31 @@ class APIUtils {
                 return ResponseEntity.badRequest().body( ApiResponse(reason.toString()).toResponseObj() )
             }
         }
+    }
+    fun generateEnvelope(instruction: String ,document: String ,did: String): DidEnvelope {
+
+        if ( instruction.isEmpty() ){
+            MainController.logger.error( "instruction is empty" )
+            throw IllegalArgumentException(APIMessage.INSTRUCTION_EMPTY.message)
+
+        }
+        if ( document.isEmpty() ){
+            MainController.logger.error( "document is empty" )
+            throw IllegalArgumentException(APIMessage.DOCUMENT_EMPTY.message)
+
+        }
+        if( did.isEmpty() ){
+            MainController.logger.error( "did is empty" )
+            throw IllegalArgumentException(APIMessage.DID_EMPTY.message)
+
+        }
+        val envelope = net.corda.did.DidEnvelope(instruction, document)
+        val envelopeDid = envelope.document.id().onFailure { throw IllegalArgumentException(APIMessage.DID_EMPTY.message) }
+
+        if ( envelopeDid.toExternalForm()!=did){
+            MainController.logger.info("Mismatch occurred in DID in parameter and DID in document ")
+            throw IllegalArgumentException(ApiResponse( APIMessage.MISMATCH_DID ).message)
+        }
+        return envelope
     }
 }
