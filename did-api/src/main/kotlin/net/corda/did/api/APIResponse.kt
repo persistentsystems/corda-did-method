@@ -1,6 +1,5 @@
 package net.corda.did.api
 
-import net.corda.did.state.DidState
 /**
  * Persistent code
  *

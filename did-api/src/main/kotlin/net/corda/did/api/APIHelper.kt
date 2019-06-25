@@ -3,7 +3,6 @@ package net.corda.did.api
 import com.natpryce.onFailure
 import net.corda.did.DidEnvelope
 import net.corda.did.DidEnvelopeFailure
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 /**
  * Persistent code
@@ -86,17 +85,17 @@ class APIUtils {
     fun generateEnvelope(instruction: String ,document: String ,did: String): DidEnvelope {
 
         if ( instruction.isEmpty() ){
-            MainController.logger.error( "instruction is empty" )
+            MainController.logger.info( "instruction is empty" )
             throw IllegalArgumentException(APIMessage.INSTRUCTION_EMPTY.message)
 
         }
         if ( document.isEmpty() ){
-            MainController.logger.error( "document is empty" )
+            MainController.logger.info( "document is empty" )
             throw IllegalArgumentException(APIMessage.DOCUMENT_EMPTY.message)
 
         }
         if( did.isEmpty() ){
-            MainController.logger.error( "did is empty" )
+            MainController.logger.info( "did is empty" )
             throw IllegalArgumentException(APIMessage.DID_EMPTY.message)
 
         }

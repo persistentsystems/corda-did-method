@@ -5,14 +5,12 @@
 
 package net.corda.did.api
 
-import net.corda.client.rpc.CordaRPCClient
-import net.corda.client.rpc.CordaRPCConnection
-import net.corda.core.messaging.CordaRPCOps
+
 import net.corda.core.utilities.NetworkHostAndPort
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
+
 
 private const val CORDA_USER_NAME = "config.rpc.username"
 private const val CORDA_USER_PASSWORD = "config.rpc.password"
@@ -37,23 +35,22 @@ open class NodeRPCConnection(
         @Value("\${$CORDA_USER_PASSWORD}") private val password: String,
         @Value("\${$CORDA_RPC_PORT}") private val rpcPort: Int) {
 
-    lateinit var rpcConnection: CordaRPCConnection
+    lateinit var rpcConnection: ReconnectingCordaRPCOps
         private set
-    lateinit var proxy: CordaRPCOps
+    lateinit var proxy: ReconnectingCordaRPCOps
         private set
 
     @PostConstruct
     fun initialiseNodeRPCConnection() {
 
         val rpcAddress = NetworkHostAndPort(host, rpcPort)
-        val rpcClient = CordaRPCClient(rpcAddress)
-        val rpcConnection = rpcClient.start(username, password)
-        proxy = rpcConnection.proxy
+            rpcConnection = ReconnectingCordaRPCOps(rpcAddress,username,password)
+            proxy = rpcConnection
+
+
+
     }
 
-    @PreDestroy
-    fun close() {
-        rpcConnection.notifyServerAndClose()
-    }
+
 
 }

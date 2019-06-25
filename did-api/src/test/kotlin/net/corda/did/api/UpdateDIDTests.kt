@@ -84,7 +84,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -135,7 +136,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isOk())
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(documentNew)).andReturn()
 
 
@@ -189,7 +191,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -239,7 +242,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -291,7 +295,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -338,7 +343,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -391,7 +397,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -441,7 +448,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -494,7 +502,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -543,7 +552,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -594,7 +604,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -643,7 +654,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -697,7 +709,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -745,7 +758,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -797,7 +811,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -844,7 +859,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -896,7 +912,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -947,7 +964,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -990,7 +1008,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().isNotFound())
+        val resultUpdate = mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isNotFound())
 
 
     }
@@ -1040,7 +1059,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -1091,7 +1111,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate= mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform( MockMvcRequestBuilders.asyncDispatch(resultUpdate) ).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -1142,7 +1163,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -1192,7 +1214,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform( MockMvcRequestBuilders.asyncDispatch(resultUpdate) ).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
@@ -1244,7 +1267,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -1289,7 +1313,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+        val resultUpdate = mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform( MockMvcRequestBuilders.asyncDispatch(resultUpdate) ).andExpect(MockMvcResultMatchers.status().isOk())
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(documentNew)).andReturn()
 
 
@@ -1341,7 +1366,8 @@ class UpdateDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
 
         /* update test*/
@@ -1392,7 +1418,8 @@ class UpdateDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+UUID.randomUUID().toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
 
