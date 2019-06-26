@@ -4,6 +4,11 @@
  */
 package net.corda.did.flows
 
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import com.natpryce.valueOrNull
+import junit.framework.AssertionFailedError
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
 import net.corda.core.identity.CordaX500Name
@@ -29,8 +34,9 @@ abstract class AbstractFlowTestUtils {
 	lateinit var originator: StartedMockNode
 	lateinit var w1: StartedMockNode
 	lateinit var w2: StartedMockNode
+	val notarySpec = CordaX500Name(organisation = "Notary", locality = "TestVillage", country = "US")
 	val UUID = java.util.UUID.randomUUID()
-	val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID}")
+	val documentId = net.corda.did.CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
 	val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 	val originalKeyPair = KeyPairGenerator().generateKeyPair()
 	val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
@@ -54,11 +60,10 @@ abstract class AbstractFlowTestUtils {
 	@Before
 	fun setup() {
 		mockNetwork = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(TestCordapp.findCordapp("net.corda.did.state"), TestCordapp.findCordapp("net.corda.did.contract"), TestCordapp.findCordapp("net.corda.did.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
-				"O=Binh,L=TestVillage,C=US")))), threadPerNode = true))
+				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US"))), threadPerNode = true, notarySpecs = listOf(MockNetworkNotarySpec(notarySpec, false))))
 		originator = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US")))
 		w1 = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US")))
 		w2 = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Binh", locality = "TestVillage", country = "US")))
-		//listOf(originator, w1, w2).forEach { it.registerInitiatedFlow(DidFinalityFlowResponder::class.java) }
 		mockNetwork.startNodes()
 	}
 
@@ -67,7 +72,7 @@ abstract class AbstractFlowTestUtils {
 		mockNetwork.stopNodes()
 	}
 
-	private fun getDidStateForCreateOperation(): DidState{
+	protected fun getDidStateForCreateOperation(): DidState{
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 
@@ -83,26 +88,10 @@ abstract class AbstractFlowTestUtils {
 		|}""".trimMargin()
 
 		val envelope = DidEnvelope(instruction, originalDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.VALID, UniqueIdentifier.fromString(UUID.toString()))
+		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
 	}
 
 	protected fun getDidStateForDeleteOperation(): DidState {
-
-		val originalDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$originalKeyUri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$originalKeyPairEncoded"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 
@@ -160,29 +149,37 @@ abstract class AbstractFlowTestUtils {
 		|}""".trimMargin()
 
 		val envelope = DidEnvelope(instruction, newDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.VALID, UniqueIdentifier.fromString(UUID.toString()))
+		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
 	}
 
-	protected fun createDID(): SignedTransaction? {
-		val didState = getDidStateForCreateOperation()
-		val flow = CreateDidFlow(didState)
+	protected fun createDID(envelope: DidEnvelope): SignedTransaction? {
+		val flow = CreateDidFlow(envelope)
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
 	}
 
-	protected fun deleteDID(): SignedTransaction? {
-		createDID()!!.tx
+	protected fun deleteDID(envelope: DidEnvelope): SignedTransaction? {
+		createDID(getDidStateForCreateOperation().envelope)!!.tx
 		mockNetwork.waitQuiescent()
-		val flow = DeleteDidFlow(getDidStateForDeleteOperation())
+		val flow = DeleteDidFlow(envelope.instruction, envelope.document.id().valueOrNull()!!.toExternalForm())
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
 	}
 
-	protected fun updateDID(): SignedTransaction? {
-		createDID()!!.tx
+	protected fun updateDID(envelope: DidEnvelope): SignedTransaction? {
+		createDID(getDidStateForCreateOperation().envelope)!!.tx
 		mockNetwork.waitQuiescent()
-		val flow = UpdateDidFlow(getDidStateForUpdateOperation())
+		val flow = UpdateDidFlow(envelope)
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
 	}
+}
+
+/**
+ * R3 code
+ *
+ */
+fun <T, E> Result<T, E>.assertSuccess(): T = when (this) {
+	is Success -> this.value
+	is Failure -> throw AssertionFailedError("Expected result to be a success but it failed: ${this.reason}")
 }

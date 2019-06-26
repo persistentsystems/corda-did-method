@@ -40,7 +40,7 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }
@@ -51,12 +51,12 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }
@@ -69,12 +69,12 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }
@@ -85,12 +85,12 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(W1.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(W1.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }
@@ -101,12 +101,12 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid.copy(participants = listOf()))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }
@@ -159,7 +159,7 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid.copy(envelope = DidEnvelope(instruction, document)))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
         }
@@ -170,12 +170,12 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid.copy(linearId = UniqueIdentifier()))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.fails()
             }
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
                 this.verifies()
             }
         }

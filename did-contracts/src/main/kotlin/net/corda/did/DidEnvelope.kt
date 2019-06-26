@@ -48,9 +48,10 @@ import java.net.URI
  * along with cryptographic proof of ownership of the DID document in form of a signature.
  * @param document The DID Document string to be written/updated
  */
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 @CordaSerializable
 class DidEnvelope(
+		// ??? moritzplatt 2019-06-20 -- do these need to be vals? `rawInstruction` is unsused `rawDocument` only from test
 		val rawInstruction: String,
 		val rawDocument: String
 ) {
@@ -83,12 +84,32 @@ class DidEnvelope(
 		validateTemporal(precursor).onFailure { return it }
 
 		// perform key ownership for deletion (i.e. prove ownership of ALL keys)
+		// ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
 		validateKeysForModification(precursor).onFailure { return it }
 
 		return Success(Unit)
 	}
 
-	private fun validate(): Result<Unit, ValidationFailure> {
+    /**
+     * Validates that the envelope presented represents a valid update/deletion of the [precursor] provided.
+     */
+    fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
+        instruction.action().onFailure {
+            return Failure(MalformedInstructionFailure(it.reason))
+        }.ensureIs(Update, Delete)
+
+        // perform base validation, ensuring that the document is valid, not yet taking into account the precursor
+        validate().onFailure { return it }
+
+        // perform key ownership for deletion (i.e. prove ownership of ALL keys)
+        // ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
+        validateKeysForModification(precursor).onFailure { return it }
+
+        return Success(Unit)
+    }
+
+
+    private fun validate(): Result<Unit, ValidationFailure> {
 		document.context().mapFailure {
 			MalformedDocumentFailure(it)
 		}.onFailure { return it }
@@ -99,12 +120,11 @@ class DidEnvelope(
 		}.onFailure { return it }
 
 		val updated = document.updated().mapFailure {
-			MalformedDocumentFailure(it)
+				MalformedDocumentFailure(it)
 		}.onFailure { return it }
 
 		if (updated != null && created != null && !updated.isAfter(created))
 			return Failure(InvalidTemporalRelationFailure())
-
 		// Try to extract the signatures from the `instruction` block.
 		// Fail in case this is not possible (i.e. data provided is not JSON or is not well-formed).
 		val signatures = instruction.signatures().onFailure {
@@ -260,7 +280,7 @@ class DidEnvelope(
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
-
+			// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
 			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()

@@ -11,6 +11,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
 import net.corda.assertFailure
+import net.corda.assertSuccess
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
@@ -30,7 +31,7 @@ class DidEnvelopeUpdateTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		/*
 		 * Generate a key pair for the original document
@@ -106,7 +107,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation succeeds for a request that adds a key`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val oldKeyUri1 = URI("${documentId.toExternalForm()}#1")
 		val oldKeyPair1 = KeyPairGenerator().generateKeyPair()
@@ -209,7 +210,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation succeeds for a request that removes a key`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val oldKeyUri = URI("${documentId.toExternalForm()}#1")
 		val oldKeyPair = KeyPairGenerator().generateKeyPair()
@@ -282,7 +283,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails for an update that tampers with the creation date`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 		val originalKeyPair = KeyPairGenerator().generateKeyPair()
@@ -352,7 +353,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails if a created date is added`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 		val originalKeyPair = KeyPairGenerator().generateKeyPair()
@@ -421,7 +422,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails for an update that does not supply an update date`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 		val originalKeyPair = KeyPairGenerator().generateKeyPair()
@@ -490,7 +491,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails for an update that occurs before the creation date`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 		val originalKeyPair = KeyPairGenerator().generateKeyPair()
@@ -560,7 +561,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails for a potential replay attack`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 		val originalKeyPair = KeyPairGenerator().generateKeyPair()
@@ -631,7 +632,7 @@ class DidEnvelopeUpdateTests {
 
 	@Test
 	fun `Validation fails for a request that doesn't provide signatures for all keys`() {
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		val keyUri1 = URI("${documentId.toExternalForm()}#uno")
 		val keyPair1 = KeyPairGenerator().generateKeyPair()

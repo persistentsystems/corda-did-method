@@ -6,6 +6,7 @@
 package net.corda.contract
 
 import net.corda.AbstractContractsStatesTestUtils
+import net.corda.assertSuccess
 import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
@@ -92,7 +93,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -104,13 +105,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -122,13 +123,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
        ledgerServices.ledger {
            transaction {
                input(DidContract.DID_CONTRACT_ID, getDidState())
-               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                this.fails()
            }
            transaction {
                input(DidContract.DID_CONTRACT_ID, getDidState())
                output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                this.verifies()
            }
        }
@@ -141,13 +142,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.DELETED))
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -160,36 +161,17 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
     }
-
-   @Test
-   fun `transaction must be signed by did originator`() {
-       val envelope = getUpdatedEnvelope()
-       ledgerServices.ledger {
-           transaction {
-               input(DidContract.DID_CONTRACT_ID, getDidState())
-               output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-               command(listOf(W1.publicKey), DidContract.Commands.Update(envelope))
-               this.fails()
-           }
-           transaction {
-               input(DidContract.DID_CONTRACT_ID, getDidState())
-               output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-               command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
-               this.verifies()
-           }
-       }
-   }
 
     @Test
     fun `id of the updated did document should not change`() {
@@ -199,7 +181,7 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
         * Generate a new key pair
         */
         val UUID = java.util.UUID.randomUUID()
-        val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID}")
+        val documentId = net.corda.did.CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
         val newKeyUri = URI("${documentId.toExternalForm()}#keys-2")
         val newKeyPair = KeyPairGenerator().generateKeyPair()
         val newKeyPairEncoded = newKeyPair.public.encoded.toBase58()
@@ -245,13 +227,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = env))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(env))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -264,13 +246,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, linearId = UniqueIdentifier()))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -283,13 +265,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, originator = W1.party))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -302,13 +284,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, witnesses = setOf()))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }
@@ -321,13 +303,13 @@ class UpdateDidTests: AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, participants = listOf()))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.fails()
             }
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update(envelope))
+                command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
                 this.verifies()
             }
         }

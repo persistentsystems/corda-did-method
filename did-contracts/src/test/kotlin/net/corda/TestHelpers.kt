@@ -49,12 +49,12 @@ abstract class AbstractContractsStatesTestUtils {
 		|}""".trimMargin()
 
 	val UUID = java.util.UUID.randomUUID()
-	val documentId = net.corda.did.CordaDid("did:corda:tcn:${UUID}")
+	val documentId = net.corda.did.CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
 	val envelope = net.corda.did.DidEnvelope(instruction, document)
 	val ORIGINATOR = TestIdentity(CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US"))
 	var W1 = TestIdentity(CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US"))
 	var W2 = TestIdentity(CordaX500Name(organisation = "Binh", locality = "TestVillage", country = "US"))
-	val CordaDid = DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.VALID, UniqueIdentifier.fromString("77ccbf5e-4ddd-4092-b813-ac06084a3eb0"))
+	val CordaDid = DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.ACTIVE, UniqueIdentifier.fromString("77ccbf5e-4ddd-4092-b813-ac06084a3eb0"))
 	val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 	val originalKeyPair = KeyPairGenerator().generateKeyPair()
 	val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
@@ -90,7 +90,7 @@ abstract class AbstractContractsStatesTestUtils {
 		|}""".trimMargin()
 
 		val envelope = DidEnvelope(instruction, originalDocument)
-		return DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.VALID, UniqueIdentifier.fromString(UUID.toString()))
+		return DidState(envelope, ORIGINATOR.party, setOf(W1.party, W2.party), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
 	}
 }
 

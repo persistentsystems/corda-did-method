@@ -11,6 +11,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
 import net.corda.assertFailure
+import net.corda.assertSuccess
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
@@ -29,7 +30,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		/*
 		 * Generate a key pair for the original document
@@ -93,7 +94,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		/*
 		 * Generate a key pair for the original document
@@ -161,7 +162,7 @@ class DidEnvelopeDeleteTests {
 		/*
 		 * Generate valid base Document
 		 */
-		val documentId = CordaDid("did:corda:tcn:${UUID.randomUUID()}")
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
 
 		/*
 		 * Generate a key pair for the original document

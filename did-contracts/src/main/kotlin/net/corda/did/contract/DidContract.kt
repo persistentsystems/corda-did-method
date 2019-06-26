@@ -47,14 +47,14 @@ open class DidContract : Contract {
     interface Commands : CommandData {
 
         // https://w3c-ccg.github.io/did-spec/#create
-        class Create(val envelope: DidEnvelope) : Commands
+        class Create : Commands
 
         // https://w3c-ccg.github.io/did-spec/#update
-        class Update(val envelope: DidEnvelope) : Commands
+        class Update : Commands
 
         // https://w3c-ccg.github.io/did-spec/#delete-revoke
         // TODO moritzplatt 2019-02-14 -- should this require a fully formed envelope?
-        class Delete(val envelope: DidEnvelope) : Commands
+        class Delete : Commands
     }
 
     /**
@@ -67,14 +67,22 @@ open class DidContract : Contract {
         "DID Create transaction should have zero inputs" using (tx.inputs.isEmpty())
         "DID Create transaction should have only one output" using (tx.outputs.size == 1)
         // TODO need to discuss this
-        "DID Create transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(DIDState.originator.owningKey))
+        // ??? moritzplatt 2019-06-20 -- looks correct
+        "DID Create transaction must be signed by the DID originator" using (setOfSigners.size == 1 && setOfSigners.contains(DIDState.originator.owningKey))
 
         // validate did envelope
-        DIDState.envelope.validateCreation().map {  require(it == Unit) }.onFailure { throw InvalidDidEnvelopeException("Invalid Did envelope $it") }
-        "Status of newly created did must be 'VALID'" using(DIDState.isValid())
-        "Originator and witness nodes should be added to the participants list" using(DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
-        val UUID = DIDState.envelope.document.UUID().valueOrNull() as UUID
-        "LinearId of the DidState must be equal to the UUID component of did" using(UUID.equals(DIDState.linearId.id))
+        // ??? moritzplatt 2019-06-20 -- can be rewritten:
+        "the envelope presented is must be valid to create" using (DIDState.envelope.validateCreation() is Success)
+
+        // ??? moritzplatt 2019-06-20 -- verify block should throw `IllegalArgumentException`
+        DIDState.envelope.validateCreation().map { require(it == Unit) }.onFailure { throw IllegalArgumentException("Invalid Did envelope $it") }
+        "Status of newly created did must be 'VALID'" using (DIDState.isValid())
+        "Originator and witness nodes should be added to the participants list" using (DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
+        // ??? moritzplatt 2019-06-20 -- unsafe cast will throw a `TypeCastException` whereas the verify block should
+        // throw `IllegalArgumentException` i.e.
+        val UUID = DIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch UUID from did") }.uuid
+        "LinearId of the DidState must be equal to the UUID component of did" using (UUID == DIDState.linearId.id)
+        // ??? moritzplatt 2019-06-20 -- can use == operator
     }
 
     /**
@@ -85,26 +93,37 @@ open class DidContract : Contract {
 
         val oldDIDState = tx.inputsOfType<DidState>().single()
         val newDIDState = tx.outputsOfType<DidState>().single()
-        "DID Update transaction should have 1 input" using (tx.inputs.size == 1)
-        "DID Update transaction should have only one output" using (tx.outputs.size == 1)
+        // ??? moritzplatt 2019-06-20 -- superfluous check. previous `single` call would already have thrown
+
         // TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
-        "DID Update transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
+        // ??? moritzplatt 2019-06-20 -- this means users will always have to go through the same node for updates
+        // is that a constraint we want to place on them?
+
+        // ??? Nitesh Solanki 2019-06-21 we can remove this check.
+        //TODO changed Q2
+        //"DID Update transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
 
         // validate modification
-        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentModificationFailure("Failed to update DID document $it") }
+        // ??? moritzplatt 2019-06-20 -- can be simplified
+        "Failed to update DID document" using (newDIDState.envelope.validateModification(oldDIDState.envelope.document) is Success)
         "Status of the precursor DID must be 'VALID'" using(oldDIDState.isValid())
         "Status of the updated DID must be 'VALID'" using(newDIDState.isValid())
 
-        val oldDid = oldDIDState.envelope.document.id().valueOrNull() as CordaDid
-        val newDid = newDIDState.envelope.document.id().valueOrNull() as CordaDid
-        "ID of the updated did document should not change" using(oldDid.toExternalForm().equals(newDid.toExternalForm()))
+        // ??? moritzplatt 2019-06-20 -- unsafe cast will throw a `TypeCastException` whereas the verify block should
+        // throw `IllegalArgumentException`
+        val oldDid = oldDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
+        val newDid = newDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
+        "ID of the updated did document should not change" using(oldDid.toExternalForm() == newDid.toExternalForm())
 
-        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId.equals(newDIDState.linearId))
+        // ??? moritzplatt 2019-06-20 -- can use == operator
+        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId == newDIDState.linearId)
 
         // TODO state participants [List] and witness nodes [Set] changes is considered as a separate update transaction and hence separate command(DIDState update)--? should this be purely DID document update transaction
-        "DidState Originator should not change when updating DID document" using (oldDIDState.originator.equals(newDIDState.originator))
-        "DidState witness nodes list should not change when updating DID document" using (oldDIDState.witnesses.equals(newDIDState.witnesses))
-        "Participants list should not change when updating DID document" using(oldDIDState.participants.equals(newDIDState.participants))
+        // ??? moritzplatt 2019-06-20 -- agreed. a change of witness nodes--if supported at all--should be a different command. this should be only about updates (in the sense of the spec)
+        // ??? moritzplatt 2019-06-20 -- could all use ==
+        "DidState Originator should not change when updating DID document" using (oldDIDState.originator == newDIDState.originator)
+        "DidState witness nodes list should not change when updating DID document" using (oldDIDState.witnesses == newDIDState.witnesses)
+        "Participants list should not change when updating DID document" using(oldDIDState.participants == newDIDState.participants)
     }
 
     /**
@@ -112,37 +131,34 @@ open class DidContract : Contract {
      *
      */
 
+    // ??? moritzplatt 2019-06-20 -- consider refactoring some of the joint functionality between `verifyDidUpdate` and `verifyDidDelete` to a joint method
     // Delete will just mark the state as DELETED
     open fun verifyDidDelete(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
         val oldDIDState = tx.inputsOfType<DidState>().single()
         val newDIDState = tx.outputsOfType<DidState>().single()
-        "DID Delete transaction should have 1 input" using (tx.inputs.size == 1)
-        "DID Delete transaction should have only one output" using (tx.outputs.size == 1)
+
         // TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
-        "DID Delete transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
+        //"DID Delete transaction must be signed by the DID originator" using(setOfSigners.size == 1 && setOfSigners.contains(oldDIDState.originator.owningKey))
 
         // validate modification
-        newDIDState.envelope.validateModification(oldDIDState.envelope.document).map {  require(it == Unit) }.onFailure { throw DidDocumentModificationFailure("Failed to delete DID document $it") }
+        "Failed to delete DID document" using (newDIDState.envelope.validateDeletion(oldDIDState.envelope.document) is Success)
         "Status of the precursor DID must be 'VALID'" using(oldDIDState.isValid())
         "Status of the updated DID must be 'INVALID'" using(!newDIDState.isValid())
 
-        val oldDidKeys = oldDIDState.envelope.document.publicKeys().valueOrNull() as Set<QualifiedPublicKey>
-        val newDidKeys = newDIDState.envelope.document.publicKeys().valueOrNull() as Set<QualifiedPublicKey>
-        "Delete transaction should not change the public Keys in DID document" using(oldDidKeys.equals(newDidKeys))
+        // ??? moritzplatt 2019-06-20 -- see notes around unsafe casts/TypeCastException above
+        val oldDidKeys = oldDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }
+        val newDidKeys = newDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }
+        
+        // ??? moritzplatt 2019-06-20 -- there was an idea earlier that for deletion you wouldn't have to produce all keys.
+        // unsure where you landed on the design discussion here
+        // TODO didn't change Q3
+        "Delete transaction should not change the public Keys in DID document" using(oldDidKeys == newDidKeys)
 
-        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId.equals(newDIDState.linearId))
+        "Linear ID of the DID state should not change when updating DID document" using(oldDIDState.linearId == newDIDState.linearId)
 
-        "DidState Originator should not change when deleting DID" using (oldDIDState.originator.equals(newDIDState.originator))
-        "DidState witness nodes list should not change when deleting DID" using (oldDIDState.witnesses.equals(newDIDState.witnesses))
-        "Participants list should not change when deleting DID" using(oldDIDState.participants.equals(newDIDState.participants))
+        "DidState Originator should not change when deleting DID" using (oldDIDState.originator == newDIDState.originator)
+        "DidState witness nodes list should not change when deleting DID" using (oldDIDState.witnesses == newDIDState.witnesses)
+        "Participants list should not change when deleting DID" using(oldDIDState.participants == newDIDState.participants)
     }
 }
-
-/**
- * Persistent code
- *
- */
-sealed class DidContractException(message: String) : CordaRuntimeException(message)
-class InvalidDidEnvelopeException(override val message: String) : DidContractException(message)
-class DidDocumentModificationFailure(override val message: String) : DidContractException(message)

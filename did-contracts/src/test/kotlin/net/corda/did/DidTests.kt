@@ -8,7 +8,10 @@ package net.corda.did
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.throws
+import net.corda.assertFailure
+import net.corda.assertSuccess
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -28,15 +31,15 @@ class DidTests(
 	@Test
 	fun `can roundtrip DID`() {
 		val expected = "did:corda:$networkName:6f262985-38e9-4766-98b9-9dde14a38740"
-		val actual = CordaDid(expected).toExternalForm()
+		val actual = CordaDid.parseExternalForm(expected).assertSuccess().toExternalForm()
 
 		assertThat(actual, equalTo(expected))
 	}
 
 	@Test
 	fun `rejects non-DIDs`() {
-		assertThat({
-			CordaDid("bogus:corda:$networkName:6f262985-38e9-4766-98b9-9dde14a38740")
-		}, throws<IllegalArgumentException>(has(IllegalArgumentException::message, equalTo("""DID must use the "did" scheme. Found "bogus"."""))))
+		val actual = CordaDid.parseExternalForm("bogus:corda:$networkName:6f262985-38e9-4766-98b9-9dde14a38740").assertFailure()
+		@Suppress("RemoveExplicitTypeArguments")
+		assertThat(actual, isA<CordaDidFailure.CordaDidValidationFailure.InvalidDidSchemeFailure>())
 	}
 }

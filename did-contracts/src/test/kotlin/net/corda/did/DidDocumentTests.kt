@@ -41,7 +41,7 @@ class DidDocumentTests {
 
 		assertThat(
 				actual = example.id().assertSuccess().toExternalForm(),
-				criteria = equalTo(CordaDid("did:corda:tcn:0e61ab14-73a3-4a7b-846b-15d6bca78b31").toExternalForm())
+				criteria = equalTo(CordaDid.parseExternalForm("did:corda:tcn:0e61ab14-73a3-4a7b-846b-15d6bca78b31").assertSuccess().toExternalForm())
 		)
 	}
 

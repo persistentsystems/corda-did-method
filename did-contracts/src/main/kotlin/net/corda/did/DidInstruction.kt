@@ -35,12 +35,6 @@ class DidInstruction(json: String) : JsonBacked(json) {
 		it.toAction()
 	}
 
-	fun id(): DidInstructionResult<CordaDid> = json.getMandatoryString("id").map {
-		CordaDid(it)
-	}.mapFailure {
-		InvalidInstructionJsonFailure(it)
-	}
-
 	/**
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an
 	 * unknown crypto suite is detected.
@@ -57,6 +51,7 @@ class DidInstruction(json: String) : JsonBacked(json) {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 
+			// ??? moritzplatt 2019-06-20 -- this assumes the encoding to be `signatureBase58` when technically others are supported to
 			val value = signature.getMandatoryBase58Bytes("signatureBase58").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
@@ -84,6 +79,7 @@ private fun String.toAction(): DidInstructionResult<Action> = when (this) {
 @Suppress("UNUSED_PARAMETER", "unused")
 sealed class DidInstructionFailure : FailureCode() {
 	class InvalidInstructionJsonFailure(val underlying: JsonFailure) : DidInstructionFailure()
+	class InvalidDidFailure(underlying: CordaDidFailure) : DidInstructionFailure()
 	class UnknownActionFailure(val action: String) : DidInstructionFailure()
 }
 

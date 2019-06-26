@@ -5,42 +5,63 @@
 
 package net.corda.did
 
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import net.corda.FailureCode
+import net.corda.JsonFailure
 import net.corda.did.Network.CordaNetwork
 import net.corda.did.Network.CordaNetworkUAT
 import net.corda.did.Network.Testnet
 import java.net.URI
 import java.util.UUID
 
-class CordaDid(
-		externalForm: String
+ class CordaDid(
+		val did: URI,
+		val network: Network,
+		val uuid: UUID
 ) {
-	val did: URI = URI.create(externalForm)
-	val network: Network
-	val uuid: UUID
 
-	init {
-		if (did.scheme != "did")
-			throw IllegalArgumentException("""DID must use the "did" scheme. Found "${did.scheme}".""")
+	 fun toExternalForm() =  did.toString()
 
-		val regex = """did:corda:(tcn|tcn-uat|testnet):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
+	 // ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
+	// rather perform parsing from string in a dedicated method that returns a result
+	companion object {
+		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
+			val did = URI.create(externalForm)
+			if (did.scheme != "did")
+				return Failure(CordaDidFailure.CordaDidValidationFailure.InvalidDidSchemeFailure(did.scheme))
 
-		val (n, u) = regex.find(externalForm)?.destructured ?: throw IllegalArgumentException("Malformed Corda DID")
+			val regex = """did:corda:(tcn|tcn-uat|testnet):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
 
-		network = n.toNetwork()
+			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure())
 
-		uuid = try {
-			UUID.fromString(u)
-		} catch (e: IllegalArgumentException) {
-			throw IllegalArgumentException("Third part of a Corda DID needs to be a valid UUID", e)
+			val network = n.toNetwork()
+
+			val uuid = try {
+				UUID.fromString(u)
+			} catch (e: IllegalArgumentException) {
+				throw IllegalArgumentException("Third part of a Corda DID needs to be a valid UUID", e)
+			}
+
+			return Success(CordaDid(did, network, uuid))
+		}
+
+
+		private fun String.toNetwork(): Network = when (this) {
+			"tcn" -> CordaNetwork
+			"tcn-uat" -> CordaNetworkUAT
+			"testnet" -> Testnet
+			else -> throw IllegalArgumentException(""""Unknown network "$this"""")
 		}
 	}
+}
 
-	fun toExternalForm() = did.toString()
-
-	private fun String.toNetwork(): Network = when (this) {
-		"tcn"     -> CordaNetwork
-		"tcn-uat" -> CordaNetworkUAT
-		"testnet" -> Testnet
-		else      -> throw IllegalArgumentException(""""Unknown network "$this"""")
+@Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
+sealed class CordaDidFailure : FailureCode() {
+	sealed class CordaDidValidationFailure(description: String) : CordaDidFailure()
+	{
+		class InvalidDidSchemeFailure(underlying: String) : CordaDidValidationFailure("""DID must use the "did" scheme. Found "${underlying}".""")
+		class MalformedCordaDidFailure : CordaDidValidationFailure("Malformed Corda DID")
 	}
 }

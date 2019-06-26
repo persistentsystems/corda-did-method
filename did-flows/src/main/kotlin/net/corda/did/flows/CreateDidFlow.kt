@@ -1,8 +1,10 @@
 package net.corda.did.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.natpryce.valueOrNull
+import com.natpryce.map
+import com.natpryce.onFailure
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.identity.CordaX500Name
@@ -11,16 +13,33 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.did.CordaDid
+import net.corda.did.DidEnvelope
 import net.corda.did.utils.DIDAlreadyExistException
-import net.corda.did.utils.FlowLogicCommonMethods
+import net.corda.did.utils.*
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
+import net.corda.did.state.DidStatus
 import java.util.*
 import kotlin.collections.ArrayList
 
 @InitiatingFlow
 @StartableByRPC
-class CreateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), FlowLogicCommonMethods {
+// ??? moritzplatt 2019-06-20 -- I'm unsure about passing a Fully formed `DidState` to the flow constructor
+// This assumes the caller can set originator, witnesses, participants which is not likely something we want to be set
+// from the outside. These fields should rather be generated in the flow itself.
+// i.e., consider the following constructor
+//
+//  class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>(), FlowLogicCommonMethods {
+//
+// then extract the parameters as follows:
+//
+//      DidState.originator: serviceHub.myInfo.legalIdentities.first()
+//      DidState.witnesses: By configuration
+//      DidState.status: envelope.instruction
+//      DidState.linearId: UniqueIdentifier(null, envelope.document.id())
+//      DidState.participants: implicit
+
+class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
     companion object {
         object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on new DidState.")
@@ -47,33 +66,46 @@ class CreateDidFlow(val didState: DidState) : FlowLogic<SignedTransaction>(), Fl
     override fun call(): SignedTransaction {
 
         // query the ledger if did exist or not
-        val uuid = didState.envelope.document.UUID().valueOrNull() as UUID
-        val didStates = serviceHub.loadState(UniqueIdentifier(null, uuid), DidState::class.java)
 
-        val did = didState.envelope.document.id().valueOrNull() as CordaDid
+        // ??? moritzplatt 2019-06-20 -- calling both `UUID()` and `id()` seems like unnecessary duplication
+        // i.e.:
+        //
+        //        didState.envelope.document.id().map {
+        //            serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
+        //        }
+
+        var didStates: List<StateAndRef<DidState>> = listOf()
+        envelope.document.id().map {
+            didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
+        }
+
+        val did = envelope.document.id().onFailure { throw Exception("") }
 
         if(didStates.isNotEmpty()) {
             throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
         }
 
         // Obtain a reference to the notary we want to use.
-        val notary = serviceHub.firstNotary()
-
+        // ??? moritzplatt 2019-06-20 -- the preferred notary should come from configuration
+        // see https://corda.network/participation/notary-considerations.html#guidance-for-application-developers for
+        // reasoning
+        val notary = serviceHub.getNotaryFromConfig()
 
         // Stage 1.
         progressTracker.currentStep = GENERATING_TRANSACTION
 
         val config = serviceHub.getAppContext().config
         val nodes = config.get("nodes") as ArrayList<*>
-        val participantsList = arrayListOf<Party>()
+        val witnessNodesList = arrayListOf<Party>()
        for (any in nodes.toSet()) {
-           participantsList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(any.toString()))!!)
+           witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(any.toString()))!!)
        }
 
+        val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
         // Generate an unsigned transaction.
-        val txCommand = Command(DidContract.Commands.Create(didState.envelope), listOf(didState.originator.owningKey))
+        val txCommand = Command(DidContract.Commands.Create(), listOf(ourIdentity.owningKey))
         val txBuilder = TransactionBuilder(notary)
-                .addOutputState(didState.copy(witnesses = participantsList.toSet(), participants = listOf(didState.originator) + participantsList), DidContract.DID_CONTRACT_ID)
+                .addOutputState(didState, DidContract.DID_CONTRACT_ID)
                 .addCommand(txCommand)
 
         // Stage 2.

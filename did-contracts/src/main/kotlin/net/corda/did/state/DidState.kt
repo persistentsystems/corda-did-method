@@ -23,7 +23,7 @@ data class DidState(
 		val originator: Party,
 		val witnesses: Set<Party>,
 		val status: DidStatus,
-		override val linearId: UniqueIdentifier = UniqueIdentifier.fromString(envelope.document.UUID().valueOrNull().toString()) ,
+		override val linearId: UniqueIdentifier ,
 		override val participants: List<AbstractParty> = (witnesses + originator).toList()
 ) : LinearState, QueryableState {
 
@@ -32,10 +32,11 @@ data class DidState(
 	 *
 	 */
 	override fun generateMappedObject(schema : MappedSchema) : PersistentState {
+		val did = this.envelope.document.id().valueOrNull()!!.toExternalForm()
 		return when (schema) {
 			is DidStateSchemaV1 -> DidStateSchemaV1.PersistentDidState(
 					originator = this.originator,
-					didExternalForm = this.envelope.document.id().valueOrNull()!!.toExternalForm(),
+					didExternalForm = did,
 					status = this.status,
 					linearId = this.linearId.id
 			)
@@ -44,7 +45,7 @@ data class DidState(
 	}
 
 	override fun supportedSchemas() = listOf(DidStateSchemaV1)
-	fun isValid() = status == DidStatus.VALID
+	fun isValid() = status == DidStatus.ACTIVE
 }
 
 /**
@@ -53,6 +54,8 @@ data class DidState(
  */
 @CordaSerializable
 enum class DidStatus {
-	VALID,
+	// ??? moritzplatt 2019-06-20 -- misleading naming as this clashes with the concept of 'validity' of an envelope.
+	// consider 'ACTIVE'
+	ACTIVE,
 	DELETED
 }
