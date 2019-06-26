@@ -84,7 +84,8 @@ class DeleteDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
         val documentDelete = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -120,7 +121,8 @@ class DeleteDIDAPITest {
             request.method = "DELETE"
             request
         }
-        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
 
 
     }
@@ -171,7 +173,8 @@ class DeleteDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
         val documentDelete = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -208,7 +211,8 @@ class DeleteDIDAPITest {
             request.method = "DELETE"
             request
         }
-        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
 
 
         val kpNew = KeyPairGenerator().generateKeyPair()
@@ -258,7 +262,8 @@ class DeleteDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).param("instruction",instructionNew).param("document",documentNew)
-        mockMvc.perform(updateBuilder).andExpect(MockMvcResultMatchers.status().isNotFound())
+        val resultUpdate=mockMvc.perform(updateBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isNotFound())
 
 
 
@@ -310,7 +315,8 @@ class DeleteDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
         val documentDelete = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -347,7 +353,8 @@ class DeleteDIDAPITest {
             request.method = "DELETE"
             request
         }
-        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn()
 
 
@@ -400,7 +407,8 @@ class DeleteDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
         val documentDelete = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -437,8 +445,10 @@ class DeleteDIDAPITest {
             request.method = "DELETE"
             request
         }
-        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().isOk())
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn()
+        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
+        val result2=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result2)).andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn()
 
 
     }
@@ -488,7 +498,8 @@ class DeleteDIDAPITest {
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
         val documentDelete = """{
 		|  "@context": "https://w3id.org/did/v1",
@@ -524,7 +535,8 @@ class DeleteDIDAPITest {
             request.method = "DELETE"
             request
         }
-        mockMvc.perform(deleteBuilder).andExpect(MockMvcResultMatchers.status().is4xxClientError())
+        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 
     }

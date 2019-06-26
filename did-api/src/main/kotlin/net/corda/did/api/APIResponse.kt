@@ -1,6 +1,5 @@
 package net.corda.did.api
 
-import net.corda.did.state.DidState
 /**
  * Persistent code
  *
@@ -17,16 +16,4 @@ fun ApiResponse.toResponseObj(): ApiResponse {
             message.toString()
     )
 }
-
-fun DidState.toResponseObj():DidState{
-
-    return DidState(
-        envelope,
-        originator,
-        witnesses,
-        status,
-        linearId,
-        participants
-
-    )
-}
+// ??? moritzplatt 2019-06-20 -- what purpose has this method? seems to do a `copy`?

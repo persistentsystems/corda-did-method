@@ -8,7 +8,14 @@
 *
 * */
 
+// ??? moritzplatt 2019-06-20 -- Gradle is missing a dependency:
+// `testCompile group: 'org.springframework.boot', name: 'spring-boot-test', version: '1.5.7.RELEASE'`
+
 //TODO is there a way to mock a Corda node so it can be tested via these tests?
+
+// ??? moritzplatt 2019-06-20 -- yes, using the Test Node Driver https://docs.corda.net/corda-api.html#public-api
+// see this for an example:
+// https://github.com/corda/samples/blob/0473ea84da6d96305af65dc5ec85120533931cbd/timesheet-example/workflows-kotlin/src/integrationTest/kotlin/com/example/DriverBasedTests.kt
 package net.corda.did.api
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
@@ -25,6 +32,8 @@ import java.net.URI
 import java.util.*
 import java.io.FileInputStream
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch
+
 /**
  * Persistent code
  *
@@ -96,7 +105,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
     @Test
     fun `Create a DID` () {
@@ -142,7 +152,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
     }
     @Test
     fun `Create API should return 400 if DID format is wrong` () {
@@ -188,7 +199,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
     @Test
     fun `Create API should return 400 if DID instruction is wrong` () {
@@ -233,7 +245,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -281,7 +294,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
     @Test
     fun `Create  DID should return 409 is DID already exists` () {
@@ -329,8 +343,10 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
-        mockMvc.perform(builder).andExpect(status().isConflict()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+        val result2=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result2)).andExpect(status().isConflict()).andReturn()
 
     }
     @Test
@@ -379,7 +395,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().isOk()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
 
     }
@@ -442,7 +459,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -486,7 +504,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -535,7 +554,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result = mockMvc.perform(builder).andReturn()
+        mockMvc.perform( asyncDispatch(result)).andExpect( status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -593,7 +613,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -630,6 +651,7 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
+
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
@@ -666,7 +688,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -762,7 +785,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
     @Test
@@ -809,7 +833,8 @@ class CreateDIDAPITest{
             request.method = "PUT"
             request
         }
-        mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
+        val result=mockMvc.perform(builder).andReturn()
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
 
 
