@@ -41,7 +41,7 @@ import java.util.UUID
 			val uuid = try {
 				UUID.fromString(u)
 			} catch (e: IllegalArgumentException) {
-				throw IllegalArgumentException("Third part of a Corda DID needs to be a valid UUID", e)
+				return Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaDidUUIDFailure())
 			}
 
 			return Success(CordaDid(did, network, uuid))
@@ -63,5 +63,7 @@ sealed class CordaDidFailure : FailureCode() {
 	{
 		class InvalidDidSchemeFailure(underlying: String) : CordaDidValidationFailure("""DID must use the "did" scheme. Found "${underlying}".""")
 		class MalformedCordaDidFailure : CordaDidValidationFailure("Malformed Corda DID")
+		class InvalidCordaDidUUIDFailure : CordaDidValidationFailure(" Malformed Corda DID UUID")
+
 	}
 }

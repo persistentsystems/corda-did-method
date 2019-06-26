@@ -101,7 +101,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
            witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(any.toString()))!!)
        }
 
-        val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
+        val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.minus(ourIdentity).toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
         // Generate an unsigned transaction.
         val txCommand = Command(DidContract.Commands.Create(), listOf(ourIdentity.owningKey))
         val txBuilder = TransactionBuilder(notary)
