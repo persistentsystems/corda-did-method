@@ -55,20 +55,21 @@ class MainController(rpc: NodeRPCConnection) {
         val apiResult = DeferredResult<ResponseEntity<Any?>>()
         try {
 
-            logger.info( "inside create function" )
+
             val envelope = apiUtils.generateEnvelope(instruction,document,did)
             net.corda.did.CordaDid.parseExternalForm(did)
 
             // ??? moritzplatt 2019-06-20 -- suggestion here would be to remove this block and instead of querying, rely on the output of the startFlowDynamic call only
             // the current implementation introduces a race condition between the `getDIDDocumentByLinearId` call and the
             // consumption of the `returnValue`
+            //pranav 2019-06-27-- removed as per review comment
 
             /**
             * Validate envelope
             */
             val envelopeVerified = envelope.validateCreation()
             envelopeVerified.onFailure { apiResult.setErrorResult( apiUtils.sendErrorResponse( it.reason ));return apiResult}
-            logger.info("document verified")
+
             // ??? moritzplatt 2019-06-20 -- as described in comments on the flow logic, this should not be passed from the API
 
 
@@ -79,27 +80,27 @@ class MainController(rpc: NodeRPCConnection) {
 
                 // ??? moritzplatt 2019-06-20 -- consider comments on the flow constructor
                   //pranav: 2019-06-27 As per Moritz comments we are now just passing envelope to flow
-                val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
-                logger.info("initializing flow handler")
+            val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
+
                 // ??? moritzplatt 2019-06-20 -- not familiar with Spring but `getOrThrow` is blocking.
                 // Maybe there is a pattern around futures (i.e. https://www.baeldung.com/spring-async)?
                 // Just a thought though
                // pranav: 2019-06-27 added logic to for asynchronous execution of blocking code
-                executorService.submit {
-                    try {
+            executorService.submit {
+                try {
 
                         val result = flowHandler.use { it.returnValue.getOrThrow() }
-                        apiResult.setResult(ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
-                    }
-                    catch(e: IllegalArgumentException ){
-                        apiResult.setErrorResult(ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() ))
+                        apiResult.setResult( ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
+                 }
+                catch(e: IllegalArgumentException ){
+                        apiResult.setErrorResult( ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() ))
 
                     }
-                    catch( e : DIDDeletedException ){
-                        apiResult.setErrorResult(ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
+                catch( e : DIDDeletedException ){
+                        apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
                     }
-                    catch( e: DIDAlreadyExistException ){
-                        apiResult.setErrorResult(ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(), HttpStatus.CONFLICT ))
+                catch( e: DIDAlreadyExistException ){
+                        apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(), HttpStatus.CONFLICT ))
 
                     }
 
@@ -111,7 +112,7 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch( e : Exception ){
             logger.error( e.message )
-            apiResult.setErrorResult(ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() ))
+            apiResult.setErrorResult( ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() ))
             return apiResult
         }
 
@@ -124,7 +125,7 @@ class MainController(rpc: NodeRPCConnection) {
     fun fetchDIDDocument( @PathVariable(value = "did") did: String ):ResponseEntity<Any?> {
 
         try {
-            val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure {   logger.info("inside exception");return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() )}
+            val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure {  return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() )}
 
             builder {
                 val didJson = queryUtils.getDIDDocumentByLinearId(uuid.uuid.toString())
@@ -135,7 +136,7 @@ class MainController(rpc: NodeRPCConnection) {
                 }
                 // ??? moritzplatt 2019-06-20 -- do not return the re-serialised version based on JsonObject. Signatures may not match
                 // pranav 2019-06-25 updated code to return raw document as a string
-                return ResponseEntity.ok().body(didJson)
+                return ResponseEntity.ok().body( didJson )
             }
         }
         catch ( e : IllegalArgumentException ){
@@ -167,6 +168,7 @@ class MainController(rpc: NodeRPCConnection) {
             val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure {    apiResult.setErrorResult(ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() ));return apiResult}
 
             // ??? moritzplatt 2019-06-20 -- merge with assignment var didJson = try { ... }
+            //pranav 2019-06-27 --changed as per review comment
             try {
                 val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.uuid.toString())
                 val envelopeVerified = envelope.validateModification( didJson )
@@ -174,7 +176,7 @@ class MainController(rpc: NodeRPCConnection) {
             }
             catch( e : NullPointerException ){
 
-                apiResult.setErrorResult(ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND ))
+                apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.NOT_FOUND ).toResponseObj(), HttpStatus.NOT_FOUND ))
                 return apiResult
             }
             catch( e : DIDDeletedException ){
@@ -182,29 +184,25 @@ class MainController(rpc: NodeRPCConnection) {
                 return apiResult
             }
 
-            /**
-             * Validate envelope
-             */
 
-            val flowHandler = proxy.startFlowDynamic(UpdateDidFlow::class.java, envelope)
-            //start
+            val flowHandler = proxy.startFlowDynamic( UpdateDidFlow::class.java, envelope)
+
             executorService.submit {
                 try {
                     val result = flowHandler.use { it.returnValue.getOrThrow() }
-                    apiResult.setResult(ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() ))
+                    apiResult.setResult( ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() ))
                 }
-                catch(e: IllegalArgumentException ){
+                catch( e: IllegalArgumentException ){
 
                     apiResult.setErrorResult( ResponseEntity.badRequest().body( ApiResponse(e.message).toResponseObj() ))
 
                 }
                 catch( e : DIDDeletedException ){
 
-                    apiResult.setErrorResult(ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
+                    apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
                 }
 
             }
-            //end
 
 
             return apiResult
@@ -212,7 +210,7 @@ class MainController(rpc: NodeRPCConnection) {
         }
         catch( e : Exception ){
             logger.error( e.message )
-            apiResult.setErrorResult(ResponseEntity.badRequest().body( ApiResponse( e.message ).toResponseObj() ))
+            apiResult.setErrorResult( ResponseEntity.badRequest().body( ApiResponse( e.message ).toResponseObj() ))
             return apiResult
         }
     }
@@ -232,7 +230,7 @@ class MainController(rpc: NodeRPCConnection) {
                 try {
                     val result = flowHandler.use { it.returnValue.getOrThrow() }
 
-                    apiResult.setResult(ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() ))
+                    apiResult.setResult( ResponseEntity.ok().body( ApiResponse(result.toString()).toResponseObj() ))
                 }
                 catch(e: IllegalArgumentException ){
 
@@ -241,7 +239,7 @@ class MainController(rpc: NodeRPCConnection) {
                 }
                 catch( e : DIDNotFoundException ){
 
-                    apiResult.setErrorResult(ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
+                    apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
                 }
 
             }
