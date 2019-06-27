@@ -87,22 +87,8 @@ class DeleteDIDAPITest {
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
-        val documentDelete = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId}",
-		|  "created": "1970-01-01T00:00:00Z",
-        |  "updated": "1970-01-02T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$uri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId}",
-		|	  "publicKeyBase58": "$pub"
-		|	}
-		|  ]
-		|}""".trimMargin()
 
-        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+        val signatureDelete = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
         val encodedSignatureDelete = signatureDelete.bytes.toBase58()
         val instructionDelete = """{
@@ -116,12 +102,12 @@ class DeleteDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
-        val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
+        //val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
+        val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionDeletejsonFile).with { request ->
             request.method = "DELETE"
             request
         }
-        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        val resultDelete = mockMvc.perform(deleteBuilder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
 
 
@@ -176,22 +162,8 @@ class DeleteDIDAPITest {
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
-        val documentDelete = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId}",
-		|  "created": "1970-01-01T00:00:00Z",
-        |  "updated": "1970-01-02T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$uri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId}",
-		|	  "publicKeyBase58": "$pub"
-		|	}
-		|  ]
-		|}""".trimMargin()
 
-        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+        val signatureDelete = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
         val encodedSignatureDelete = signatureDelete.bytes.toBase58()
         val instructionDelete = """{
@@ -206,7 +178,7 @@ class DeleteDIDAPITest {
 		|}""".trimMargin()
 
         val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
+        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
         val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
             request.method = "DELETE"
             request
@@ -318,22 +290,8 @@ class DeleteDIDAPITest {
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
-        val documentDelete = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId}",
-		|  "created": "1970-01-01T00:00:00Z",
-        |  "updated": "1970-01-02T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$uri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId}",
-		|	  "publicKeyBase58": "$pub"
-		|	}
-		|  ]
-		|}""".trimMargin()
 
-        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+        val signatureDelete = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
         val encodedSignatureDelete = signatureDelete.bytes.toBase58()
         val instructionDelete = """{
@@ -348,7 +306,7 @@ class DeleteDIDAPITest {
 		|}""".trimMargin()
 
         val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
+        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
         val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
             request.method = "DELETE"
             request
@@ -410,22 +368,9 @@ class DeleteDIDAPITest {
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
-        val documentDelete = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId}",
-		|  "created": "1970-01-01T00:00:00Z",
-        |  "updated": "1970-01-02T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$uri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId}",
-		|	  "publicKeyBase58": "$pub"
-		|	}
-		|  ]
-		|}""".trimMargin()
 
-        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+
+        val signatureDelete = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
         val encodedSignatureDelete = signatureDelete.bytes.toBase58()
         val instructionDelete = """{
@@ -440,14 +385,14 @@ class DeleteDIDAPITest {
 		|}""".trimMargin()
 
         val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
+        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
         val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+uuid.toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
             request.method = "DELETE"
             request
         }
-        val resultDelete=mockMvc.perform(deleteBuilder).andReturn()
+        val resultDelete = mockMvc.perform(deleteBuilder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().isOk())
-        val result2=mockMvc.perform(builder).andReturn()
+        val result2 = mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result2)).andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn()
 
 
@@ -501,22 +446,8 @@ class DeleteDIDAPITest {
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
 
-        val documentDelete = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId}",
-		|  "created": "1970-01-01T00:00:00Z",
-        |  "updated": "1970-01-02T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$uri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId}",
-		|	  "publicKeyBase58": "$pub"
-		|	}
-		|  ]
-		|}""".trimMargin()
 
-        val signatureDelete = kp.private.sign(documentDelete.toByteArray(Charsets.UTF_8))
+        val signatureDelete = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
         val encodedSignatureDelete = signatureDelete.bytes.toBase58()
         val instructionDelete = """{
@@ -530,8 +461,8 @@ class DeleteDIDAPITest {
 		|  ]
 		|}""".trimMargin()
         val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-        val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
-        val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+UUID.randomUUID().toString()).file(instructionDeletejsonFile).file(documentDeletejsonFile).with { request ->
+       // val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+        val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl+"did:corda:tcn:"+UUID.randomUUID().toString()).file(instructionDeletejsonFile).with { request ->
             request.method = "DELETE"
             request
         }
