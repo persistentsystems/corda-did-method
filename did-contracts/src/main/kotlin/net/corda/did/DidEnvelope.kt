@@ -52,6 +52,8 @@ import java.net.URI
 @CordaSerializable
 class DidEnvelope(
 		// ??? moritzplatt 2019-06-20 -- do these need to be vals? `rawInstruction` is unsused `rawDocument` only from test
+
+		// nitesh solanki 2019-06-27 yes, else corda serialization throws an exception
 		val rawInstruction: String,
 		val rawDocument: String
 ) {
@@ -91,8 +93,10 @@ class DidEnvelope(
 	}
 
     /**
-     * Validates that the envelope presented represents a valid update/deletion of the [precursor] provided.
+     * Validates that the envelope presented represents a valid deletion of the [precursor] provided.
      */
+
+	// nitesh solanki 2019-06-27  for deletion there is no temporal checks since we are not passing new doc to delete api
     fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
         instruction.action().onFailure {
             return Failure(MalformedInstructionFailure(it.reason))

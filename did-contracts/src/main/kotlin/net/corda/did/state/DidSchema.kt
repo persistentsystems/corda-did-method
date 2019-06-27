@@ -24,6 +24,8 @@ object DidSchema
  * Second option is to directly query the vault service with did.UUID since that is used as a linearID for DidState.
  */
 // ??? moritzplatt 2019-06-20 -- I feel option 2 is OK as the DID ID will always be stored in the linear ID
+
+// nitesh solanki 2019-06-27 ok.
 @CordaSerializable
 object DidStateSchemaV1 : MappedSchema(schemaFamily = DidSchema::class.java, version = 1, mappedTypes = listOf(PersistentDidState::class.java)) {
     @Entity

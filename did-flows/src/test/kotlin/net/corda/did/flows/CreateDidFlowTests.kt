@@ -21,6 +21,8 @@ import kotlin.test.assertFailsWith
 
 // ??? moritzplatt 2019-06-20 -- missing a test for various invalid input envelopes
 // re-use some of the earlier test vectors from the did-contracts package
+// nitesh solanki 2019-06-27 made changes as suggested.
+
 class CreateDidFlowTests : AbstractFlowTestUtils() {
 
     @Test

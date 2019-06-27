@@ -22,6 +22,7 @@ import net.corda.did.utils.DIDNotFoundException
 @InitiatingFlow
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)
+// nitesh solanki 2019-06-27 made changes as suggested.
 class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
     companion object {
@@ -51,6 +52,8 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
         // query the ledger if did exist or not
         // ??? moritzplatt 2019-06-20 -- previous comments on UUID vs id apply
 
+        // nitesh solanki 2019-06-27 made changes as suggested.
+
         val did = envelope.document.id().onFailure { throw InvalidDIDException("Invalid DID passed") }
 
         val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, did.uuid), DidState::class.java)
@@ -62,6 +65,7 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
         // Obtain a reference to the notary we want to use.
         // ??? moritzplatt 2019-06-20 -- previous comment on notary selection applies
+        // nitesh solanki 2019-06-27 made changes as suggested.
         val notary = serviceHub.getNotaryFromConfig()
 
         // Stage 1.

@@ -29,6 +29,13 @@ import java.util.*
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)
 // ??? moritzplatt 2019-06-20 -- does that even need a whole envelope? wouldn't an instruction be enough?
+
+
+// nitesh solanki 2019-06-27 made changes as suggested. Passing instruction in raw format else corda throws below exception
+// Caused by: net.corda.core.CordaRuntimeException: net.corda.serialization.internal.amqp.EvolutionSerializationException: java.util.List<*> ->           Cannot construct evolution serializer for remote type net.corda.did.DidInstruction
+//json1: java.lang.String
+// Any idea why that exception is thrown even after annotating the instruction class as @CordaSerializable
+
 class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<SignedTransaction>() {
 
     companion object {
@@ -68,6 +75,8 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 
         // Obtain a reference to the notary we want to use.
         // ??? moritzplatt 2019-06-20 -- previous comment on notary selection applies
+
+        // nitesh solanki 2019-06-27 made changes as suggested.
         val notary = serviceHub.getNotaryFromConfig()
 
         // Stage 1.

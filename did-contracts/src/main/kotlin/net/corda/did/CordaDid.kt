@@ -26,6 +26,8 @@ import java.util.UUID
 
 	 // ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
 	// rather perform parsing from string in a dedicated method that returns a result
+
+	 // nitesh solanki 2019-06-27 made changes as suggested
 	companion object {
 		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
 			val did = URI.create(externalForm)

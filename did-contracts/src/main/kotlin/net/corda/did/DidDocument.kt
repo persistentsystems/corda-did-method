@@ -70,6 +70,9 @@ class DidDocument(document: String) : JsonBacked(document) {
 	// `UUID` is the type returned, not the concept behind it
 
     // ??? moritzplatt 2019-06-20 -- this method feels unnecessary as the same result can be achieved by `id().uuid`
+
+	// nitesh solanki 2019-06-27 UUID() not needed
+
 	/*fun UUID(): DidDocumentResult<UUID?> = id().map{
 			return Success(it.uuid)
 		}.mapFailure {

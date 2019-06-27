@@ -39,6 +39,9 @@ import kotlin.collections.ArrayList
 //      DidState.linearId: UniqueIdentifier(null, envelope.document.id())
 //      DidState.participants: implicit
 
+
+
+// nitesh solanki 2019-06-27 made changes as suggested
 class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
     companion object {
@@ -74,6 +77,9 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
         //            serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
         //        }
 
+
+        // nitesh solanki 2019-06-27 made changes as suggested
+
         var didStates: List<StateAndRef<DidState>> = listOf()
         envelope.document.id().map {
             didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
@@ -89,6 +95,9 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
         // ??? moritzplatt 2019-06-20 -- the preferred notary should come from configuration
         // see https://corda.network/participation/notary-considerations.html#guidance-for-application-developers for
         // reasoning
+
+
+        // nitesh solanki 2019-06-27 made changes as suggested
         val notary = serviceHub.getNotaryFromConfig()
 
         // Stage 1.
