@@ -29,7 +29,7 @@ import java.util.*
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)
 // ??? moritzplatt 2019-06-20 -- does that even need a whole envelope? wouldn't an instruction be enough?
-class DeleteDidFlow(val instruction: DidInstruction, val did: String) : FlowLogic<SignedTransaction>() {
+class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<SignedTransaction>() {
 
     companion object {
         object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on new DidState.")
@@ -57,10 +57,9 @@ class DeleteDidFlow(val instruction: DidInstruction, val did: String) : FlowLogi
 
         // ??? moritzplatt 2019-06-20 -- previous comments on UUID vs id apply
         // query the ledger if did exist or not
-        var didStates: List<StateAndRef<DidState>> = listOf()
-        CordaDid.parseExternalForm(did).map {
-            didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
-        }
+        val cordaDID = CordaDid.parseExternalForm(did).onFailure { throw InvalidDIDException("Invalid DID passed") }
+
+        val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, cordaDID.uuid), DidState::class.java)
 
         if( didStates.isEmpty() ) {
             throw DIDNotFoundException("DID with id $did does not exist")
@@ -78,7 +77,7 @@ class DeleteDidFlow(val instruction: DidInstruction, val did: String) : FlowLogi
         val txCommand = Command(DidContract.Commands.Delete(), listOf(ourIdentity.owningKey))
         val txBuilder = TransactionBuilder(notary)
                 .addInputState(inputDidState)
-                .addOutputState(inputDidState.state.data.copy(status = DidStatus.DELETED, envelope = DidEnvelope(instruction.source, inputDidState.state.data.envelope.document.source)), DidContract.DID_CONTRACT_ID)
+                .addOutputState(inputDidState.state.data.copy(status = DidStatus.DELETED, envelope = DidEnvelope(DidInstruction(instruction).source, inputDidState.state.data.envelope.document.source)), DidContract.DID_CONTRACT_ID)
                 .addCommand(txCommand)
 
         // Stage 2.

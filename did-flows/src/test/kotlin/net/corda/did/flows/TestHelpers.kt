@@ -161,7 +161,7 @@ abstract class AbstractFlowTestUtils {
 	protected fun deleteDID(envelope: DidEnvelope): SignedTransaction? {
 		createDID(getDidStateForCreateOperation().envelope)!!.tx
 		mockNetwork.waitQuiescent()
-		val flow = DeleteDidFlow(envelope.instruction, envelope.document.id().valueOrNull()!!.toExternalForm())
+		val flow = DeleteDidFlow(envelope.rawInstruction, envelope.document.id().valueOrNull()!!.toExternalForm())
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
 	}

@@ -50,12 +50,10 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
         // query the ledger if did exist or not
         // ??? moritzplatt 2019-06-20 -- previous comments on UUID vs id apply
-        var didStates: List<StateAndRef<DidState>> = listOf()
-        envelope.document.id().map {
-            didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
-        }
 
-        val did = envelope.document.id().onFailure { throw Exception("") }
+        val did = envelope.document.id().onFailure { throw InvalidDIDException("Invalid DID passed") }
+
+        val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, did.uuid), DidState::class.java)
 
         if( didStates.isEmpty() ) {
             throw DIDNotFoundException("DID with id ${did.toExternalForm()} does not exist")

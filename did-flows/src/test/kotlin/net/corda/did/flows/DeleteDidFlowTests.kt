@@ -108,7 +108,7 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|}""".trimMargin()
 
 		val envelope = DidEnvelope(deleteInstruction, originalDocument)
-        val flow = DeleteDidFlow(envelope.instruction, documentId.toExternalForm())
+        val flow = DeleteDidFlow(envelope.rawInstruction, documentId.toExternalForm())
         val future = originator.startFlow(flow)
         assertFailsWith<TransactionVerificationException> {  future.getOrThrow() }
     }
@@ -200,7 +200,7 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 
     @Test
     fun `flow throws DIDNotFound exception for invalid did`() {
-        val flow = DeleteDidFlow(getDidStateForDeleteOperation().envelope.instruction, getDidStateForDeleteOperation().envelope.document.id().valueOrNull()!!.toExternalForm())
+        val flow = DeleteDidFlow(getDidStateForDeleteOperation().envelope.rawInstruction, getDidStateForDeleteOperation().envelope.document.id().valueOrNull()!!.toExternalForm())
         val future = originator.startFlow(flow)
         mockNetwork.waitQuiescent()
         assertFailsWith<DIDNotFoundException> {  future.getOrThrow() }

@@ -28,3 +28,4 @@ import net.corda.core.node.services.vault.QueryCriteria
 class NotaryNotFoundException(override val message: String) : CordaRuntimeException(message)
 class DIDAlreadyExistException(override val message: String) : CordaRuntimeException(message)
 class DIDNotFoundException(override val message: String) : CordaRuntimeException(message)
+class InvalidDIDException(override val message: String) : CordaRuntimeException(message)
