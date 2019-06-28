@@ -48,9 +48,6 @@ dependencies {
     testImplementation 'com.ninja-squad:springmockk:1.1.0'
 
     compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version")
-    compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
-    compile "org.apache.logging.log4j:log4j-web:$log4j_version"
-    
     compile project(":did-contracts")
     compile project(":did-flows")
 }
