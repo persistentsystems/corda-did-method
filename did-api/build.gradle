@@ -28,7 +28,7 @@ dependencyManagement {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'com.google.code.gson:gson:2.2.+'
+   
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile "junit:junit:$junit_version"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
