@@ -131,6 +131,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
         progressTracker.currentStep = FINALISING_TRANSACTION
 
         val otherPartySession = didState.witnesses.minus(ourIdentity).map { initiateFlow(it) }.toSet()
+
         // Notarise and record the transaction in witness parties' vaults.
         return subFlow(FinalityFlow(signedTx, otherPartySession, FINALISING_TRANSACTION.childProgressTracker()))
     }
