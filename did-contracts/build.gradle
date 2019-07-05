@@ -9,10 +9,18 @@ cordapp {
         targetPlatformVersion corda_platform_version.toInteger()
         minimumPlatformVersion corda_platform_version.toInteger()
     }
+    signing {
+        enabled false
+    }
 }
 
+configurations {
+    modules
+    compile.extendsFrom(modules)
+}
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
 
     // TODO does this need to be `cordapp` instead?
     compile "com.grack:nanojson:1.1"
@@ -29,9 +37,16 @@ dependencies {
     cordaCompile "$corda_release_group:corda-rpc:$corda_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+
+    //cordaCompile project(':did-envelope')
+    modules project(':did-envelope')
+    //compile files ('lib/did-envelope-1.0-SNAPSHOT.jar')
 }
 
 
+jar {
+    configurations.modules.collect { it.isDirectory() ? it : zipTree(it) }
+}
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         languageVersion = "1.2"

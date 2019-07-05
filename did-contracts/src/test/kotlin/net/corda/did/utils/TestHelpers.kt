@@ -1,5 +1,5 @@
 
-package net.corda
+package net.corda.did.utils
 
 import com.natpryce.Failure
 import com.natpryce.Result
@@ -16,7 +16,6 @@ import net.corda.did.state.DidStatus
 import net.corda.testing.core.TestIdentity
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import java.net.URI
-import java.util.*
 
 /**
  * Persistent code
@@ -50,7 +49,7 @@ abstract class AbstractContractsStatesTestUtils {
 
 	val UUID = java.util.UUID.randomUUID()
 	val documentId = net.corda.did.CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
-	val envelope = net.corda.did.DidEnvelope(instruction, document)
+	val envelope = DidEnvelope(instruction, document)
 	val ORIGINATOR = TestIdentity(CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US"))
 	var W1 = TestIdentity(CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US"))
 	var W2 = TestIdentity(CordaX500Name(organisation = "Binh", locality = "TestVillage", country = "US"))

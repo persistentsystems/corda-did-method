@@ -1,11 +1,9 @@
-package net.corda.state
+package net.corda.did.state
 
-import net.corda.AbstractContractsStatesTestUtils
+import net.corda.did.utils.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
 import net.corda.did.DidEnvelope
-import net.corda.did.state.DidState
-import net.corda.did.state.DidStatus
 import org.junit.Test
 import kotlin.test.assertEquals
 

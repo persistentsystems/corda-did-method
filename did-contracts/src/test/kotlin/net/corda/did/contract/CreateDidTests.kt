@@ -3,22 +3,20 @@
  *
  */
 
-package net.corda.contract
+package net.corda.did.contract
 
-import net.corda.AbstractContractsStatesTestUtils
+import net.corda.did.utils.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
 import net.corda.did.DidEnvelope
-import net.corda.did.contract.DidContract
 import net.corda.testing.node.MockServices
 import net.corda.testing.node.ledger
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
-import java.util.*
 
 /**
  * Test cases for DIDState evolution (Create command). Envelope test are covered in DIDEnvelope test files
@@ -28,14 +26,14 @@ class CreateDidTests: AbstractContractsStatesTestUtils() {
 
     class DummyCommand : TypeOnlyCommandData()
 
-    private var ledgerServices = MockServices(listOf("net.corda.did"))
+    private var ledgerServices = MockServices(listOf("net.corda.did.contract"))
 
     @Test
     fun `transaction must include Create command`() {
         ledgerServices.ledger {
             transaction {
                 output(DidContract.DID_CONTRACT_ID, CordaDid)
-                command(listOf(ORIGINATOR.publicKey), CreateDidTests.DummyCommand())
+                command(listOf(ORIGINATOR.publicKey), DummyCommand())
                 this.fails()
             }
             transaction {

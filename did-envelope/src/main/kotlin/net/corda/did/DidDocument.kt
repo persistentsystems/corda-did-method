@@ -17,8 +17,8 @@ import net.corda.getMandatoryBase58Bytes
 import net.corda.getMandatoryCryptoSuiteFromKeyID
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
+import java.lang.IllegalArgumentException
 import java.time.Instant
-import java.util.*
 import javax.xml.bind.DatatypeConverter
 
 /**
@@ -31,7 +31,7 @@ import javax.xml.bind.DatatypeConverter
  * means that usage of the convenience methods has a high computational overhead.
  */
 @CordaSerializable
-class DidDocument(document: String) : JsonBacked(document) {
+data class DidDocument(val document1: String) : JsonBacked(document1) {
 
 	fun id(): DidDocumentResult<CordaDid> {
 

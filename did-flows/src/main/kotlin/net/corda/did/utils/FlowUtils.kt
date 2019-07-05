@@ -1,6 +1,7 @@
 package net.corda.did.utils
 
 import co.paralleluniverse.fibers.Suspendable
+import net.corda.AbstractFetchDidDocumentFromRegistryNodeFlow
 import net.corda.core.CordaRuntimeException
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
@@ -44,11 +45,8 @@ class FetchDidDocument(private val linearId: UniqueIdentifier) : FlowLogic<DidDo
     }
 }
 
-@InitiatingFlow
-abstract class AbstractFetchDidDocumentFromRegistryNodeFlow<out T> : FlowLogic<T>()
-
 @InitiatedBy(AbstractFetchDidDocumentFromRegistryNodeFlow::class)
-class FetchDidDocumentFromRegistryNodeResponderFlow(val session: FlowSession) : FlowLogic<Unit> (){
+class FetchDidDocumentFromRegistryNodeResponderFlow(private val session: FlowSession) : FlowLogic<Unit> (){
 
     companion object {
         object RECEIVING : ProgressTracker.Step("Receiving DID request")

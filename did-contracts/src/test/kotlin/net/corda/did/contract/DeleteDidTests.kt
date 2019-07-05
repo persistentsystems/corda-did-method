@@ -3,16 +3,15 @@
 *
 */
 
-package net.corda.contract
+package net.corda.did.contract
 
-import net.corda.AbstractContractsStatesTestUtils
+import net.corda.did.utils.AbstractContractsStatesTestUtils
 import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
 import net.corda.did.DidEnvelope
-import net.corda.did.contract.DidContract
 import net.corda.did.state.DidStatus
 import net.corda.testing.node.MockServices
 import net.corda.testing.node.ledger
@@ -29,7 +28,7 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
 
     class DummyCommand : TypeOnlyCommandData()
 
-    private var ledgerServices = MockServices(listOf("net.corda.did"))
+    private var ledgerServices = MockServices(listOf("net.corda.did.contract"))
 
     private fun getUpdatedEnvelope() : DidEnvelope {
 
@@ -72,7 +71,7 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
             transaction {
                 input(DidContract.DID_CONTRACT_ID, getDidState())
                 output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
-                command(listOf(ORIGINATOR.publicKey), DeleteDidTests.DummyCommand())
+                command(listOf(ORIGINATOR.publicKey), DummyCommand())
                 this.fails()
             }
             transaction {

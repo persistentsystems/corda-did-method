@@ -2,18 +2,15 @@ package net.corda.did.contract
 
 
 import com.natpryce.*
-import net.corda.core.CordaRuntimeException
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
 import net.corda.core.transactions.LedgerTransaction
 import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
-import net.corda.did.QualifiedPublicKey
 import net.corda.did.contract.DidContract.Commands.Create
 import net.corda.did.state.DidState
 import java.security.PublicKey
-import java.util.*
 
 // Make the contract open for inheritance--?
 open class DidContract : Contract {
