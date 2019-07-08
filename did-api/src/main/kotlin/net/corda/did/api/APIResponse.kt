@@ -4,6 +4,10 @@ package net.corda.did.api
  * Persistent code
  *
  */
+/**
+ * @param[message] takes a string message input
+ * @return a proper message object which can then be sent as response
+ * */
 data class ApiResponse(val message:String?){
     constructor(apiMessage:APIMessage) : this(apiMessage.message) {
 

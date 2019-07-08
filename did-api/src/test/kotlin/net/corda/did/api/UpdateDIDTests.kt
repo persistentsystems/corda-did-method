@@ -17,7 +17,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
  * Persistent code
  *
  */
-
+/**
+ * @property[mockMvc] MockMvc Class instance used for testing the spring API.
+ * @property[mainController] The API controller being tested
+ * @property[apiUrl] The url where the api will be running
+ * */
 class UpdateDIDAPITest {
     lateinit var mockMvc: MockMvc
     lateinit var mainController: MainController
@@ -25,6 +29,9 @@ class UpdateDIDAPITest {
 
     @Before
     fun setup() {
+        /**
+         * reading configurations from the config.properties file and setting properties of the Class
+         * */
         val prop = Properties()
         prop.load(FileInputStream(System.getProperty("user.dir") + "/config.properties"))
         apiUrl = prop.getProperty("apiUrl")
@@ -37,7 +44,9 @@ class UpdateDIDAPITest {
         mainController = MainController(rpc)
         mockMvc = MockMvcBuilders.standaloneSetup(mainController).build()
     }
-
+/**
+ * This test will try to create a DID then update by adding new public key
+ * */
     @Test
     fun `Create a DID and update the document with new public key` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -143,7 +152,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update by adding new public key by signing payload using a single private key
+     * */
 
     @Test
     fun `Update document by using single private key to sign multiple public keys should fail` () {
@@ -248,6 +259,9 @@ class UpdateDIDAPITest {
 
 
     }
+    /**
+     * This test will try to create a DID then update by adding new public key and replacing original public key with same key
+     * */
 
     @Test
     fun `Updating original public keys of a document should fail` () {
@@ -350,7 +364,9 @@ class UpdateDIDAPITest {
 
     }
 
-
+    /**
+     * This test will try to create a DID then update by using create command instead of update
+     * */
     @Test
     fun `Calling an update operation with create command should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -454,7 +470,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update by using wrong document format
+     * */
 
     @Test
     fun `Update should fail for incorrect document format` () {
@@ -558,6 +576,9 @@ class UpdateDIDAPITest {
 
 
     }
+    /**
+     * This test will try to create a DID then update by using wrong instruction format
+     * */
     @Test
     fun `Update should fail if instruction format is incorrect` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -661,7 +682,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update no missing public key
+     * */
 
     @Test
     fun `Create a DID and update the document with missing public key` () {
@@ -764,7 +787,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update by not providing signature
+     * */
     @Test
     fun `Create a DID and update the document with missing signature` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -865,7 +890,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update by replacing all public keys with new ones
+     * */
     @Test
     fun `Update the document with all new public keys should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -970,7 +997,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to  update a  DIDdocument that does not exist
+     * */
     @Test
     fun `Update a DID that does not exist should fail` () {
 
@@ -1013,6 +1042,9 @@ class UpdateDIDAPITest {
 
 
     }
+    /**
+     * This test will try to create a DID then update with same id for all public keys
+     * */
     @Test
     fun `Update of a document with wrong uri should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -1117,6 +1149,9 @@ class UpdateDIDAPITest {
 
 
     }
+    /**
+     * This test will try to create a DID then update without context field
+     * */
     @Test
     fun `Update of a document without context should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -1220,7 +1255,9 @@ class UpdateDIDAPITest {
 
 
     }
-
+    /**
+     * This test will try to create a DID then update by replacing old public key with new public key
+     * */
     @Test
     fun `Create a DID and update the document with a single public key` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -1320,6 +1357,9 @@ class UpdateDIDAPITest {
 
 
     }
+    /**
+     * This test will try to create a DID then update by sending wrong did as request parameter
+     * */
     @Test
     fun `Update the document with mismatching DID should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()

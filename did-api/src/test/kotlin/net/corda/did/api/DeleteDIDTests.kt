@@ -17,7 +17,11 @@ import java.util.*
  * Persistent code
  *
  */
-
+/**
+ * @property[mockMvc] MockMvc Class instance used for testing the spring API.
+ * @property[mainController] The API controller being tested
+ * @property[apiUrl] The url where the api will be running
+ * */
 class DeleteDIDAPITest {
     lateinit var mockMvc: MockMvc
     lateinit var mainController: MainController
@@ -25,6 +29,9 @@ class DeleteDIDAPITest {
 
     @Before
     fun setup() {
+        /**
+         * reading configurations from the config.properties file and setting properties of the Class
+         * */
         val prop = Properties()
         prop.load(FileInputStream(System.getProperty("user.dir") + "/config.properties"))
         apiUrl = prop.getProperty("apiUrl")
@@ -37,7 +44,7 @@ class DeleteDIDAPITest {
         mainController = MainController(rpc)
         mockMvc = MockMvcBuilders.standaloneSetup(mainController).build()
     }
-
+/** This test will try to create a DID and then delete it*/
     @Test
     fun ` Create DID and Delete it` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -112,7 +119,7 @@ class DeleteDIDAPITest {
 
 
     }
-
+    /** This test will try to create a DID , delete it and then update it*/
     @Test
     fun `Delete a DID and then update should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -239,7 +246,7 @@ class DeleteDIDAPITest {
 
 
     }
-
+    /** This test will try to create a DID ,delete it and fetch it*/
     @Test
     fun `Delete a DID and then fetch should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -316,7 +323,7 @@ class DeleteDIDAPITest {
 
 
     }
-
+    /** This test will try to create a DID , delete it and then recreate it*/
     @Test
     fun `Recreating a deleted DID should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -394,6 +401,7 @@ class DeleteDIDAPITest {
 
 
     }
+    /** This test will try to create a DID and then delete it with incorrect request parameter*/
     @Test
     fun `Delete it with incorrect DID as request parameter` () {
         val kp = KeyPairGenerator().generateKeyPair()

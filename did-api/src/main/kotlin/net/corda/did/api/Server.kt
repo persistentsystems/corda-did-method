@@ -22,6 +22,10 @@ open class Server
 /**
  * Starts our Spring Boot application.
  */
+
+/**
+ * @param[args] arguments passed to the spring boot server during initialization
+ * */
 fun main(args: Array<String>) {
 
         val app = SpringApplication(Server::class.java)

@@ -35,6 +35,12 @@ import java.util.concurrent.Executors
 // itself. i.e. re-establishing connection in case it fails or adding functionality to re-establish a connection in case of errors
 
 // pranav 2019-06-25 added RPC reconnection library to reconnect if node connection is lost,docs@ https://docs.corda.net/clientrpc.html#reconnecting-rpc-clients
+/**
+ * @property proxy the node RPC connection object instance
+ * @property queryUtils helper function used to query the ledger.
+ * @property apiUtils helper functions used to form API responses.
+ * @property executorService is used for creating new threads for tasks that are blocking.
+ * */
 class MainController(rpc: NodeRPCConnection) {
 
     companion object {
@@ -58,12 +64,19 @@ class MainController(rpc: NodeRPCConnection) {
     @PutMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun createDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String ) : DeferredResult<ResponseEntity<Any?>> {
+        /**
+         * Creates an instance of Deferred Result, this will be used to send responses from tasks running in separate threads
+         * */
         val apiResult = DeferredResult<ResponseEntity<Any?>>()
         try {
-
-
+            /**
+             * Takes instruction,document and did as input, validates them and returns an envelope Object.
+             * */
             val envelope = apiUtils.generateEnvelope(instruction,document,did)
-            net.corda.did.CordaDid.parseExternalForm(did)
+            /**
+             *  Checks if the provided 'did' is in the correct format.
+             * */
+            net.corda.did.CordaDid.parseExternalForm(did).onFailure {    apiResult.setErrorResult(ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() ));return apiResult}
 
             // ??? moritzplatt 2019-06-20 -- suggestion here would be to remove this block and instead of querying, rely on the output of the startFlowDynamic call only
             // the current implementation introduces a race condition between the `getDIDDocumentByLinearId` call and the
@@ -73,6 +86,9 @@ class MainController(rpc: NodeRPCConnection) {
             /**
             * Validate envelope
             */
+            /**
+             * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
+             * */
             val envelopeVerified = envelope.validateCreation()
             envelopeVerified.onFailure { apiResult.setErrorResult( apiUtils.sendErrorResponse( it.reason ));return apiResult}
 
@@ -86,12 +102,20 @@ class MainController(rpc: NodeRPCConnection) {
 
                 // ??? moritzplatt 2019-06-20 -- consider comments on the flow constructor
                   //pranav: 2019-06-27 As per Moritz comments we are now just passing envelope to flow
+            /**
+             * Passing the generated envelope as a parameter to the CreateDidFlow
+             * returns a flow handler
+             * */
             val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
 
                 // ??? moritzplatt 2019-06-20 -- not familiar with Spring but `getOrThrow` is blocking.
                 // Maybe there is a pattern around futures (i.e. https://www.baeldung.com/spring-async)?
                 // Just a thought though
                // pranav: 2019-06-27 added logic to for asynchronous execution of blocking code
+            /**
+             * Executing the flow in a separate thread and return result.
+             * throws exception if flow invocation fails
+             * */
             executorService.submit {
                 try {
 
@@ -103,7 +127,7 @@ class MainController(rpc: NodeRPCConnection) {
 
                     }
                 catch( e : DIDDeletedException ){
-                        apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.NOT_FOUND))
+                        apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.DID_DELETED ).toResponseObj(), HttpStatus.CONFLICT))
                     }
                 catch( e: DIDAlreadyExistException ){
                         apiResult.setErrorResult( ResponseEntity ( ApiResponse( APIMessage.CONFLICT ).toResponseObj(), HttpStatus.CONFLICT ))
@@ -135,9 +159,15 @@ class MainController(rpc: NodeRPCConnection) {
     fun fetchDIDDocument( @PathVariable(value = "did") did: String ):ResponseEntity<Any?> {
 
         try {
+            /**
+             * converts the "did" from external form to uuid form else returns an error
+             * */
             val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure {  return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() )}
 
             builder {
+                /**
+                 * query the ledger using the uuid and return raw document else return an error.
+                 * */
                 val didJson = queryUtils.getDIDDocumentByLinearId(uuid.uuid.toString())
                 if( didJson.isEmpty() ){
                     val response = ApiResponse( APIMessage.NOT_FOUND )
@@ -178,13 +208,25 @@ class MainController(rpc: NodeRPCConnection) {
     @PostMapping(value = "{did}",
             produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes=arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
     fun updateDID( @PathVariable(value = "did") did: String, @RequestParam("instruction") instruction: String, @RequestParam("document") document: String ) : DeferredResult<ResponseEntity<Any?>> {
+        /**
+         * Creates an instance of Deferred Result, this will be used to send responses from tasks running in separate threads
+         * */
         val apiResult = DeferredResult<ResponseEntity<Any?>>()
         try {
+            /**
+             * Takes instruction,document and did as input, validates them and returns an envelope Object.
+             * */
             val envelope = apiUtils.generateEnvelope(instruction,document,did)
+            /**
+             * converts the "did" from external form to uuid form else returns an error
+             * */
             val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure {    apiResult.setErrorResult(ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( ApiResponse( APIMessage.INCORRECT_FORMAT ).toResponseObj() ));return apiResult}
 
             // ??? moritzplatt 2019-06-20 -- merge with assignment var didJson = try { ... }
             //pranav 2019-06-27 --changed as per review comment
+            /**
+             * Perform a check at the API layer to make sure that the data provided meets the criteria for update,before passing it to the flow.
+             * */
             try {
                 val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.uuid.toString())
                 val envelopeVerified = envelope.validateModification( didJson )
@@ -200,8 +242,15 @@ class MainController(rpc: NodeRPCConnection) {
                 return apiResult
             }
 
-
+            /**
+             * Passing the generated envelope as a parameter to the UpdateDidFlow
+             * returns a flow handler
+             * */
             val flowHandler = proxy.startFlowDynamic( UpdateDidFlow::class.java, envelope)
+            /**
+             * Executing the flow in a separate thread and return result.
+             * throws exception if flow invocation fails
+             * */
 
             executorService.submit {
                 try {
@@ -248,9 +297,14 @@ class MainController(rpc: NodeRPCConnection) {
     fun deleteDID( @PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String ) : DeferredResult<ResponseEntity<Any?>> {
         val apiResult = DeferredResult<ResponseEntity<Any?>>()
         try {
-
+            /**
+             * Passing the instruction and did to the DeleteDidFlow
+             * */
             val flowHandler = proxy.startFlow(::DeleteDidFlow, instruction, did)
-
+            /**
+             * Executing the flow in a separate thread and return result.
+             * throws exception if flow invocation fails
+             * */
             executorService.submit {
                 try {
                     val result = flowHandler.use { it.returnValue.getOrThrow() }
