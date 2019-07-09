@@ -33,6 +33,9 @@ import java.util.UUID
 import kotlin.text.Charsets.UTF_8
 import java.security.KeyPairGenerator as JavaKeyPairGenerator
 
+/**
+ * Test cases for [DidEnvelope] Create
+ */
 class DidEnvelopeCreateTests {
 
 	@Test

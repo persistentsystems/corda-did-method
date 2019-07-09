@@ -24,6 +24,9 @@ import java.net.URI
 import java.util.UUID
 import java.security.KeyPairGenerator as JavaKeyPairGenerator
 
+/**
+ * Test cases for [DidEnvelope] Update
+ */
 class DidEnvelopeUpdateTests {
 
 	@Test

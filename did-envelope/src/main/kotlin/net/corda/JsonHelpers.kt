@@ -21,22 +21,55 @@ import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite
 import java.net.URI
 
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryArray(key: String): JsonResult<JsonArray> = getArray(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
 
+
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryNumber(key: String): JsonResult<Number> = getNumber(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
 
+
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryObject(key: String): JsonResult<JsonObject> = getObject(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
+
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 
 fun JsonObject.getMandatoryString(key: String): JsonResult<String> = getString(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
 
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryUri(key: String): JsonResult<URI> = getMandatoryString(key).flatMap { value ->
 	try {
 		Success(URI.create(value))
@@ -45,18 +78,36 @@ fun JsonObject.getMandatoryUri(key: String): JsonResult<URI> = getMandatoryStrin
 	}
 }
 
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryCryptoSuiteFromKeyID(keyID: String): JsonResult<CryptoSuite> = getMandatoryString(keyID).flatMap { value ->
 	CryptoSuite.fromKeyID(value).mapFailure {
 		InvalidCryptoSuiteFailure(value)
 	}
 }
 
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): JsonResult<CryptoSuite> = getMandatoryString(signatureID).flatMap { value ->
 	CryptoSuite.fromSignatureID(value).mapFailure {
 		InvalidCryptoSuiteFailure(value)
 	}
 }
 
+/**
+ *
+ * @param key json key
+ * @receiver [JsonObject]
+ * @return [JsonResult]
+ */
 // ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional representations?
 fun JsonObject.getMandatoryBase58Bytes(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {

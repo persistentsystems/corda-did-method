@@ -7,6 +7,9 @@ import net.corda.did.DidEnvelope
 import org.junit.Test
 import kotlin.test.assertEquals
 
+/**
+ * Test cases for [DidState]
+ */
 class DidStateTests : AbstractContractsStatesTestUtils() {
 
     /**

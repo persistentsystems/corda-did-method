@@ -16,6 +16,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+/**
+ * Test cases for [CordaDid]
+ */
 @Suppress("RemoveExplicitTypeArguments")
 @RunWith(Parameterized::class)
 class DidTests(

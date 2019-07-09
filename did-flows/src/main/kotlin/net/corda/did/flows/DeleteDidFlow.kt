@@ -25,6 +25,13 @@ import net.corda.did.state.DidStatus
 import net.corda.did.utils.DIDNotFoundException
 import java.util.*
 
+/**
+ * Initiating flow to DELETE a DID on ledger as specified in the w3 specification. The delete operation only deactivates the did on ledger by updating the [DidState] with status as [DidStatus.DELETED].
+ * Ref: https://w3c-ccg.github.io/did-spec/#deactivate
+ *
+ * @property instruction The instruction JSON object containing signatures of did-owner on the did-document to be deactivated.
+ * @property did the did to be deleted.
+ */
 @InitiatingFlow
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)

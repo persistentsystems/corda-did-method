@@ -27,8 +27,19 @@ import net.corda.getMandatoryCryptoSuiteFromSignatureID
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
 
+/**
+ * This encapsulates the instruction string, outlining which action should be performed with the DID document provided
+ * along with cryptographic proof of ownership of the DID document in form of a signature.
+ *
+ * @param json string representation of instruction JSON object.
+ */
 @CordaSerializable
 class DidInstruction(json: String) : JsonBacked(json) {
+
+	/**
+	 * Returns the action
+	 * @return [DidInstructionResult]
+	 */
 	fun action(): DidInstructionResult<Action> = json.getMandatoryString("action").mapFailure {
 		InvalidInstructionJsonFailure(it)
 	}.flatMap {
@@ -38,6 +49,8 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	/**
 	 * Returns a set of signatures that use a well-known [CryptoSuite]. Throws an exception if a signature with an
 	 * unknown crypto suite is detected.
+	 *
+	 * @return [DidInstructionResult]
 	 */
 	fun signatures(): DidInstructionResult<Set<QualifiedSignature>> = json.getMandatoryArray("signatures").mapFailure {
 		InvalidInstructionJsonFailure(it)
@@ -61,6 +74,10 @@ class DidInstruction(json: String) : JsonBacked(json) {
 	}
 }
 
+/**
+ * Enum to represent DID operations as specified in the w3 specification.
+ * Ref: https://w3c-ccg.github.io/did-spec/#did-operations
+ */
 enum class Action {
 	Read,
 	Create,
@@ -68,6 +85,10 @@ enum class Action {
 	Delete
 }
 
+/**
+ * @receiver [String]
+ * @return [DidInstructionResult]
+ */
 private fun String.toAction(): DidInstructionResult<Action> = when (this) {
 	"read"   -> Success(Read)
 	"create" -> Success(Create)

@@ -8,6 +8,7 @@ package net.corda.did
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
+import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.JsonFailure
 import net.corda.did.Network.CordaNetwork
@@ -16,19 +17,37 @@ import net.corda.did.Network.Testnet
 import java.net.URI
 import java.util.UUID
 
- class CordaDid(
+
+
+/**
+ * The Corda notation for did
+ *
+ * @property did The instruction JSON object containing signatures of did-owner on the did-document to be deactivated.
+ * @property network the target corda-network.
+ * @property uuid the did to be deleted.
+ */
+class CordaDid(
 		val did: URI,
 		val network: Network,
 		val uuid: UUID
 ) {
 
+    /**
+     * Returns the did in external form
+     */
 	 fun toExternalForm() =  did.toString()
 
 	 // ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
 	// rather perform parsing from string in a dedicated method that returns a result
 
 	 // nitesh solanki 2019-06-27 made changes as suggested
+
 	companion object {
+
+        /**
+         * Returns Success if did can be successfully parsed or returns Failure
+         * @param externalForm Did in external format
+         */
 		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
 			val did = URI.create(externalForm)
 			if (did.scheme != "did")
@@ -38,7 +57,7 @@ import java.util.UUID
 
 			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure())
 
-			val network = n.toNetwork()
+			val network = n.toNetwork().onFailure { return it }
 
 			val uuid = try {
 				UUID.fromString(u)
@@ -49,12 +68,18 @@ import java.util.UUID
 			return Success(CordaDid(did, network, uuid))
 		}
 
-
-		private fun String.toNetwork(): Network = when (this) {
-			"tcn" -> CordaNetwork
-			"tcn-uat" -> CordaNetworkUAT
-			"testnet" -> Testnet
-			else -> throw IllegalArgumentException(""""Unknown network "$this"""")
+        /**
+         * Returns an enum representing target Corda network for did
+         *
+         * @receiver [String]
+         * @return [Network]
+         *
+         */
+		private fun String.toNetwork(): Result<Network, CordaDidFailure> = when (this) {
+			"tcn" -> Success(CordaNetwork)
+			"tcn-uat" -> Success(CordaNetworkUAT)
+			"testnet" -> Success(Testnet)
+			else -> Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure())
 		}
 	}
 }
@@ -66,6 +91,6 @@ sealed class CordaDidFailure : FailureCode() {
 		class InvalidDidSchemeFailure(underlying: String) : CordaDidValidationFailure("""DID must use the "did" scheme. Found "${underlying}".""")
 		class MalformedCordaDidFailure : CordaDidValidationFailure("Malformed Corda DID")
 		class InvalidCordaDidUUIDFailure : CordaDidValidationFailure(" Malformed Corda DID UUID")
-
+        class InvalidCordaNetworkFailure : CordaDidValidationFailure("Invalid corda network")
 	}
 }

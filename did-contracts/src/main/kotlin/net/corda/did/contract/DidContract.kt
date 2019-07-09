@@ -6,21 +6,33 @@ import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
 import net.corda.core.transactions.LedgerTransaction
-import net.corda.did.CordaDid
-import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract.Commands.Create
 import net.corda.did.state.DidState
 import java.security.PublicKey
 
-// Make the contract open for inheritance--?
+/**
+ * Contract class to govern the [DidState] evolution.
+ * @property DID_CONTRACT_ID
+ * @property Commands.Create Command logic to verify DID Create transaction.
+ * @property Commands.Update Command logic to verify DID Update transaction.
+ * @property Commands.Delete Command logic to verify DID Delete transaction.
+ *
+ */
 open class DidContract : Contract {
 
     companion object {
 
+        /**
+         * Define Contract ID
+         */
         @JvmStatic
         val DID_CONTRACT_ID = "net.corda.did.contract.DidContract"
     }
 
+    /**
+     * @param tx The [LedgerTransaction]
+     * @throws IllegalArgumentException
+     */
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commandsOfType(Commands::class.java).single()
 
@@ -37,26 +49,35 @@ open class DidContract : Contract {
         //	- validate all keys are owned by the creator
     }
 
-    // Commands that can write DID information to the ledger.
-    // Note that there is no `Read` command.
-    //
-    // https://w3c-ccg.github.io/did-spec/#did-operations
+    /**
+     * Commands that can write DID information to the ledger.
+     * Note that there is no `Read` command.
+     *
+     * Ref: https://w3c-ccg.github.io/did-spec/#did-operations
+     */
     interface Commands : CommandData {
 
-        // https://w3c-ccg.github.io/did-spec/#create
+        /**
+         * Create Command
+         * Ref: https://w3c-ccg.github.io/did-spec/#create
+         */
         class Create : Commands
 
-        // https://w3c-ccg.github.io/did-spec/#update
+        /** Update Command
+         *  Ref: https://w3c-ccg.github.io/did-spec/#create
+         */
         class Update : Commands
 
-        // https://w3c-ccg.github.io/did-spec/#delete-revoke
-        // TODO moritzplatt 2019-02-14 -- should this require a fully formed envelope?
+        /** Delete Command
+         *  Ref: https://w3c-ccg.github.io/did-spec/#deactivate
+         */
         class Delete : Commands
     }
 
     /**
      * Persistent code
-     *
+     * @param tx The [LedgerTransaction]
+     * @param setOfSigners list of signers for Create DID transaction
      */
     open fun verifyDidCreate(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
@@ -93,7 +114,8 @@ open class DidContract : Contract {
 
     /**
      * Persistent code
-     *
+     * @param tx The [LedgerTransaction]
+     * @param setOfSigners list of signers for Update DID transaction
      */
     open fun verifyDidUpdate(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
@@ -140,9 +162,9 @@ open class DidContract : Contract {
 
     /**
      * Persistent code
-     *
+     * @param tx The [LedgerTransaction]
+     * @param setOfSigners list of signers for Delete DID transaction
      */
-
     // ??? moritzplatt 2019-06-20 -- consider refactoring some of the joint functionality between `verifyDidUpdate` and `verifyDidDelete` to a joint method
     // Delete will just mark the state as DELETED
     open fun verifyDidDelete(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {

@@ -12,16 +12,22 @@ import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
 import net.corda.did.utils.DIDAlreadyExistException
 import net.corda.did.utils.*
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
-import java.util.*
 import kotlin.collections.ArrayList
 
+
+/**
+ * Initiating flow to CREATE a DID on ledger as specified in the w3 specification.
+ * Ref: https://w3c-ccg.github.io/did-spec/#create
+ * The did will be created on the [DidState.originator] and [DidState.witnesses] nodes.
+ *
+ * @property envelope the [DidEnvelope] object.
+ */
 @InitiatingFlow
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- I'm unsure about passing a Fully formed `DidState` to the flow constructor

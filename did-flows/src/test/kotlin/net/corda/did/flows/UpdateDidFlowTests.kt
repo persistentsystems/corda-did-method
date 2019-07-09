@@ -24,6 +24,9 @@ import kotlin.test.assertFailsWith
 // re-use some of the earlier test vectors from the did-contracts package
 
 // nitesh solanki 2019-06-27 made changes as suggested.
+/**
+ * Test cases for [UpdateDidFlow]
+ */
 class UpdateDidFlowTests : AbstractFlowTestUtils() {
 
     @Test

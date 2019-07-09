@@ -27,7 +27,7 @@ import org.junit.Before
 import java.net.URI
 
 /**
- * A base class to reduce the boilerplate when writing land title flow tests.
+ * Helper class for Flow tests
  */
 abstract class AbstractFlowTestUtils {
 	lateinit var mockNetwork: MockNetwork

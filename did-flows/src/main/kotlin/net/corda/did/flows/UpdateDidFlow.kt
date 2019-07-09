@@ -17,8 +17,16 @@ import net.corda.did.DidEnvelope
 import net.corda.did.utils.*
 import net.corda.did.contract.DidContract
 import net.corda.did.state.DidState
+import net.corda.did.state.DidStatus
 import net.corda.did.utils.DIDNotFoundException
 
+/**
+ * Initiating flow to UPDATE a DID on ledger as specified in the w3 specification.
+ * Ref: https://w3c-ccg.github.io/did-spec/#update
+ * The delete operation only deactivates the did on ledger by updating the [DidState] with status as [DidStatus.DELETED]
+ *
+ * @property envelope the [DidEnvelope] object
+ */
 @InitiatingFlow
 @StartableByRPC
 // ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)

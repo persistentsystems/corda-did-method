@@ -16,6 +16,9 @@ import java.time.Instant
 import java.time.Instant.EPOCH
 import kotlin.test.fail
 
+/**
+ * Test cases for [DidDocument]
+ */
 class DidDocumentTests {
 
 	@Test

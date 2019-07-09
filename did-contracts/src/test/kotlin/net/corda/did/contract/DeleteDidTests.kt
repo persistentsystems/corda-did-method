@@ -12,6 +12,8 @@ import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
 import net.corda.did.DidEnvelope
+import net.corda.did.contract.DidContract.Commands.Delete
+import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.testing.node.MockServices
 import net.corda.testing.node.ledger
@@ -20,10 +22,9 @@ import org.junit.Test
 import java.net.URI
 
 /**
- * Test cases for DIDState evolution (Delete command). Envelope test are covered in DIDEnvelope test files
+ * Test cases for [DidState] evolution specifically for [Delete] command.
  *
  */
-
 class DeleteDidTests : AbstractContractsStatesTestUtils() {
 
     class DummyCommand : TypeOnlyCommandData()

@@ -23,6 +23,9 @@ import org.junit.Test
 import java.net.URI
 import kotlin.test.fail
 
+/**
+ * Test cases for [DidInstruction]
+ */
 class DidInstructionTests {
 
 	@Test

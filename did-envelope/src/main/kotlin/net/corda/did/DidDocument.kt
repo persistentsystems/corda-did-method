@@ -29,12 +29,18 @@ import javax.xml.bind.DatatypeConverter
  * Instead, this class provides convenience methods, that extract information from the JSON document on request. Note
  * that the document tree these operations work on will not be stored in a field to keep serialisation size small. This
  * means that usage of the convenience methods has a high computational overhead.
+ *
+ * @property document1 String representation of did document.
  */
 @CordaSerializable
 data class DidDocument(val document1: String) : JsonBacked(document1) {
 
+	/**
+	 * Returns the id from json did document
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	fun id(): DidDocumentResult<CordaDid> {
-
 		val id = json.getMandatoryString("id").mapFailure {
 			InvalidDocumentJsonFailure(it)
 		}.onFailure {  return it }
@@ -81,11 +87,22 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 			return Failure(DidDocumentFailure.InvalidUUIDFormatFailure(it.toString()))
 		}*/
 
+	/**
+	 * Returns the context from json did document
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	fun context()= json.getMandatoryString("@context").map {
 		 it.isNotEmpty()
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}
+
+	/**
+	 * Returns the list of public Keys from json did document
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	fun publicKeys(): DidDocumentResult<Set<QualifiedPublicKey>> = json.getMandatoryArray("publicKey").map { keys ->
 		keys.filterIsInstance(JsonObject::class.java).map { key ->
 			val id = key.getMandatoryUri("id").mapFailure {
@@ -111,10 +128,25 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 
 	// These (by design) drop time zone information as we are only interested in a before/after relationship of
 	// instants.
+	/**
+	 * Returns the created timestamp from json did document
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	fun created(): DidDocumentResult<Instant?> = getTimestamp("created")
 
+	/**
+	 * Returns the updated timestamp from json did document
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	fun updated(): DidDocumentResult<Instant?> = getTimestamp("updated")
 
+	/**
+	 * Returns the Instant type
+	 *
+	 * @return [DidDocumentResult]
+	 */
 	private fun getTimestamp(field: String): DidDocumentResult<Instant?> = json.getString(field)?.let {
 		try {
 			Success(DatatypeConverter.parseDateTime(it).toInstant())

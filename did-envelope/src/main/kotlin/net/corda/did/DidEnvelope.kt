@@ -44,9 +44,11 @@ import java.net.URI
  * that the document tree these operations work on will not be stored in a field to keep serialisation size small. This
  * means that usage of the convenience methods has a high computational overhead.
  *
- * @param instruction The instruction string, outlining which action should be performed with the DID document provided
+ * @property rawInstruction The instruction string, outlining which action should be performed with the DID document provided
  * along with cryptographic proof of ownership of the DID document in form of a signature.
- * @param document The DID Document string to be written/updated
+ * @property rawDocument The DID Document string to be written/updated
+ * @property instruction The [DidInstruction] object
+ * @property document The [DidDocument] object
  */
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 @CordaSerializable
@@ -73,6 +75,7 @@ class DidEnvelope(
 
 	/**
 	 * Validates that the envelope presented represents a valid update/deletion of the [precursor] provided.
+	 * @param precursor The precursor document.
 	 */
 	fun validateModification(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
@@ -94,6 +97,7 @@ class DidEnvelope(
 
     /**
      * Validates that the envelope presented represents a valid deletion of the [precursor] provided.
+	 * @param precursor The precursor document.
      */
 
 	// nitesh solanki 2019-06-27  for deletion there is no temporal checks since we are not passing new doc to delete api
@@ -203,6 +207,9 @@ class DidEnvelope(
 		return pairings.verifySignatures()
 	}
 
+	/**
+	 * @param precursor The precursor document
+	 */
 	private fun validateTemporal(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		// temporal validation
 		val precursorCreated = precursor.created().mapFailure {
@@ -231,6 +238,9 @@ class DidEnvelope(
 		return Success(Unit)
 	}
 
+	/**
+	 * @param precursor The precursor document
+	 */
 	// validate that _each_ key in the precursor document has a signature in the current one
 	private fun validateKeysForModification(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		// standard validation has been performed prior to this so we know the keys in the precursor document have a
@@ -251,6 +261,9 @@ class DidEnvelope(
 		}.verifySignatures()
 	}
 
+	/**
+	 * @param precursor The precursor document
+	 */
 	// validate that _at least one_ key in the precursor document has a signature in the current one
 	private fun validateKeysForDelete(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		val precursorKeys = precursor.publicKeys().mapFailure {
@@ -281,6 +294,13 @@ class DidEnvelope(
 		return Success(Unit)
 	}
 
+	/**
+	 *
+	 * @param originalMessage message on which signature is obtained
+	 * @param publicKey [QualifiedPublicKey] of the signer
+	 * @receiver [ByteArray]
+	 * @return [Boolean] returns true if signature is valid else false
+	 */
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
@@ -291,6 +311,11 @@ class DidEnvelope(
 		}
 	}
 
+	/**
+	 * @param expected
+	 * @receiver [Action]
+	 * @throws IllegalArgumentException
+	 */
 	private fun Action.ensureIs(vararg expected: Action) {
 		if (!expected.contains(this))
 			throw IllegalArgumentException("Can't validate a $this action using a $expected method.")

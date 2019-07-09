@@ -17,9 +17,11 @@ import net.corda.testing.node.ledger
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.Test
 import java.net.URI
+import net.corda.did.state.DidState
+import net.corda.did.contract.DidContract.Commands.Create
 
 /**
- * Test cases for DIDState evolution (Create command). Envelope test are covered in DIDEnvelope test files
+ * Test cases for [DidState] evolution specifically for [Create] command.
  *
  */
 class CreateDidTests: AbstractContractsStatesTestUtils() {
