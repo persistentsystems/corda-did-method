@@ -34,6 +34,7 @@ class CordaDid(
 
     /**
      * Returns the did in external form
+	 *
      */
 	 fun toExternalForm() =  did.toString()
 
@@ -46,6 +47,7 @@ class CordaDid(
 
         /**
          * Returns Success if did can be successfully parsed or returns Failure
+		 *
          * @param externalForm Did in external format
          */
 		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
@@ -87,10 +89,11 @@ class CordaDid(
 @Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
 /**
  * Returns specific classes for various validation failures on Corda DID
+ *
  * */
 sealed class CordaDidFailure : FailureCode() {
 	/**
-	 * * @property[InvalidDidSchemeFailure] DID must use the "did" scheme.
+	 * @property[InvalidDidSchemeFailure] DID must use the "did" scheme.
 	 * @property[MalformedCordaDidFailure] Malformed Corda DID
 	 * @property[InvalidCordaDidUUIDFailure] Malformed Corda DID UUID
 	 * @property[InvalidCordaNetworkFailure] Invalid corda network

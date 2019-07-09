@@ -326,6 +326,7 @@ class DidEnvelope(
 @Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
 /**
  * Class specifies if there is any error document or instruction supplied.
+ *
  * @property[MalformedInstructionFailure] Used to specify if  instruction is malformed.
  * @property[MalformedDocumentFailure] Specifies malformed document.
  * @property[MalformedPrecursorFailure] Specifies if precursor is malformed.

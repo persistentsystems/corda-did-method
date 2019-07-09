@@ -13,6 +13,7 @@ import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 /**
  * Class with helper functions for querying ledger.
+ *
  * @property proxy RPC connection object passed to the constructor.
  * */
 class QueryUtil(private val proxy: CordaRPCOps) {

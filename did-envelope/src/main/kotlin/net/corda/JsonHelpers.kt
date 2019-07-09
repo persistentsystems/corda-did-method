@@ -122,6 +122,7 @@ typealias JsonResult<T> = Result<T, JsonFailure>
 @Suppress("UNUSED_PARAMETER", "unused")
 /**
  * Class for returning error in JSON payload
+ *
  * @property [MissingPropertyFailure] Specifies that a property is missing in JSON payload.
  * @property [InvalidUriFailure] Specifies if uri is invalid.
  * @property [InvalidBase58Representation] Specifies if base58 representation is wrong.

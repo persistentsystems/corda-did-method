@@ -1,6 +1,7 @@
 package net.corda.did.api
 /**
  * Enum for API  messages
+ *
  * */
 /**
  * Persistent code

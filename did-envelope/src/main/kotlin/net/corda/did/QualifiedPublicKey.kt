@@ -10,6 +10,7 @@ import java.net.URI
 /**
  * A representation of a public key mirroring the fields outlined in the Decentralized Identifiers v0.11 Data Model
  * Draft Community Group Report 06 February 2019 (https://w3c-ccg.github.io/did-spec/#public-keys)
+ *
  *@property[id] Uri of the target.
  *@property[type] Type of cryptographic suite being used.
  *@property[controller] Id of the controller of the public key .

@@ -93,7 +93,9 @@ class APIUtils {
      * @param[instruction] The instruction payload containing signature,action passed as a string
      * @param[document] The raw document containing encoded public key ,information about type of key,as well as information about the controller of did
      * @param[did] The decentralized identifier passed as a string
+     *
      * The function performs validations on instruction,document and did passed
+     *
      * @return  The DidEnvelope class object
      * */
     fun generateEnvelope(instruction: String ,document: String ,did: String): DidEnvelope {
