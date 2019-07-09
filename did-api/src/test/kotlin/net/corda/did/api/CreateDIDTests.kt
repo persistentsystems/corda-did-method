@@ -33,12 +33,17 @@ import java.util.*
 import java.io.FileInputStream
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch
+import java.lang.Thread.sleep
 
 /**
  * Persistent code
  *
  */
-
+/**
+ * @property[mockMvc] MockMvc Class instance used for testing the spring API.
+ * @property[mainController] The API controller being tested
+ * @property[apiUrl] The url where the api will be running
+ * */
 class CreateDIDAPITest{
     lateinit var mockMvc: MockMvc
     lateinit var mainController : MainController
@@ -46,6 +51,9 @@ class CreateDIDAPITest{
 
     @Before
     fun setup() {
+        /**
+         * reading configurations from the config.properties file and setting properties of the Class
+         * */
         val prop = Properties()
         prop.load(FileInputStream(System.getProperty("user.dir")+"/config.properties"))
         apiUrl = prop.getProperty("apiUrl")
@@ -58,7 +66,9 @@ class CreateDIDAPITest{
         mainController = MainController(rpc)
         mockMvc = MockMvcBuilders.standaloneSetup(mainController).build()
     }
-
+/**
+ * This test will try to create a DID with no context field
+ * */
     @Test
     fun `Create a DID with no context should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -108,6 +118,9 @@ class CreateDIDAPITest{
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
+    /**
+     * This test will try to create a DID with all the correct parameters
+     * */
     @Test
     fun `Create a DID` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -155,6 +168,9 @@ class CreateDIDAPITest{
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
     }
+    /**
+     * This test will try to create a DID with wrong DID format
+     * */
     @Test
     fun `Create API should return 400 if DID format is wrong` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -202,6 +218,9 @@ class CreateDIDAPITest{
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
+    /**
+     * This test will try to create a DID with wrong instruction format
+     * */
     @Test
     fun `Create API should return 400 if DID instruction is wrong` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -249,6 +268,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with wrong document format
+     * */
     @Test
     fun `Create API should return 400 if document format is wrong` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -297,6 +319,9 @@ class CreateDIDAPITest{
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
     }
+    /**
+     * This test will try to create a DID which already exists
+     * */
     @Test
     fun `Create  DID should return 409 is DID already exists` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -346,9 +371,13 @@ class CreateDIDAPITest{
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
         val result2=mockMvc.perform(builder).andReturn()
+        sleep(2000)
         mockMvc.perform(asyncDispatch(result2)).andExpect(status().isConflict()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID and fetch it
+     * */
     @Test
     fun `Create a DID and fetch it` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -397,10 +426,13 @@ class CreateDIDAPITest{
         }
         val result=mockMvc.perform(builder).andReturn()
         mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+        sleep(2000)
         mockMvc.perform(MockMvcRequestBuilders.get(apiUrl+"did:corda:tcn:"+uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
 
     }
-
+    /**
+     * This test will try to create a DID  and modify the document before sending without updating instruction
+     * */
     @Test
     fun `Create a DID with altered document being signed should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -463,6 +495,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with no signature
+     * */
     @Test
     fun `Create a DID with no signature should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -508,6 +543,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with document signed using wrong private key
+     * */
     @Test
     fun `Create a DID should fail if document signed with wrong key` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -558,6 +596,9 @@ class CreateDIDAPITest{
         mockMvc.perform( asyncDispatch(result)).andExpect( status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with multiple public keys mapping to same id.
+     * */
     @Test
     fun `Create a DID with multiple public keys of same id should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -617,6 +658,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with no instruction .
+     * */
     @Test
     fun `Create a DID with no instruction should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -655,6 +699,9 @@ class CreateDIDAPITest{
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with no document
+     * */
     @Test
     fun `Create DID with no document should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -692,6 +739,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with no DID parameter
+     * */
     @Test
     fun `Create DID with no DID parameter should fail` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -741,7 +791,9 @@ class CreateDIDAPITest{
         mockMvc.perform(builder).andExpect(status().is4xxClientError()).andReturn()
 
     }
-
+    /**
+     * This test will try to create a DID with no public key in the document
+     * */
     @Test
     fun `Create  DID should fail if no public key is provided` () {
         val kp = KeyPairGenerator().generateKeyPair()
@@ -789,6 +841,9 @@ class CreateDIDAPITest{
         mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
     }
+    /**
+     * This test will try to create a DID with different DID as request parameter from the document
+     * */
     @Test
     fun `Create a DID with incorrect DID in parameter` () {
         val kp = KeyPairGenerator().generateKeyPair()

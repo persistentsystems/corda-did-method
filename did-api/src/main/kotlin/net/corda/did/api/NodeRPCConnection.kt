@@ -27,6 +27,7 @@ private const val CORDA_RPC_PORT = "config.rpc.port"
  * @property username The username for logging into the RPC client.
  * @property password The password for logging into the RPC client.
  * @property proxy The RPC proxy.
+ * @property rpcConnection Instance of the ReconnectingCordaRPCOps class
  */
 @Component
 open class NodeRPCConnection(
@@ -39,7 +40,7 @@ open class NodeRPCConnection(
         private set
     lateinit var proxy: ReconnectingCordaRPCOps
         private set
-
+/** Construct a node RPC connection object */
     @PostConstruct
     fun initialiseNodeRPCConnection() {
 

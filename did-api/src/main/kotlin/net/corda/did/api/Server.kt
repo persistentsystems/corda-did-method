@@ -24,7 +24,7 @@ open class Server
  */
 
 /**
- * @param[args] arguments passed to the spring boot server during initialization
+ * @param[args] Arguments passed to the spring boot server during initialization
  * */
 fun main(args: Array<String>) {
 

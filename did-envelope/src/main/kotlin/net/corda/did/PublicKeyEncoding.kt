@@ -13,6 +13,12 @@ package net.corda.did
  *
  * @param encodingId The well-know identifier for the mechanism the public key is encoded in according to the draft
  * community report.
+ * @property[PublicKeyPem] Pem encoding for public key
+ * @property[PublicKeyJwk] JWK encoding for public key
+ * @property[PublicKeyHex] Hex encoding of the public key
+ * @property[PublicKeyBase64] Base64 encoding of public key
+ * @property[PublicKeyBase58] base58 encoding of public key
+ * @property[PublicKeyMultibase] Multibase encoding of public key
  */
 @Suppress("MemberVisibilityCanBePrivate")
 enum class PublicKeyEncoding(

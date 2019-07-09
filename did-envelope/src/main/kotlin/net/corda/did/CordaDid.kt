@@ -41,7 +41,7 @@ class CordaDid(
 	// rather perform parsing from string in a dedicated method that returns a result
 
 	 // nitesh solanki 2019-06-27 made changes as suggested
-
+/** Contains methods for parsing from an external form of DID and an enum representing target Corda network for did*/
 	companion object {
 
         /**
@@ -85,7 +85,16 @@ class CordaDid(
 }
 
 @Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
+/**
+ * Returns specific classes for various validation failures on Corda DID
+ * */
 sealed class CordaDidFailure : FailureCode() {
+	/**
+	 * * @property[InvalidDidSchemeFailure] DID must use the "did" scheme.
+	 * @property[MalformedCordaDidFailure] Malformed Corda DID
+	 * @property[InvalidCordaDidUUIDFailure] Malformed Corda DID UUID
+	 * @property[InvalidCordaNetworkFailure] Invalid corda network
+	 * */
 	sealed class CordaDidValidationFailure(description: String) : CordaDidFailure()
 	{
 		class InvalidDidSchemeFailure(underlying: String) : CordaDidValidationFailure("""DID must use the "did" scheme. Found "${underlying}".""")

@@ -77,6 +77,10 @@ class DidInstruction(json: String) : JsonBacked(json) {
 /**
  * Enum to represent DID operations as specified in the w3 specification.
  * Ref: https://w3c-ccg.github.io/did-spec/#did-operations
+ * @property[Read] Specify Read action.
+ * @property[Create] Specify Create action.
+ * @property[Update] Specify Update action.
+ * @property[Delete] Specify Delete action.
  */
 enum class Action {
 	Read,
@@ -98,6 +102,12 @@ private fun String.toAction(): DidInstructionResult<Action> = when (this) {
 }
 
 @Suppress("UNUSED_PARAMETER", "unused")
+/**
+ * Used to specify failures in instruction json.
+ * @property[InvalidInstructionJsonFailure] Instruction malformed
+ * @property[InvalidDidFailure] Invalid DID
+ * @property[UnknownActionFailure] Invalid action
+ * */
 sealed class DidInstructionFailure : FailureCode() {
 	class InvalidInstructionJsonFailure(val underlying: JsonFailure) : DidInstructionFailure()
 	class InvalidDidFailure(underlying: CordaDidFailure) : DidInstructionFailure()

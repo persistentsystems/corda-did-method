@@ -27,6 +27,7 @@ import kotlin.collections.ArrayList
  * The did will be created on the [DidState.originator] and [DidState.witnesses] nodes.
  *
  * @property envelope the [DidEnvelope] object.
+ * @property progressTracker
  */
 @InitiatingFlow
 @StartableByRPC
@@ -142,7 +143,10 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
         return subFlow(FinalityFlow(signedTx, otherPartySession, FINALISING_TRANSACTION.childProgressTracker()))
     }
 }
-
+/**
+ * Receiver finality flow
+ * @property[otherPartySession] FlowSession
+ * */
 @InitiatedBy(CreateDidFlow::class)
 class CreateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable

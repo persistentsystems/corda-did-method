@@ -26,6 +26,7 @@ import net.corda.did.utils.DIDNotFoundException
  * The delete operation only deactivates the did on ledger by updating the [DidState] with status as [DidStatus.DELETED]
  *
  * @property envelope the [DidEnvelope] object
+ * @property ProgressTracker tracks the progress in the various stages of transaction
  */
 @InitiatingFlow
 @StartableByRPC
@@ -107,6 +108,10 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 }
 
 @InitiatedBy(UpdateDidFlow::class)
+/**
+ * Receiver finality flow
+ * @property[otherPartySession] FlowSession
+ * */
 class UpdateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {

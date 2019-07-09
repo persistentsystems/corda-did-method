@@ -31,6 +31,7 @@ import java.util.*
  *
  * @property instruction The instruction JSON object containing signatures of did-owner on the did-document to be deactivated.
  * @property did the did to be deleted.
+ * @property ProgressTracker for tracking the steps in transaction
  */
 @InitiatingFlow
 @StartableByRPC
@@ -116,6 +117,10 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 }
 
 @InitiatedBy(DeleteDidFlow::class)
+/**
+ * Receiver finality flow
+ * @property[otherPartySession] FlowSession
+ * */
 class DeleteDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {

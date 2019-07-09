@@ -157,6 +157,13 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 }
 
 @Suppress("UNUSED_PARAMETER")
+/**
+ * Identify incorrect document json
+ * @property InvalidDocumentJsonFailure  if document is invalid
+ * @property InvalidDidFailure DID is invalid
+ * @property InvalidTimeStampFormatFailure created or updated field is invalid.
+ *
+ * */
 sealed class DidDocumentFailure : FailureCode() {
 	class InvalidDocumentJsonFailure(underlying: JsonFailure) : DidDocumentFailure()
 	class InvalidDidFailure(underlying: CordaDidFailure) : DidDocumentFailure()

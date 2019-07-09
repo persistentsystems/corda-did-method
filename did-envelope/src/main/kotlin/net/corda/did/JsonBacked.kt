@@ -16,6 +16,11 @@ import kotlin.text.Charsets.UTF_8
  */
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 @CordaSerializable
+/**
+ *@property[raw] The raw document data.
+ * @property [json] document parsed as JsonObject
+ * @param [source] document passed as a string.
+ * */
 abstract class JsonBacked(val source: String) {
 	// Corda serialisation dictates these won't be serialised. Only the fields in the constructor that have getters are.
 	// This means there is no volume overhead in storing these as fields.

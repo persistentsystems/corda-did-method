@@ -120,6 +120,13 @@ fun JsonObject.getMandatoryBase58Bytes(key: String): JsonResult<ByteArray> = get
 typealias JsonResult<T> = Result<T, JsonFailure>
 
 @Suppress("UNUSED_PARAMETER", "unused")
+/**
+ * Class for returning error in JSON payload
+ * @property [MissingPropertyFailure] Specifies that a property is missing in JSON payload.
+ * @property [InvalidUriFailure] Specifies if uri is invalid.
+ * @property [InvalidBase58Representation] Specifies if base58 representation is wrong.
+ * @property [InvalidCryptoSuiteFailure] Specifies if the provided crypto suite is invalid
+ * */
 sealed class JsonFailure : FailureCode() {
 	class MissingPropertyFailure(val key: String) : JsonFailure()
 	class InvalidUriFailure(val value: String) : JsonFailure()

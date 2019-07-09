@@ -12,13 +12,14 @@ import net.corda.did.DidDocument
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 /**
+ * Class with helper functions for querying ledger.
  * @property proxy RPC connection object passed to the constructor.
  * */
 class QueryUtil(private val proxy: CordaRPCOps) {
 
      /**
-      * @param[linearId] takes uuid as input.
-      * @return raw DID document.
+      * @param[linearId] Takes uuid as input.
+      * @return Raw DID document.
       * */
     fun getDIDDocumentByLinearId(linearId: String): String {
         val criteria= QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
@@ -38,8 +39,8 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 
     }
     /**
-     * @param[linearId] takes uuid as input.
-     * @return returns DidDocument class object.
+     * @param[linearId] Takes uuid as input.
+     * @return  DidDocument class object.
      * */
     fun getCompleteDIDDocumentByLinearId( linearId: String ): DidDocument {
         val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
@@ -57,5 +58,8 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 
 
 }
-
+/** @param message Takes input as string.
+ *   This class throws a custom exception for DIDDeletion
+ *
+ * */
 class DIDDeletedException(message:String):Exception(message)

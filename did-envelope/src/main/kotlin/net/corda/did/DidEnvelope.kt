@@ -324,6 +324,25 @@ class DidEnvelope(
 }
 
 @Suppress("UNUSED_PARAMETER", "CanBeParameter", "MemberVisibilityCanBePrivate")
+/**
+ * Class specifies if there is any error document or instruction supplied.
+ * @property[MalformedInstructionFailure] Used to specify if  instruction is malformed.
+ * @property[MalformedDocumentFailure] Specifies malformed document.
+ * @property[MalformedPrecursorFailure] Specifies if precursor is malformed.
+ * @property[NoKeysFailure] Specifies DID document does not contain public keys.
+ * @property[SignatureTargetFailure] Multiple Signatures target the same key
+ * @property[SignatureCountFailure] The number of keys in the DID document does not match the number of signatures
+ * @property[UnsupportedCryptoSuiteFailure] Not a supported cryptographic suite
+ * @property[CryptoSuiteMismatchFailure] Signing keys and signature are using different suites
+ * @property[InvalidSignatureFailure] Signature is invalid.
+ * @property[MissingSignatureFailure] Signature missing.
+ * @property[MissingTemporalInformationFailure] Temporal information not  provided.
+ * @property[InvalidTemporalRelationFailure] Temporal information is invalid.
+ * @property[InvalidPublicKeyId] PublicKey ID must contain did as prefix for target
+ * @property[DuplicatePublicKeyIdFailure] Multiple public keys have the same ID
+ * @property[UntargetedPublicKeyFailure] No signature was provided for target.
+ * @property[NoMatchingSignatureFailure] No matching signature.
+ * */
 sealed class DidEnvelopeFailure : FailureCode() {
 	sealed class ValidationFailure(description: String) : DidEnvelopeFailure() {
 		class MalformedInstructionFailure(val underlying: DidInstructionFailure) : ValidationFailure("The instruction document is invalid: $underlying")

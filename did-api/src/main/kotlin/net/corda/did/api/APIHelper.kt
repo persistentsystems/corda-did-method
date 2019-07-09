@@ -8,11 +8,14 @@ import org.springframework.http.ResponseEntity
  * Persistent code
  *
  */
-
+/**
+ * Helper functions for handling API exceptions and responses
+ *
+ * */
 class APIUtils {
     /**
-     * @param[reason] takes exception as input
-     * @return the appropriate status code and message
+     * @param[reason] Takes exception as input
+     * @return The appropriate status code and message
      * */
     fun sendErrorResponse( reason : DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
         when( reason ){
@@ -87,11 +90,11 @@ class APIUtils {
         }
     }
     /**
-     * @param[instruction] the instruction payload containing signature,action passed as a string
-     * @param[document] the raw document containing encoded public key ,information about type of key,as well as information about the controller of did
-     * @param[did] the decentralized identifier passed as a string
+     * @param[instruction] The instruction payload containing signature,action passed as a string
+     * @param[document] The raw document containing encoded public key ,information about type of key,as well as information about the controller of did
+     * @param[did] The decentralized identifier passed as a string
      * The function performs validations on instruction,document and did passed
-     * @return returns the DidEnvelope class object
+     * @return  The DidEnvelope class object
      * */
     fun generateEnvelope(instruction: String ,document: String ,did: String): DidEnvelope {
 
