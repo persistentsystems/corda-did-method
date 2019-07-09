@@ -4,7 +4,7 @@ package net.corda.did.api
  *
  */
 /**
- * @return returns the appropriate string message for the enum key
+ * @return the appropriate string message for the enum key
  * */
 enum class APIMessage(val message: String) {
 

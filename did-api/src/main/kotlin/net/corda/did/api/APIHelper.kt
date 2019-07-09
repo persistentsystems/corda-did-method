@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity
 
 class APIUtils {
     /**
-     * @param[reason] takes exception as input and
-     * @return returns the appropriate status code and message
+     * @param[reason] takes exception as input
+     * @return the appropriate status code and message
      * */
     fun sendErrorResponse( reason : DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
         when( reason ){

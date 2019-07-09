@@ -18,7 +18,7 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 
      /**
       * @param[linearId] takes uuid as input.
-      * @return returns raw DID document.
+      * @return raw DID document.
       * */
     fun getDIDDocumentByLinearId(linearId: String): String {
         val criteria= QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
