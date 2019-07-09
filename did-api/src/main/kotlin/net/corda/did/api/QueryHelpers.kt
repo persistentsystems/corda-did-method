@@ -11,10 +11,15 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.did.DidDocument
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
-
+/**
+ * @property proxy RPC connection object passed to the constructor.
+ * */
 class QueryUtil(private val proxy: CordaRPCOps) {
 
-
+     /**
+      * @param[linearId] takes uuid as input.
+      * @return raw DID document.
+      * */
     fun getDIDDocumentByLinearId(linearId: String): String {
         val criteria= QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
         val results = proxy.vaultQueryBy<DidState>(criteria).states
@@ -32,6 +37,10 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 
 
     }
+    /**
+     * @param[linearId] takes uuid as input.
+     * @return returns DidDocument class object.
+     * */
     fun getCompleteDIDDocumentByLinearId( linearId: String ): DidDocument {
         val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
         val results = proxy.vaultQueryBy<DidState>(criteria).states
