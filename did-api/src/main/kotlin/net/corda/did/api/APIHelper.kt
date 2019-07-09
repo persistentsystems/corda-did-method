@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity
  */
 
 class APIUtils {
+    /**
+     * @param[reason] takes exception as input
+     * @return the appropriate status code and message
+     * */
     fun sendErrorResponse( reason : DidEnvelopeFailure.ValidationFailure ): ResponseEntity<Any?> {
         when( reason ){
             is DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure ->  {
@@ -82,6 +86,13 @@ class APIUtils {
             }
         }
     }
+    /**
+     * @param[instruction] the instruction payload containing signature,action passed as a string
+     * @param[document] the raw document containing encoded public key ,information about type of key,as well as information about the controller of did
+     * @param[did] the decentralized identifier passed as a string
+     * The function performs validations on instruction,document and did passed
+     * @return returns the DidEnvelope class object
+     * */
     fun generateEnvelope(instruction: String ,document: String ,did: String): DidEnvelope {
 
         if ( instruction.isEmpty() ){

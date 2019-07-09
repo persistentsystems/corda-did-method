@@ -3,7 +3,9 @@ package net.corda.did.api
  * Persistent code
  *
  */
-
+/**
+ * @return the appropriate string message for the enum key
+ * */
 enum class APIMessage(val message: String) {
 
     NOT_FOUND( "The provided DID is not found." ),
