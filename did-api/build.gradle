@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.7.RELEASE'
     id 'net.corda.plugins.quasar-utils'
     id 'net.corda.plugins.cordformation'
+    id 'org.jetbrains.dokka'
    }
 
 ext {
@@ -60,6 +61,10 @@ dependencies {
 test{
     exclude '**/*'
 }
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
 
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -74,4 +79,8 @@ task runPartyAServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.did.api.ServerKt'
     args '--server.port=50005','--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/javadoc"
 }
