@@ -1,8 +1,3 @@
-/**
- * Persistent code
- *
- */
-
 package net.corda.did.contract
 
 import net.corda.core.contracts.TypeOnlyCommandData

@@ -37,7 +37,7 @@ data class DidState(
 ) : LinearState, QueryableState {
 
 	/**
-	 * Persistent code
+	 *
 	 * @param schema [MappedSchema] object
 	 */
 	override fun generateMappedObject(schema: MappedSchema): PersistentState {
@@ -58,7 +58,7 @@ data class DidState(
 }
 
 /**
- * Persistent code
+ *
  * Enum to represent the status of [DidState]
  */
 @CordaSerializable

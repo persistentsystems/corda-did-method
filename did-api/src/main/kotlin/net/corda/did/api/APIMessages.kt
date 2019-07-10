@@ -4,10 +4,6 @@ package net.corda.did.api
  * Enum for API  messages
  * */
 /**
- * Persistent code
- *
- */
-/**
  * @param [message] The response message as a string
  * @return The appropriate string message for the enum key
  * */

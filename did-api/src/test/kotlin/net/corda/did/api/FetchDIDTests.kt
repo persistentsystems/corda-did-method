@@ -10,10 +10,6 @@ import java.io.FileInputStream
 import java.util.Properties
 
 /**
- * Persistent code
- *
- */
-/**
  * @property[mockMvc] MockMvc Class instance used for testing the spring API.
  * @property[mainController] The API controller being tested
  * @property[apiUrl] The url where the api will be running

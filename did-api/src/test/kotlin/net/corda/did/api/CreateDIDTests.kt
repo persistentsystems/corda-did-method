@@ -1,8 +1,3 @@
-/**
- * Persistent code
- *
- */
-
 /*
 * The tests need a corda node to be running. The configuration can be found in config.properties
 *
@@ -37,10 +32,6 @@ import java.net.URI
 import java.util.Properties
 import java.util.UUID
 
-/**
- * Persistent code
- *
- */
 /**
  * @property[mockMvc] MockMvc Class instance used for testing the spring API.
  * @property[mainController] The API controller being tested

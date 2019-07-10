@@ -1,7 +1,3 @@
-/**
- * Persistent code
- *
- */
 package net.corda.did.api
 
 import org.springframework.boot.Banner

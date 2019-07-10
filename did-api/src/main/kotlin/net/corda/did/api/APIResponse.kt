@@ -1,10 +1,6 @@
 package net.corda.did.api
 
 /**
- * Persistent code
- *
- */
-/**
  * Class to turn the response string into a Response object
  *
  * @param[message] Takes a string message input

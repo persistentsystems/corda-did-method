@@ -1,8 +1,3 @@
-/**
- * Persistent code
- *
- */
-
 package net.corda.did.api
 
 import com.natpryce.onFailure

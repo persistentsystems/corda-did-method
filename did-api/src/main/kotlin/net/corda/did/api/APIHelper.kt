@@ -6,10 +6,6 @@ import net.corda.did.DidEnvelopeFailure
 import org.springframework.http.ResponseEntity
 
 /**
- * Persistent code
- *
- */
-/**
  * Helper functions for handling API exceptions and responses
  *
  * */

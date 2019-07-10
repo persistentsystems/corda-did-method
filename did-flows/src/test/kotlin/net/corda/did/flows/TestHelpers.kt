@@ -1,7 +1,3 @@
-/**
- * Persistent code
- *
- */
 package net.corda.did.flows
 
 import com.natpryce.Failure

@@ -1,10 +1,5 @@
 package net.corda.did.api
 
-/**
- * Persistent code
- *
- */
-
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.vaultQueryBy

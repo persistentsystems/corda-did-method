@@ -1,9 +1,5 @@
 package net.corda.did.flows
 
-/**
- * Persistent code
- *
- */
 import co.paralleluniverse.fibers.Suspendable
 import com.natpryce.onFailure
 import net.corda.core.contracts.Command

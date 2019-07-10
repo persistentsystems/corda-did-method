@@ -18,7 +18,7 @@ import net.i2p.crypto.eddsa.KeyPairGenerator
 import java.net.URI
 
 /**
- * Persistent code
+ *
  * Helper class for [DidStateTests]
  */
 abstract class AbstractContractsStatesTestUtils {

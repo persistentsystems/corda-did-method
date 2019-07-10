@@ -626,10 +626,6 @@ class DidEnvelopeCreateTests {
 		assertThat(actual, isA<InvalidTemporalRelationFailure>())
 	}
 
-	/**
-	 * Persistent code
-	 *
-	 */
 	@Test
 	fun `validation fails if publicKey id does not contain did as prefix`() {
 		val document = """{

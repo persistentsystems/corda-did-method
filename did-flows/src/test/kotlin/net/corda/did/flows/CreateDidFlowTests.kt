@@ -606,10 +606,6 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
 	}
 
-	/**
-	 * Persistent code
-	 *
-	 */
 	@Test
 	fun `DID creation fails if publicKey id does not contain did as prefix`() {
 		val document = """{

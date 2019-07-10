@@ -78,7 +78,7 @@ open class DidContract : Contract {
 	}
 
 	/**
-	 * Persistent code
+	 *
 	 * @param tx The [LedgerTransaction]
 	 * @param setOfSigners list of signers for Create DID transaction
 	 */
@@ -116,7 +116,7 @@ open class DidContract : Contract {
 	}
 
 	/**
-	 * Persistent code
+	 *
 	 * @param tx The [LedgerTransaction]
 	 * @param setOfSigners list of signers for Update DID transaction
 	 */
@@ -164,7 +164,7 @@ open class DidContract : Contract {
 	}
 
 	/**
-	 * Persistent code
+	 *
 	 * @param tx The [LedgerTransaction]
 	 * @param setOfSigners list of signers for Delete DID transaction
 	 */

@@ -184,10 +184,6 @@ class DidEnvelope(
 			publicKey to signature
 		}
 
-		/**
-		 * Persistent code
-		 *
-		 */
 		// Fail if the id of the public key do not contain did as a prefix
 		publicKeys.map { publicKey ->
 			val publicKeyId = publicKey.id.toString()
