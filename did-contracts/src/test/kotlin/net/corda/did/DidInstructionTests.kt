@@ -64,7 +64,7 @@ class DidInstructionTests {
 	}
 
 	@Test
-	fun `Rejects "create" instruction using an unknown crypto suite`() {
+	fun `Rejects create instruction using an unknown crypto suite`() {
 		val instruction = """{
 		  "action": "create",
 		  "signatures": [
