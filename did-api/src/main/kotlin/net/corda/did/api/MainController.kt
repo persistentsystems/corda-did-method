@@ -92,9 +92,6 @@ class MainController(rpc: NodeRPCConnection) {
 			//pranav 2019-06-27-- removed as per review comment
 
 			/**
-			 * Validate envelope
-			 */
-			/**
 			 * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
 			 *
 			 * */
@@ -111,9 +108,9 @@ class MainController(rpc: NodeRPCConnection) {
 			// ??? moritzplatt 2019-06-20 -- consider comments on the flow constructor
 			//pranav: 2019-06-27 As per Moritz comments we are now just passing envelope to flow
 			/**
-			 * Passing the generated envelope as a parameter to the CreateDidFlow
+			 * Passing the generated envelope as a parameter to the CreateDidFlow.
 			 *
-			 * returns a flow handler
+			 * Returns a flow handler
 			 * */
 			val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
 
@@ -124,7 +121,7 @@ class MainController(rpc: NodeRPCConnection) {
 			/**
 			 * Executes the flow in a separate thread and returns result.
 			 *
-			 * throws exception if flow invocation fails
+			 * Throws exception if flow invocation fails
 			 * */
 			executorService.submit {
 				try {
@@ -166,14 +163,14 @@ class MainController(rpc: NodeRPCConnection) {
 
 		try {
 			/**
-			 * converts the "did" from external form to uuid form else returns an error
+			 * Converts the "did" from external form to uuid form else returns an error
 			 *
 			 * */
 			val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()) }
 
 			builder {
 				/**
-				 * query the ledger using the uuid and return raw document else return an error.
+				 * Query the ledger using the uuid and return raw document else return an error.
 				 *
 				 * */
 				val didJson = queryUtils.getDIDDocumentByLinearId(uuid.uuid.toString())
@@ -226,7 +223,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			val envelope = apiUtils.generateEnvelope(instruction, document, did)
 			/**
-			 * converts the "did" from external form to uuid form else returns an error
+			 * Converts the "did" from external form to uuid form else returns an error
 			 *
 			 * */
 			val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
@@ -251,13 +248,13 @@ class MainController(rpc: NodeRPCConnection) {
 			}
 
 			/**
-			 * Passing the generated envelope as a parameter to the UpdateDidFlow
-			 * returns a flow handler
+			 * Passing the generated envelope as a parameter to the UpdateDidFlow.
+			 * Returns a flow handler
 			 * */
 			val flowHandler = proxy.startFlowDynamic(UpdateDidFlow::class.java, envelope)
 			/**
 			 * Executing the flow in a separate thread and return result.
-			 * throws exception if flow invocation fails
+			 * Throws exception if flow invocation fails
 			 * */
 
 			executorService.submit {
@@ -310,7 +307,7 @@ class MainController(rpc: NodeRPCConnection) {
 			/**
 			 * Executing the flow in a separate thread and return result.
 			 *
-			 * throws exception if flow invocation fails
+			 * Throws exception if flow invocation fails
 			 * */
 			executorService.submit {
 				try {
