@@ -1,7 +1,3 @@
-/**
- * Persistent code
- *
- */
 package net.corda.did.flows
 
 import com.natpryce.Failure
@@ -20,14 +16,19 @@ import net.corda.did.DidEnvelope
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.testing.core.singleIdentity
-import net.corda.testing.node.*
+import net.corda.testing.node.MockNetwork
+import net.corda.testing.node.MockNetworkNotarySpec
+import net.corda.testing.node.MockNetworkParameters
+import net.corda.testing.node.MockNodeParameters
+import net.corda.testing.node.StartedMockNode
+import net.corda.testing.node.TestCordapp
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.After
 import org.junit.Before
 import java.net.URI
 
 /**
- * A base class to reduce the boilerplate when writing land title flow tests.
+ * Helper class for Flow tests
  */
 abstract class AbstractFlowTestUtils {
 	lateinit var mockNetwork: MockNetwork
@@ -72,7 +73,7 @@ abstract class AbstractFlowTestUtils {
 		mockNetwork.stopNodes()
 	}
 
-	protected fun getDidStateForCreateOperation(): DidState{
+	protected fun getDidStateForCreateOperation(): DidState {
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 
@@ -175,10 +176,6 @@ abstract class AbstractFlowTestUtils {
 	}
 }
 
-/**
- * R3 code
- *
- */
 fun <T, E> Result<T, E>.assertSuccess(): T = when (this) {
 	is Success -> this.value
 	is Failure -> throw AssertionFailedError("Expected result to be a success but it failed: ${this.reason}")

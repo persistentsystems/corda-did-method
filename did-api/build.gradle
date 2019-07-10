@@ -3,7 +3,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.7.RELEASE'
     id 'net.corda.plugins.quasar-utils'
     id 'net.corda.plugins.cordformation'
-   }
+    id 'org.jetbrains.dokka'
+}
 
 ext {
     spring_boot_version = '1.5.7.RELEASE'
@@ -36,7 +37,6 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.7.RELEASE'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-test', version: '1.5.7.RELEASE'
 
-
     // https://mvnrepository.com/artifact/org.springframework/spring-test
     // Corda dependencies.
     compile "net.corda:corda-core:$corda_release_version"
@@ -47,12 +47,25 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'com.ninja-squad:springmockk:1.1.0'
 
+
     compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version")
+
+    compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version") {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+    compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
+    //compile "org.apache.logging.log4j:log4j-web:$log4j_version"
+
     compile project(":did-contracts")
     compile project(":did-flows")
+    compile project(":did-envelope")
 }
-test{
+test {
     exclude '**/*'
+}
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
 }
 
 
@@ -67,5 +80,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 task runPartyAServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.did.api.ServerKt'
-    args '--server.port=50005','--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/javadoc"
 }

@@ -1,8 +1,3 @@
-/**
- * R3 copy
- *
- */
-
 package net.corda.did.resolver
 
 import com.natpryce.hamkrest.assertion.assertThat

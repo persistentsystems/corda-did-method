@@ -1,12 +1,13 @@
 package net.corda.did.flows
 
-
 import com.natpryce.valueOrNull
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.toBase58
-import net.corda.did.*
+import net.corda.did.CordaDid
+import net.corda.did.CryptoSuite
+import net.corda.did.DidEnvelope
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.did.utils.DIDNotFoundException
@@ -20,35 +21,38 @@ import kotlin.test.assertFailsWith
 // re-use some of the earlier test vectors from the did-contracts package
 
 // nitesh solanki 2019-06-27 made changes as suggested.
+/**
+ * Test cases for [DeleteDidFlow]
+ */
 class DeleteDidFlowTests : AbstractFlowTestUtils() {
 
-    @Test
-    fun `delete did successfully`() {
-        // delete did
-        deleteDID(getDidStateForDeleteOperation().envelope)!!.tx
-        mockNetwork.waitQuiescent()
+	@Test
+	fun `delete did successfully`() {
+		// delete did
+		deleteDID(getDidStateForDeleteOperation().envelope)!!.tx
+		mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'DELETED' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.DELETED)
-        }
+		// confirm did state with status as 'DELETED' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.DELETED)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.DELETED)
-        }
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.DELETED)
+		}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.DELETED)
-        }
-    }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.DELETED)
+		}
+	}
 
-    @Test
+	@Test
 	fun `Deletion fails for an envelope with wrong signature`() {
 		/*
 		 * Generate valid base Document
@@ -76,15 +80,14 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-
 		val bogusKeys = KeyPairGenerator().generateKeyPair()
 		val signature = bogusKeys.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
-        val oldKeySignature = keyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-        val oldEncodedSignature = oldKeySignature.bytes.toBase58()
+		val oldKeySignature = keyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
+		val oldEncodedSignature = oldKeySignature.bytes.toBase58()
 
-        val createInstruction = """{
+		val createInstruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -95,8 +98,8 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        createDID(DidEnvelope(createInstruction, originalDocument))
-        mockNetwork.waitQuiescent()
+		createDID(DidEnvelope(createInstruction, originalDocument))
+		mockNetwork.waitQuiescent()
 
 		val deleteInstruction = """{
 		|  "action": "delete",
@@ -110,26 +113,26 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|}""".trimMargin()
 
 		val envelope = DidEnvelope(deleteInstruction, originalDocument)
-        val flow = DeleteDidFlow(envelope.rawInstruction, documentId.toExternalForm())
-        val future = originator.startFlow(flow)
-        assertFailsWith<TransactionVerificationException> {  future.getOrThrow() }
-    }
+		val flow = DeleteDidFlow(envelope.rawInstruction, documentId.toExternalForm())
+		val future = originator.startFlow(flow)
+		assertFailsWith<TransactionVerificationException> { future.getOrThrow() }
+	}
 
-    @Test
-    fun `Deletion fails for an envelope with irrelevant signatures`() {
-        /*
-         * Generate valid base Document
-         */
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `Deletion fails for an envelope with irrelevant signatures`() {
+		/*
+		 * Generate valid base Document
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        /*
-         * Generate a key pair for the original document
-         */
-        val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-        val keyPair1 = KeyPairGenerator().generateKeyPair()
-        val encodedKey1 = keyPair1.public.encoded.toBase58()
+		/*
+		 * Generate a key pair for the original document
+		 */
+		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
+		val keyPair1 = KeyPairGenerator().generateKeyPair()
+		val encodedKey1 = keyPair1.public.encoded.toBase58()
 
-        val originalDocument = """{
+		val originalDocument = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "created": "1970-01-01T00:00:00Z",
@@ -143,7 +146,7 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val newDocument = """{
+		val newDocument = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "created": "1970-01-01T00:00:00Z",
@@ -158,14 +161,13 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val signature = keyPair1.private.sign(newDocument.toByteArray(Charsets.UTF_8))
-        val encodedSignature = signature.bytes.toBase58()
+		val signature = keyPair1.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val encodedSignature = signature.bytes.toBase58()
 
-        val oldSignature = keyPair1.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-        val oldEncodedSignature = oldSignature.bytes.toBase58()
+		val oldSignature = keyPair1.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
+		val oldEncodedSignature = oldSignature.bytes.toBase58()
 
-
-        val createInstruction = """{
+		val createInstruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -176,10 +178,10 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        createDID(DidEnvelope(createInstruction, originalDocument))
-        mockNetwork.waitQuiescent()
+		createDID(DidEnvelope(createInstruction, originalDocument))
+		mockNetwork.waitQuiescent()
 
-        val deleteInstruction = """{
+		val deleteInstruction = """{
 		|  "action": "delete",
 		|  "signatures": [
 		|	{
@@ -190,21 +192,21 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(deleteInstruction, originalDocument)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { deleteDID(envelope) }
-    }
+		val envelope = DidEnvelope(deleteInstruction, originalDocument)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { deleteDID(envelope) }
+	}
 
-    @Test
-    fun `SignedTransaction returned by the flow is signed by the did originator`() {
-        val signedTx = deleteDID(getDidStateForDeleteOperation().envelope)!!
-        signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
-    }
+	@Test
+	fun `SignedTransaction returned by the flow is signed by the did originator`() {
+		val signedTx = deleteDID(getDidStateForDeleteOperation().envelope)!!
+		signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
+	}
 
-    @Test
-    fun `flow throws DIDNotFound exception for invalid did`() {
-        val flow = DeleteDidFlow(getDidStateForDeleteOperation().envelope.rawInstruction, getDidStateForDeleteOperation().envelope.document.id().valueOrNull()!!.toExternalForm())
-        val future = originator.startFlow(flow)
-        mockNetwork.waitQuiescent()
-        assertFailsWith<DIDNotFoundException> {  future.getOrThrow() }
-    }
+	@Test
+	fun `flow throws DIDNotFound exception for invalid did`() {
+		val flow = DeleteDidFlow(getDidStateForDeleteOperation().envelope.rawInstruction, getDidStateForDeleteOperation().envelope.document.id().valueOrNull()!!.toExternalForm())
+		val future = originator.startFlow(flow)
+		mockNetwork.waitQuiescent()
+		assertFailsWith<DIDNotFoundException> { future.getOrThrow() }
+	}
 }

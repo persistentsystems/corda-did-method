@@ -10,6 +10,7 @@ buildscript {
         junit_version = "4.12"
         quasar_version = "0.7.10"
         corda_platform_version = "4"
+        dokka_version = "0.9.18"
 
         hamkrest_version = "1.7.0.0"
         http4k_version = "3.112.2"
@@ -30,6 +31,7 @@ buildscript {
         classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
     }
 }
 
