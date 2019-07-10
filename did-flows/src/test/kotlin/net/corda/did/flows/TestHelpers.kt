@@ -176,10 +176,7 @@ abstract class AbstractFlowTestUtils {
 	}
 }
 
-/**
- * R3 code
- *
- */
+
 fun <T, E> Result<T, E>.assertSuccess(): T = when (this) {
 	is Success -> this.value
 	is Failure -> throw AssertionFailedError("Expected result to be a success but it failed: ${this.reason}")

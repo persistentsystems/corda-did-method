@@ -1,7 +1,4 @@
-/**
- * R3 copy
- *
- */
+
 package net.corda.did.state
 
 import com.natpryce.valueOrNull
