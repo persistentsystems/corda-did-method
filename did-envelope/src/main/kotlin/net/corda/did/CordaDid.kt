@@ -1,7 +1,7 @@
 /**
-* R3 copy
-*
-*/
+ * R3 copy
+ *
+ */
 
 package net.corda.did
 
@@ -10,14 +10,15 @@ import com.natpryce.Result
 import com.natpryce.Success
 import com.natpryce.onFailure
 import net.corda.FailureCode
-import net.corda.JsonFailure
+import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidCordaDidUUIDFailure
+import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure
+import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidDidSchemeFailure
+import net.corda.did.CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure
 import net.corda.did.Network.CordaNetwork
 import net.corda.did.Network.CordaNetworkUAT
 import net.corda.did.Network.Testnet
 import java.net.URI
 import java.util.UUID
-
-
 
 /**
  * The Corda notation for did
@@ -32,24 +33,24 @@ class CordaDid(
 		val uuid: UUID
 ) {
 
-    /**
-     * Returns the did in external form
+	/**
+	 * Returns the did in external form
 	 *
-     */
-	 fun toExternalForm() =  did.toString()
+	 */
+	fun toExternalForm() = did.toString()
 
-	 // ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
+	// ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
 	// rather perform parsing from string in a dedicated method that returns a result
 
-	 // nitesh solanki 2019-06-27 made changes as suggested
-/** Contains methods for parsing from an external form of DID and an enum representing target Corda network for did*/
+	// nitesh solanki 2019-06-27 made changes as suggested
+	/** Contains methods for parsing from an external form of DID and an enum representing target Corda network for did*/
 	companion object {
 
-        /**
-         * Returns Success if did can be successfully parsed or returns Failure
+		/**
+		 * Returns Success if did can be successfully parsed or returns Failure
 		 *
-         * @param externalForm Did in external format
-         */
+		 * @param externalForm Did in external format
+		 */
 		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
 			val did = URI.create(externalForm)
 			if (did.scheme != "did")
@@ -57,7 +58,8 @@ class CordaDid(
 
 			val regex = """did:corda:(tcn|tcn-uat|testnet):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
 
-			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure())
+			val (n, u) = regex.find(externalForm)?.destructured
+					?: return Failure(CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure())
 
 			val network = n.toNetwork().onFailure { return it }
 
@@ -70,18 +72,18 @@ class CordaDid(
 			return Success(CordaDid(did, network, uuid))
 		}
 
-        /**
-         * Returns an enum representing target Corda network for did
-         *
-         * @receiver [String]
-         * @return [Network]
-         *
-         */
+		/**
+		 * Returns an enum representing target Corda network for did
+		 *
+		 * @receiver [String]
+		 * @return [Network]
+		 *
+		 */
 		private fun String.toNetwork(): Result<Network, CordaDidFailure> = when (this) {
-			"tcn" -> Success(CordaNetwork)
+			"tcn"     -> Success(CordaNetwork)
 			"tcn-uat" -> Success(CordaNetworkUAT)
 			"testnet" -> Success(Testnet)
-			else -> Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure())
+			else      -> Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure())
 		}
 	}
 }
@@ -98,11 +100,10 @@ sealed class CordaDidFailure : FailureCode() {
 	 * @property[InvalidCordaDidUUIDFailure] Malformed Corda DID UUID
 	 * @property[InvalidCordaNetworkFailure] Invalid corda network
 	 * */
-	sealed class CordaDidValidationFailure(description: String) : CordaDidFailure()
-	{
+	sealed class CordaDidValidationFailure(description: String) : CordaDidFailure() {
 		class InvalidDidSchemeFailure(underlying: String) : CordaDidValidationFailure("""DID must use the "did" scheme. Found "${underlying}".""")
 		class MalformedCordaDidFailure : CordaDidValidationFailure("Malformed Corda DID")
 		class InvalidCordaDidUUIDFailure : CordaDidValidationFailure(" Malformed Corda DID UUID")
-        class InvalidCordaNetworkFailure : CordaDidValidationFailure("Invalid corda network")
+		class InvalidCordaNetworkFailure : CordaDidValidationFailure("Invalid corda network")
 	}
 }

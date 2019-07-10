@@ -20,7 +20,9 @@ import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Read
 import net.corda.did.Action.Update
+import net.corda.did.DidInstructionFailure.InvalidDidFailure
 import net.corda.did.DidInstructionFailure.InvalidInstructionJsonFailure
+import net.corda.did.DidInstructionFailure.UnknownActionFailure
 import net.corda.getMandatoryArray
 import net.corda.getMandatoryBase58Bytes
 import net.corda.getMandatoryCryptoSuiteFromSignatureID

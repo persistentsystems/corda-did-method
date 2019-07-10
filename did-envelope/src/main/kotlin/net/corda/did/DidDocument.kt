@@ -6,10 +6,16 @@
 package net.corda.did
 
 import com.grack.nanojson.JsonObject
-import com.natpryce.*
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import com.natpryce.map
+import com.natpryce.mapFailure
+import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.JsonFailure
 import net.corda.core.serialization.CordaSerializable
+import net.corda.did.DidDocumentFailure.InvalidDidFailure
 import net.corda.did.DidDocumentFailure.InvalidDocumentJsonFailure
 import net.corda.did.DidDocumentFailure.InvalidTimeStampFormatFailure
 import net.corda.getMandatoryArray
@@ -43,31 +49,31 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 	fun id(): DidDocumentResult<CordaDid> {
 		val id = json.getMandatoryString("id").mapFailure {
 			InvalidDocumentJsonFailure(it)
-		}.onFailure {  return it }
+		}.onFailure { return it }
 
 		val cordaDID = CordaDid.parseExternalForm(id).onFailure { return Failure(DidDocumentFailure.InvalidDidFailure(it.reason)) }
-			// ??? moritzplatt 2019-06-20 -- this call could throw an exception. to keep in line with the monadic approach,
-			// consider refactoring the CordaDID class in the following way:
-			//
-			// class CordaDid(
-			//        val did: URI,
-			//        val network: Network,
-			//        val uuid: UUID
-			//) {
-			//
-			//    companion object {
-			//        fun parseExternalForm(externalForm: String): Result<CordaDid, ???> {
-			//           ...
-			//        }
-			//    }
-			//
-			//    fun toExternalForm() = did.toString()
-			//}
-			//
-			// This will allow you to stick to the monadic approach and chain success/failures further
+		// ??? moritzplatt 2019-06-20 -- this call could throw an exception. to keep in line with the monadic approach,
+		// consider refactoring the CordaDID class in the following way:
+		//
+		// class CordaDid(
+		//        val did: URI,
+		//        val network: Network,
+		//        val uuid: UUID
+		//) {
+		//
+		//    companion object {
+		//        fun parseExternalForm(externalForm: String): Result<CordaDid, ???> {
+		//           ...
+		//        }
+		//    }
+		//
+		//    fun toExternalForm() = did.toString()
+		//}
+		//
+		// This will allow you to stick to the monadic approach and chain success/failures further
 
-			return Success(cordaDID)
-		}
+		return Success(cordaDID)
+	}
 
 	// ??? moritzplatt 2019-06-20 -- shouldn't return a nullable UUID but a failure if the UUID can't be retrieved
 	// it is mandatory
@@ -75,7 +81,7 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 	// ??? moritzplatt 2019-06-20 -- consider renaming the function:
 	// `UUID` is the type returned, not the concept behind it
 
-    // ??? moritzplatt 2019-06-20 -- this method feels unnecessary as the same result can be achieved by `id().uuid`
+	// ??? moritzplatt 2019-06-20 -- this method feels unnecessary as the same result can be achieved by `id().uuid`
 
 	// nitesh solanki 2019-06-27 UUID() not needed
 
@@ -92,8 +98,8 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 	 *
 	 * @return [DidDocumentResult]
 	 */
-	fun context()= json.getMandatoryString("@context").map {
-		 it.isNotEmpty()
+	fun context() = json.getMandatoryString("@context").map {
+		it.isNotEmpty()
 	}.mapFailure {
 		InvalidDocumentJsonFailure(it)
 	}

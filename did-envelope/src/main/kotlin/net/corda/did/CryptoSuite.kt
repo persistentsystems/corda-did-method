@@ -9,6 +9,7 @@ import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
 import net.corda.FailureCode
+import net.corda.did.CryptoSuiteFailure.UnknownCryptoSuiteIDFailure
 
 /**
  * Supported Crypto Suites as registered in the "Linked Data Cryptographic Suite Registry" Draft Community Group Report
@@ -43,6 +44,7 @@ enum class CryptoSuite(
 		}?.let {
 			Success(it)
 		} ?: Failure(CryptoSuiteFailure.UnknownCryptoSuiteIDFailure(signatureID))
+
 		/** Identify suite using Key Id*/
 		fun fromKeyID(keyID: String): Result<CryptoSuite, CryptoSuiteFailure> = values().firstOrNull {
 			it.keyID == keyID

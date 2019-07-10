@@ -20,7 +20,12 @@ import net.corda.did.DidEnvelope
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.testing.core.singleIdentity
-import net.corda.testing.node.*
+import net.corda.testing.node.MockNetwork
+import net.corda.testing.node.MockNetworkNotarySpec
+import net.corda.testing.node.MockNetworkParameters
+import net.corda.testing.node.MockNodeParameters
+import net.corda.testing.node.StartedMockNode
+import net.corda.testing.node.TestCordapp
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.After
 import org.junit.Before
@@ -72,7 +77,7 @@ abstract class AbstractFlowTestUtils {
 		mockNetwork.stopNodes()
 	}
 
-	protected fun getDidStateForCreateOperation(): DidState{
+	protected fun getDidStateForCreateOperation(): DidState {
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 

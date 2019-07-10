@@ -5,12 +5,10 @@
 
 package net.corda.did.api
 
-
 import net.corda.core.utilities.NetworkHostAndPort
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
-
 
 private const val CORDA_USER_NAME = "config.rpc.username"
 private const val CORDA_USER_PASSWORD = "config.rpc.password"
@@ -31,27 +29,24 @@ private const val CORDA_RPC_PORT = "config.rpc.port"
  */
 @Component
 open class NodeRPCConnection(
-        @Value("\${$CORDA_NODE_HOST}") private val host: String,
-        @Value("\${$CORDA_USER_NAME}") private val username: String,
-        @Value("\${$CORDA_USER_PASSWORD}") private val password: String,
-        @Value("\${$CORDA_RPC_PORT}") private val rpcPort: Int) {
+		@Value("\${$CORDA_NODE_HOST}") private val host: String,
+		@Value("\${$CORDA_USER_NAME}") private val username: String,
+		@Value("\${$CORDA_USER_PASSWORD}") private val password: String,
+		@Value("\${$CORDA_RPC_PORT}") private val rpcPort: Int) {
 
-    lateinit var rpcConnection: ReconnectingCordaRPCOps
-        private set
-    lateinit var proxy: ReconnectingCordaRPCOps
-        private set
-/** Construct a node RPC connection object */
-    @PostConstruct
-    fun initialiseNodeRPCConnection() {
+	lateinit var rpcConnection: ReconnectingCordaRPCOps
+		private set
+	lateinit var proxy: ReconnectingCordaRPCOps
+		private set
 
-        val rpcAddress = NetworkHostAndPort(host, rpcPort)
-            rpcConnection = ReconnectingCordaRPCOps(rpcAddress,username,password)
-            proxy = rpcConnection
+	/** Construct a node RPC connection object */
+	@PostConstruct
+	fun initialiseNodeRPCConnection() {
 
+		val rpcAddress = NetworkHostAndPort(host, rpcPort)
+		rpcConnection = ReconnectingCordaRPCOps(rpcAddress, username, password)
+		proxy = rpcConnection
 
-
-    }
-
-
+	}
 
 }

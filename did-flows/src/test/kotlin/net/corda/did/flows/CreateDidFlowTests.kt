@@ -1,15 +1,10 @@
 package net.corda.did.flows
 
-import com.grack.nanojson.JsonParserException
-import com.natpryce.Success
-import com.natpryce.hamkrest.*
-import com.natpryce.hamkrest.assertion.assertThat
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CordaDid
 import net.corda.did.CryptoSuite
 import net.corda.did.DidEnvelope
-import net.corda.did.DidEnvelopeFailure
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
 import net.corda.did.utils.DIDAlreadyExistException
@@ -28,46 +23,46 @@ import kotlin.test.assertFailsWith
  */
 class CreateDidFlowTests : AbstractFlowTestUtils() {
 
-    @Test
-    fun `create new did successfully`() {
-        // create did
-        createDID(getDidStateForCreateOperation().envelope)!!.tx
-        mockNetwork.waitQuiescent()
+	@Test
+	fun `create new did successfully`() {
+		// create did
+		createDID(getDidStateForCreateOperation().envelope)!!.tx
+		mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		// confirm did state with status as 'VALID' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
-    }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
+	}
 
-    @Test
-    fun `DID creation succeeds for an envelope with multiple keys`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation succeeds for an envelope with multiple keys`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val keyPair1 = KeyPairGenerator().generateKeyPair()
-        val keyPair2 = KeyPairGenerator().generateKeyPair()
+		val keyPair1 = KeyPairGenerator().generateKeyPair()
+		val keyPair2 = KeyPairGenerator().generateKeyPair()
 
-        val encodedPubKey1 = keyPair1.public.encoded.toBase58()
-        val encodedPubKey2 = keyPair2.public.encoded.toBase58()
+		val encodedPubKey1 = keyPair1.public.encoded.toBase58()
+		val encodedPubKey2 = keyPair2.public.encoded.toBase58()
 
-        val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-        val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
+		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
+		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -86,13 +81,13 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
-        val signature2 = keyPair2.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature2 = keyPair2.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedSignature1 = signature1.bytes.toBase58()
-        val encodedSignature2 = signature2.bytes.toBase58()
+		val encodedSignature1 = signature1.bytes.toBase58()
+		val encodedSignature2 = signature2.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -108,42 +103,42 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
+		val envelope = DidEnvelope(instruction, document)
 
-        createDID(envelope)!!.tx
-        mockNetwork.waitQuiescent()
+		createDID(envelope)!!.tx
+		mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		// confirm did state with status as 'VALID' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
-    }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
+	}
 
-    @Test
-    fun `DID creation fails for an envelope with multiple signatures targeting the same key`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope with multiple signatures targeting the same key`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val kp = KeyPairGenerator().generateKeyPair()
+		val kp = KeyPairGenerator().generateKeyPair()
 
-        val pub = kp.public.encoded.toBase58()
+		val pub = kp.public.encoded.toBase58()
 
-        val uri = URI("${documentId.toExternalForm()}#keys-1")
+		val uri = URI("${documentId.toExternalForm()}#keys-1")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -156,13 +151,13 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
-        val signature2 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature2 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedSignature1 = signature1.bytes.toBase58()
-        val encodedSignature2 = signature2.bytes.toBase58()
+		val encodedSignature1 = signature1.bytes.toBase58()
+		val encodedSignature2 = signature2.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -178,23 +173,23 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope clashing key IDs`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope clashing key IDs`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val keyPair1 = KeyPairGenerator().generateKeyPair()
-        val keyPair2 = KeyPairGenerator().generateKeyPair()
+		val keyPair1 = KeyPairGenerator().generateKeyPair()
+		val keyPair2 = KeyPairGenerator().generateKeyPair()
 
-        val encodedPubKey1 = keyPair1.public.encoded.toBase58()
-        val encodedPubKey2 = keyPair2.public.encoded.toBase58()
+		val encodedPubKey1 = keyPair1.public.encoded.toBase58()
+		val encodedPubKey2 = keyPair2.public.encoded.toBase58()
 
-        val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
+		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -213,13 +208,13 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
-        val signature2 = keyPair2.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature2 = keyPair2.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedSignature1 = signature1.bytes.toBase58()
-        val encodedSignature2 = signature2.bytes.toBase58()
+		val encodedSignature1 = signature1.bytes.toBase58()
+		val encodedSignature2 = signature2.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -235,43 +230,43 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope without keys`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope without keys`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [ ]
 		|}""".trimMargin()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [ ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope with fewer signatures than keys`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope with fewer signatures than keys`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val keyPair1 = KeyPairGenerator().generateKeyPair()
-        val keyPair2 = KeyPairGenerator().generateKeyPair()
+		val keyPair1 = KeyPairGenerator().generateKeyPair()
+		val keyPair2 = KeyPairGenerator().generateKeyPair()
 
-        val encodedPubKey1 = keyPair1.public.encoded.toBase58()
-        val encodedPubKey2 = keyPair2.public.encoded.toBase58()
+		val encodedPubKey1 = keyPair1.public.encoded.toBase58()
+		val encodedPubKey2 = keyPair2.public.encoded.toBase58()
 
-        val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-        val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
+		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
+		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -290,11 +285,11 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
+		val signature1 = keyPair1.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedSignature1 = signature1.bytes.toBase58()
+		val encodedSignature1 = signature1.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -305,26 +300,26 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope using a non-Ed25519 key`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope using a non-Ed25519 key`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
+		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
 
-        // TODO moritzplatt 2019-02-18 -- this will become valid once the crypto suite limitation is removed
-        val rsaKeyPair = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
+		// TODO moritzplatt 2019-02-18 -- this will become valid once the crypto suite limitation is removed
+		val rsaKeyPair = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
 
-        val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()
-        val rsaPubKey2 = rsaKeyPair.public.encoded.toBase58()
+		val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()
+		val rsaPubKey2 = rsaKeyPair.public.encoded.toBase58()
 
-        val ed25519keyUri = URI("${documentId.toExternalForm()}#keys-1")
-        val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val ed25519keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -343,13 +338,13 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val ed25519Signature = ed25519KeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
-        val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
+		val ed25519Signature = ed25519KeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedEd25519Signature = ed25519Signature.bytes.toBase58()
-        val encodedRsaSignature = rsaSignature.bytes.toBase58()
+		val encodedEd25519Signature = ed25519Signature.bytes.toBase58()
+		val encodedRsaSignature = rsaSignature.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -365,22 +360,22 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope with mismatched crypto suites`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope with mismatched crypto suites`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
-        val rsaKeyPair = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
+		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
 
-        val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()
+		val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()
 
-        val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -393,11 +388,11 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(Charsets.UTF_8))
 
-        val encodedRsaSignature = rsaSignature.bytes.toBase58()
+		val encodedRsaSignature = rsaSignature.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -408,21 +403,21 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope with invalid signature`() {
-        val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
+	@Test
+	fun `DID creation fails for an envelope with invalid signature`() {
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 
-        val keyPair = KeyPairGenerator().generateKeyPair()
+		val keyPair = KeyPairGenerator().generateKeyPair()
 
-        val pubKeyBase58 = keyPair.public.encoded.toBase58()
+		val pubKeyBase58 = keyPair.public.encoded.toBase58()
 
-        val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
 
-        val document = """{
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "${documentId.toExternalForm()}",
 		|  "publicKey": [
@@ -435,10 +430,10 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val wrongSignature = keyPair.private.sign("nonsense".toByteArray(Charsets.UTF_8))
-        val encodedWrongSignature = wrongSignature.bytes.toBase58()
+		val wrongSignature = keyPair.private.sign("nonsense".toByteArray(Charsets.UTF_8))
+		val encodedWrongSignature = wrongSignature.bytes.toBase58()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -449,14 +444,14 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
+		val envelope = DidEnvelope(instruction, document)
 
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    @Test
-    fun `DID creation fails for an envelope with malformed instructions`() {
-        val document = """{
+	@Test
+	fun `DID creation fails for an envelope with malformed instructions`() {
+		val document = """{
 		  "@context": "https://w3id.org/did/v1",
 		  "id": "did:corda:tcn:f85c1782-4dd4-4433-b375-6218c7e53600",
 		  "publicKey": [
@@ -469,15 +464,17 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		  ]
 		}""".trimMargin()
 
-        val instruction = "Bogus"
+		val instruction = "Bogus"
 
-        assertFailsWith<java.lang.IllegalArgumentException> {   val envelope = DidEnvelope(instruction, document)
-            createDID(envelope) }
-    }
+		assertFailsWith<java.lang.IllegalArgumentException> {
+			val envelope = DidEnvelope(instruction, document)
+			createDID(envelope)
+		}
+	}
 
-    @Test
-    fun `DID creation succeeds for an envelope with a created date only`() {
-        val document = """{
+	@Test
+	fun `DID creation succeeds for an envelope with a created date only`() {
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:77ccbf5e-4ddd-4092-b813-ac06084a3eb0",
 		|  "created": "1970-01-01T00:00:00Z",
@@ -491,7 +488,7 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -502,33 +499,33 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        createDID(envelope)
-        mockNetwork.waitQuiescent()
+		val envelope = DidEnvelope(instruction, document)
+		createDID(envelope)
+		mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		// confirm did state with status as 'VALID' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
-    }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
+	}
 
-    @Test
-    fun `DID creation succeeds for an envelope with an update date only`() {
-        val document = """{
+	@Test
+	fun `DID creation succeeds for an envelope with an update date only`() {
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:7915fe51-6073-461e-b116-1fcb839c9118",
 		|  "updated": "2019-01-01T00:00:00Z",
@@ -542,7 +539,7 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -553,33 +550,33 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        createDID(envelope)
-        mockNetwork.waitQuiescent()
+		val envelope = DidEnvelope(instruction, document)
+		createDID(envelope)
+		mockNetwork.waitQuiescent()
 
-        // confirm did state with status as 'VALID' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		// confirm did state with status as 'VALID' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
-    }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
+	}
 
-    @Test
-    fun `DID creation fails for an envelope stating it was updated before it was created`() {
-        val document = """{
+	@Test
+	fun `DID creation fails for an envelope stating it was updated before it was created`() {
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
 		|  "created": "2019-01-02T00:00:00Z",
@@ -594,7 +591,7 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -605,17 +602,17 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
-    /**
-     * Persistent code
-     *
-     */
-    @Test
-    fun `DID creation fails if publicKey id does not contain did as prefix`() {
-        val document = """{
+	/**
+	 * Persistent code
+	 *
+	 */
+	@Test
+	fun `DID creation fails if publicKey id does not contain did as prefix`() {
+		val document = """{
 		|  "@context": "https://w3id.org/did/v1",
 		|  "id": "did:corda:tcn:11f4e420-95dc-4969-91eb-4795883fa781",
 		|  "created": "1970-01-01T00:00:00Z",
@@ -630,7 +627,7 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val instruction = """{
+		val instruction = """{
 		|  "action": "create",
 		|  "signatures": [
 		|	{
@@ -641,43 +638,41 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 		|  ]
 		|}""".trimMargin()
 
-        val envelope = DidEnvelope(instruction, document)
-        assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
-    }
+		val envelope = DidEnvelope(instruction, document)
+		assertFailsWith<net.corda.core.contracts.TransactionVerificationException> { createDID(envelope) }
+	}
 
+	@Test
+	fun `create did should fail if did already exist`() {
+		// create did
+		createDID(getDidStateForCreateOperation().envelope)!!.tx
+		mockNetwork.waitQuiescent()
 
+		// confirm did state with status as 'VALID' on all 3 nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-    @Test
-    fun `create did should fail if did already exist`() {
-        // create did
-        createDID(getDidStateForCreateOperation().envelope)!!.tx
-        mockNetwork.waitQuiescent()
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        // confirm did state with status as 'VALID' on all 3 nodes
-        w1.transaction {
-            val states = w1.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.size == 1)
+			assert(states[0].state.data.status == DidStatus.ACTIVE)
+		}
 
-        w2.transaction {
-            val states = w2.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
+		assertFailsWith<DIDAlreadyExistException> { createDID(getDidStateForCreateOperation().envelope) }
+	}
 
-        originator.transaction {
-            val states = originator.services.vaultService.queryBy(DidState::class.java).states
-            assert(states.size == 1)
-            assert(states[0].state.data.status == DidStatus.ACTIVE)
-        }
-
-        assertFailsWith<DIDAlreadyExistException> { createDID(getDidStateForCreateOperation().envelope) }
-    }
-
-    @Test
-    fun `SignedTransaction returned by the flow is signed by the did originator`() {
-        val signedTx = createDID(getDidStateForCreateOperation().envelope)!!
-        signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
-    }
+	@Test
+	fun `SignedTransaction returned by the flow is signed by the did originator`() {
+		val signedTx = createDID(getDidStateForCreateOperation().envelope)!!
+		signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
+	}
 }

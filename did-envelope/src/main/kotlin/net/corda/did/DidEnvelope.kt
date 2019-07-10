@@ -5,7 +5,12 @@
 
 package net.corda.did
 
-import com.natpryce.*
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import com.natpryce.mapFailure
+import com.natpryce.onFailure
+import com.natpryce.valueOrNull
 import net.corda.FailureCode
 import net.corda.core.serialization.CordaSerializable
 import net.corda.did.Action.Create
@@ -59,8 +64,8 @@ class DidEnvelope(
 		val rawInstruction: String,
 		val rawDocument: String
 ) {
-	 val instruction = DidInstruction(rawInstruction)
-	 val document = DidDocument(rawDocument)
+	val instruction = DidInstruction(rawInstruction)
+	val document = DidDocument(rawDocument)
 
 	/**
 	 * Validates that the envelope presented is formatted in a valid way to _create_ a DID.
@@ -95,29 +100,28 @@ class DidEnvelope(
 		return Success(Unit)
 	}
 
-    /**
-     * Validates that the envelope presented represents a valid deletion of the [precursor] provided.
+	/**
+	 * Validates that the envelope presented represents a valid deletion of the [precursor] provided.
 	 * @param precursor The precursor document.
-     */
+	 */
 
 	// nitesh solanki 2019-06-27  for deletion there is no temporal checks since we are not passing new doc to delete api
-    fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
-        instruction.action().onFailure {
-            return Failure(MalformedInstructionFailure(it.reason))
-        }.ensureIs(Update, Delete)
+	fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
+		instruction.action().onFailure {
+			return Failure(MalformedInstructionFailure(it.reason))
+		}.ensureIs(Update, Delete)
 
-        // perform base validation, ensuring that the document is valid, not yet taking into account the precursor
-        validate().onFailure { return it }
+		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
+		validate().onFailure { return it }
 
-        // perform key ownership for deletion (i.e. prove ownership of ALL keys)
-        // ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
-        validateKeysForModification(precursor).onFailure { return it }
+		// perform key ownership for deletion (i.e. prove ownership of ALL keys)
+		// ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
+		validateKeysForModification(precursor).onFailure { return it }
 
-        return Success(Unit)
-    }
+		return Success(Unit)
+	}
 
-
-    private fun validate(): Result<Unit, ValidationFailure> {
+	private fun validate(): Result<Unit, ValidationFailure> {
 		document.context().mapFailure {
 			MalformedDocumentFailure(it)
 		}.onFailure { return it }
@@ -128,7 +132,7 @@ class DidEnvelope(
 		}.onFailure { return it }
 
 		val updated = document.updated().mapFailure {
-				MalformedDocumentFailure(it)
+			MalformedDocumentFailure(it)
 		}.onFailure { return it }
 
 		if (updated != null && created != null && !updated.isAfter(created))
@@ -138,7 +142,6 @@ class DidEnvelope(
 		val signatures = instruction.signatures().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
 		}
-
 
 		val distinctSignatureTargets = signatures.map { it.target }.distinct()
 
@@ -180,7 +183,6 @@ class DidEnvelope(
 			} ?: return Failure(UntargetedPublicKeyFailure(publicKey.id))
 			publicKey to signature
 		}
-
 
 		/**
 		 * Persistent code
@@ -304,8 +306,8 @@ class DidEnvelope(
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
-			// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
-			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+		// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
+		// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()
 		}

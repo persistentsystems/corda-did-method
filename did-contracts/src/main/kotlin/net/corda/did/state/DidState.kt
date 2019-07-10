@@ -14,8 +14,8 @@ import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import net.corda.core.schemas.QueryableState
 import net.corda.core.serialization.CordaSerializable
-import net.corda.did.DidEnvelope
 import net.corda.did.CordaDid
+import net.corda.did.DidEnvelope
 import net.corda.did.contract.DidContract
 
 /**
@@ -32,7 +32,7 @@ data class DidState(
 		val originator: Party,
 		val witnesses: Set<Party>,
 		val status: DidStatus,
-		override val linearId: UniqueIdentifier ,
+		override val linearId: UniqueIdentifier,
 		override val participants: List<AbstractParty> = (witnesses + originator).toList()
 ) : LinearState, QueryableState {
 
@@ -40,7 +40,7 @@ data class DidState(
 	 * Persistent code
 	 * @param schema [MappedSchema] object
 	 */
-	override fun generateMappedObject(schema : MappedSchema) : PersistentState {
+	override fun generateMappedObject(schema: MappedSchema): PersistentState {
 		val did = this.envelope.document.id().valueOrNull()!!.toExternalForm()
 		return when (schema) {
 			is DidStateSchemaV1 -> DidStateSchemaV1.PersistentDidState(
@@ -49,7 +49,7 @@ data class DidState(
 					status = this.status,
 					linearId = this.linearId.id
 			)
-			else -> throw IllegalArgumentException("Unrecognised schema $schema")
+			else                -> throw IllegalArgumentException("Unrecognised schema $schema")
 		}
 	}
 

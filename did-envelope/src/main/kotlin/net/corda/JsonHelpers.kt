@@ -31,7 +31,6 @@ fun JsonObject.getMandatoryArray(key: String): JsonResult<JsonArray> = getArray(
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
 
-
 /**
  *
  * @param key json key
@@ -41,7 +40,6 @@ fun JsonObject.getMandatoryArray(key: String): JsonResult<JsonArray> = getArray(
 fun JsonObject.getMandatoryNumber(key: String): JsonResult<Number> = getNumber(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
-
 
 /**
  *

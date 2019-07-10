@@ -7,9 +7,7 @@ package net.corda.did
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
-import com.natpryce.hamkrest.throws
 import net.corda.assertFailure
 import net.corda.assertSuccess
 import org.junit.Test

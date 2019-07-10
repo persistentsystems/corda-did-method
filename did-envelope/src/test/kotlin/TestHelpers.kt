@@ -1,4 +1,3 @@
-
 package net.corda
 
 import com.natpryce.Failure

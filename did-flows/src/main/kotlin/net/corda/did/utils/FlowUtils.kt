@@ -7,7 +7,11 @@ import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.flows.*
+import net.corda.core.flows.FlowException
+import net.corda.core.flows.FlowLogic
+import net.corda.core.flows.FlowSession
+import net.corda.core.flows.InitiatedBy
+import net.corda.core.flows.InitiatingFlow
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.node.ServiceHub
@@ -21,34 +25,33 @@ import net.corda.did.state.DidState
 // ??? moritzplatt 2019-06-20 -- these dont need to be encapsulated in an interface but can be standalone extension
 // methods just as well
 
-    /**
-     * returns a notary from cordapp-config file or throws an exception if notary not found in the nodes network map cache.
-     *
-     * @receiver [ServiceHub]
-     * @return [Party]
-     * @throws NotaryNotFoundException
-     */
-    fun ServiceHub.getNotaryFromConfig(): Party? {
-        val config = this.getAppContext().config
-        val notary = config.get("notary")
-        return this.networkMapCache.getNotary(CordaX500Name.parse(notary.toString())) ?: throw NotaryNotFoundException("Notary not found")
-    }
+/**
+ * returns a notary from cordapp-config file or throws an exception if notary not found in the nodes network map cache.
+ *
+ * @receiver [ServiceHub]
+ * @return [Party]
+ * @throws NotaryNotFoundException
+ */
+fun ServiceHub.getNotaryFromConfig(): Party? {
+	val config = this.getAppContext().config
+	val notary = config.get("notary")
+	return this.networkMapCache.getNotary(CordaX500Name.parse(notary.toString()))
+			?: throw NotaryNotFoundException("Notary not found")
+}
 
-    /**
-     * returns list of [StateAndRef] for given linearId
-     *
-     * @param T the type of state
-     * @param linearId the linearId of the [LinearState] to be queried
-     * @receiver [ServiceHub]
-     * @return [List<StateAndRef>]
-     */
-    fun <T : ContractState> ServiceHub.loadState(linearId: UniqueIdentifier, clazz: Class<T>): List<StateAndRef<T>> {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(null,
-                listOf(linearId), Vault.StateStatus.UNCONSUMED, null)
-        return this.vaultService.queryBy(clazz, queryCriteria).states
-    }
-
-
+/**
+ * returns list of [StateAndRef] for given linearId
+ *
+ * @param T the type of state
+ * @param linearId the linearId of the [LinearState] to be queried
+ * @receiver [ServiceHub]
+ * @return [List<StateAndRef>]
+ */
+fun <T : ContractState> ServiceHub.loadState(linearId: UniqueIdentifier, clazz: Class<T>): List<StateAndRef<T>> {
+	val queryCriteria = QueryCriteria.LinearStateQueryCriteria(null,
+			listOf(linearId), Vault.StateStatus.UNCONSUMED, null)
+	return this.vaultService.queryBy(clazz, queryCriteria).states
+}
 
 /**
  * Initiating flow to Fetch the [DidDocument] from ledger.
@@ -56,21 +59,21 @@ import net.corda.did.state.DidState
  * @property linearId the linearId of the [DidState].
  */
 @InitiatingFlow
-class FetchDidDocument(private val linearId: UniqueIdentifier) : FlowLogic<DidDocument> (){
+class FetchDidDocument(private val linearId: UniqueIdentifier) : FlowLogic<DidDocument>() {
 
-    /**
-     * Loads the [DidState] from the ledger and returns the [DidDocument] or throws an exception if DID not found.
-     * @return [DidDocument]
-     * @throws FlowException
-     */
-    @Suspendable
-    override fun call(): DidDocument {
-       try {
-          return  serviceHub.loadState(linearId, DidState::class.java).singleOrNull()!!.state.data.envelope.document
-        } catch (e: Exception) {
-            throw FlowException(e)
-        }
-    }
+	/**
+	 * Loads the [DidState] from the ledger and returns the [DidDocument] or throws an exception if DID not found.
+	 * @return [DidDocument]
+	 * @throws FlowException
+	 */
+	@Suspendable
+	override fun call(): DidDocument {
+		try {
+			return serviceHub.loadState(linearId, DidState::class.java).singleOrNull()!!.state.data.envelope.document
+		} catch (e: Exception) {
+			throw FlowException(e)
+		}
+	}
 }
 
 /**
@@ -83,35 +86,35 @@ class FetchDidDocument(private val linearId: UniqueIdentifier) : FlowLogic<DidDo
  * @property session the flow session between initiator and responder.
  */
 @InitiatedBy(AbstractFetchDidDocumentFromRegistryNodeFlow::class)
-class FetchDidDocumentFromRegistryNodeResponderFlow(private val session: FlowSession) : FlowLogic<Unit> (){
+class FetchDidDocumentFromRegistryNodeResponderFlow(private val session: FlowSession) : FlowLogic<Unit>() {
 
-    companion object {
-        object RECEIVING : ProgressTracker.Step("Receiving DID request")
-        object FETCHING : ProgressTracker.Step("Fetching DID from vault")
-        object SENDING : ProgressTracker.Step("Sending DID Document")
-    }
+	companion object {
+		object RECEIVING : ProgressTracker.Step("Receiving DID request")
+		object FETCHING : ProgressTracker.Step("Fetching DID from vault")
+		object SENDING : ProgressTracker.Step("Sending DID Document")
+	}
 
-    override val progressTracker = ProgressTracker(RECEIVING, FETCHING, SENDING)
+	override val progressTracker = ProgressTracker(RECEIVING, FETCHING, SENDING)
 
-    /**
-     * Loads the [DidState] from the ledger and returns the [DidDocument] or throws an exception if DID not found.
-     * @throws FlowException
-     */
-    @Suspendable
-    override fun call() {
-        progressTracker.currentStep = RECEIVING
-        val linearId = session.receive<UniqueIdentifier>().unwrap { it }
+	/**
+	 * Loads the [DidState] from the ledger and returns the [DidDocument] or throws an exception if DID not found.
+	 * @throws FlowException
+	 */
+	@Suspendable
+	override fun call() {
+		progressTracker.currentStep = RECEIVING
+		val linearId = session.receive<UniqueIdentifier>().unwrap { it }
 
-        progressTracker.currentStep = FETCHING
-       val response = try {
-              serviceHub.loadState(linearId, DidState::class.java).singleOrNull()!!.state.data.envelope.document
-        } catch (e: Exception) {
-            throw FlowException(e)
-        }
+		progressTracker.currentStep = FETCHING
+		val response = try {
+			serviceHub.loadState(linearId, DidState::class.java).singleOrNull()!!.state.data.envelope.document
+		} catch (e: Exception) {
+			throw FlowException(e)
+		}
 
-        progressTracker.currentStep = SENDING
-        session.send(response)
-    }
+		progressTracker.currentStep = SENDING
+		session.send(response)
+	}
 }
 
 class NotaryNotFoundException(override val message: String) : CordaRuntimeException(message)

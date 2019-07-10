@@ -1,4 +1,3 @@
-
 package net.corda.did.utils
 
 import com.natpryce.Failure
@@ -12,11 +11,11 @@ import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
 import net.corda.did.DidEnvelope
 import net.corda.did.state.DidState
+import net.corda.did.state.DidStateTests
 import net.corda.did.state.DidStatus
 import net.corda.testing.core.TestIdentity
 import net.i2p.crypto.eddsa.KeyPairGenerator
 import java.net.URI
-import net.corda.did.state.DidStateTests
 
 /**
  * Persistent code
@@ -59,7 +58,7 @@ abstract class AbstractContractsStatesTestUtils {
 	val originalKeyPair = KeyPairGenerator().generateKeyPair()
 	val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
 
-	fun getDidState() : DidState{
+	fun getDidState(): DidState {
 
 		val originalDocument = """{
 		|  "@context": "https://w3id.org/did/v1",

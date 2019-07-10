@@ -8,15 +8,16 @@ import net.corda.core.identity.Party
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import net.corda.core.serialization.CordaSerializable
-import java.util.*
-import javax.persistence.*
-
+import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Index
+import javax.persistence.Table
 
 /**
  * The family of schemas for [DidState].
  */
 object DidSchema
-
 
 /**
  * A [DidState] schema.
@@ -28,18 +29,18 @@ object DidSchema
 // nitesh solanki 2019-06-27 ok.
 @CordaSerializable
 object DidStateSchemaV1 : MappedSchema(schemaFamily = DidSchema::class.java, version = 1, mappedTypes = listOf(PersistentDidState::class.java)) {
-    @Entity
-    @Table(name = "did_states", indexes = [Index(name = "did_external_form_idx", columnList = "did_external_form")])
-    class PersistentDidState (
-            @Column(name = "did_originator", nullable = false)
-            var originator: Party,
+	@Entity
+	@Table(name = "did_states", indexes = [Index(name = "did_external_form_idx", columnList = "did_external_form")])
+	class PersistentDidState(
+			@Column(name = "did_originator", nullable = false)
+			var originator: Party,
 
-            @Column(name = "did_external_form", nullable = false)
-            var didExternalForm: String,
+			@Column(name = "did_external_form", nullable = false)
+			var didExternalForm: String,
 
-            @Column(name = "did_status", nullable = false)
-            var status: DidStatus,
+			@Column(name = "did_status", nullable = false)
+			var status: DidStatus,
 
-            @Column(name = "linear_id", nullable = false)
-            var linearId: UUID) : PersistentState()
+			@Column(name = "linear_id", nullable = false)
+			var linearId: UUID) : PersistentState()
 }
