@@ -8,7 +8,7 @@ Additionally, it contains a [Universal Resolver Driver](https://github.com/decen
 
 The system architecture outlined above illustrates the high level components without going into implementation details.
 On a high level, persistence of DID documents will be provided by a _consortium_ of trusted nodes operating within a _network_.
-The Corda DID method allows targeting three networks by specification: [The Corda Network](https://corda.network/) (UAT and Live [environments](https://corda.network/policy/environments.html)) as well as [Testnet](https://docs.corda.net/head/corda-testnet-intro.html). 
+The Corda DID method allows targeting three networks by specification: [The Corda Network](https://corda.network/) (UAT and Live [environments](https://corda.network/policy/environments.html)) as well as [Testnet](https://docs.corda.net/head/corda-testnet-intro.html).
 
 End users that aim to _create_, _read_, _update_ or _delete_ DID documents can do so by interacting with a trusted node of their choosing.
 The API provided for interaction is exposing REST endpoints over HTTPS, using a JSON based envelope format closely aligned with the JSON-LD examples found in the [draft community report](https://w3c-ccg.github.io/did-spec/#dfn-did-document).
@@ -22,9 +22,9 @@ Witness nodes will perform the a cryptographic integrity check as part of the [c
 
 Once replicated, anyone with access to one of the consortium nodes can request the DID document by querying the REST API of an arbitrary node for the document ID.
 Systems that aim to support multiple DID methods including the Corda DID method can utilise a [Universal Resolver](https://github.com/decentralized-identity/universal-resolver) that uses the Corda driver.
-The driver will translate the request in the universal format to the Corda specific format. 
+The driver will translate the request in the universal format to the Corda specific format.
 It is also aware of the consortium nodes for a given supported environment.
-The driver thus exclusively requires the id as input.   
+The driver thus exclusively requires the id as input.
 
 Corda DID Format
 ----------------
@@ -44,13 +44,68 @@ I.e.
 ### Corda DID-Network Mapping
 
 Initially, consortium membership is envisioned to change rarely so that a fixed set of member nodes can be defined and provided to consortium members.
-A more dynamic approach to membership may be developed later. 
+A more dynamic approach to membership may be developed later.
 
 | ID        | Network                                                         | Stage | Consortium Member Nodes |
 |-----------|-----------------------------------------------------------------|-------|-------------------------|
 | `testnet` | [Testnet](https://docs.corda.net/head/corda-testnet-intro.html) | --    | --to be defined--       |
 | `tcn-uat` | [The Corda Network](https://corda.network/)                     | UAT   | --to be defined--       |
 | `tcn`     | [The Corda Network](https://corda.network/)                     | Live  | --to be defined--       |
+
+
+
+### Directory Structure
+| Directory | Description                                                     |
+|-----------|-----------------------------------------------------------------|
+| `did-api` | Module for defining REST api                         |
+| `did-contracts` |  Module for defining Corda smart contracts.                   |
+| `did-flows`     | Module defining Corda flows.               |
+| `did-envelope` | Module defines the did envelope, document and instruction|
+
+
+## CorDapp design -CMN views
+The CorDapp functions as registry which maps decentralized identifiers to a document containing assosiated public keys,This needs to be deployed by any node that wants to act as a member node of a DID business network.
+### State view 
+![State View](/cmn_diagrams/State.png)
+### State evolution view 
+![State View](/cmn_diagrams/State evolution view.png)
+### State machine view 
+![State machine view](/cmn_diagrams/State machine view.png)
+### BPMN (create did process)
+![BPMN (create did process)](/cmn_diagrams/BPMN.png)
+## Transaction instance
+## Create view 
+![Create transaction instance view](/cmn_diagrams/Create-Transaction-Instance.png)
+## Update view
+![Update transaction instance view](/cmn_diagrams/Update-Tranasction-Instance.png)
+## Delete view
+![Delete transaction instance view](/cmn_diagrams/Delete-Transaction-Instance.png)
+
+### Pre-requisites
+Please refer to the [set up](https://docs.corda.net/getting-set-up.html) instructions.
+
+### Build step
+To build jar use command `./gradelw jar` .This will generate the following files
+
+| File | Description                                                     |
+|-----------|-----------------------------------------------------------------|
+| `did-contracts-1.0-SNAPSHOT.jar` | contains state and contracts                  |
+| `did-flows-1.0-SNAPSHOT.jar` |  contains flows                 |
+
+
+
+
+### Running the nodes
+The nodes need to have a config file with list of witness nodes. Example configuration shown below
+```bash
+nodes = [
+"O=PartyB,L=New York,C=US"
+]
+
+notary = "O=Notary,L=London,C=GB"
+```
+
+
 
 Components
 ----------
@@ -73,7 +128,7 @@ This envelope must contain signatures by all private keys associated with the pu
 
 Envelopes that do not contain signatures for all public keys will be rejected.
 Envelopes using unsupported cryptographic suites or unsupported serialisation mechanisms will be rejected.
-In the current implementation there are severe restrictions on which suites and serialisation mechanisms can be used (see _Caveats_ below). 
+In the current implementation there are severe restrictions on which suites and serialisation mechanisms can be used (see _Caveats_ below).
 
 #### API Format
 
@@ -149,7 +204,7 @@ The instruction data is to be formatted according to the following schema:
 ```
 
 i.e.:
- 
+
 ```json
 {
   "action": "create",
@@ -190,9 +245,9 @@ Instruction:
   "action": "create",
   "signatures": [
 	{
-	  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a#keys-1",
+	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
 	  "type": "Ed25519Signature2018",
-	  "signatureBase58": "3prrFYf3miPmZTFH9eAsfBDbiTbhwyMGFCcwrbouPdKjz14zhSHTTfWCBWBeKzGbaL4QVgjZzkb9mrDhmVJ9CATG"
+	  "signatureBase58": "2M12aBn5ijmmUyHtTf56NTJsUEUbpbqbAgpsvxsfMa2KrL5MR5rGb4dP37QoyRWp94kqreDMV9P4K3QHfE67ypTD"
 	}
   ]
 }
@@ -203,13 +258,13 @@ Document:
 ```json
 {
   "@context": "https://w3id.org/did/v1",
-  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a",
+  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
   "publicKey": [
 	{
-	  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a#keys-1",
+	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
 	  "type": "Ed25519VerificationKey2018",
-	  "controller": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a",
-	  "publicKeyBase58": "GfHq2tTVk9z4eXgyW7mGhENuKu7WM8hES9emfJvBB4VXrgaL6kS1xs4nSs96"
+	  "controller": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+	  "publicKeyBase58": "GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"
 	}
   ]
 }
@@ -217,29 +272,31 @@ Document:
 
 HTTP Request:
 
+
 ```bash
 curl -X PUT \
-  http://example.org/did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
-  -F 'instruction={
+http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
+  -H 'content-type: multipart/form-data' \
+  -F instruction='{
   "action": "create",
   "signatures": [
 	{
-	  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a#keys-1",
+	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
 	  "type": "Ed25519Signature2018",
-	  "signatureBase58": "3prrFYf3miPmZTFH9eAsfBDbiTbhwyMGFCcwrbouPdKjz14zhSHTTfWCBWBeKzGbaL4QVgjZzkb9mrDhmVJ9CATG"
+	  "signatureBase58": "2M12aBn5ijmmUyHtTf56NTJsUEUbpbqbAgpsvxsfMa2KrL5MR5rGb4dP37QoyRWp94kqreDMV9P4K3QHfE67ypTD"
 	}
   ]
 }' \
-  -F 'document={
+  -F document'={
   "@context": "https://w3id.org/did/v1",
-  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a",
+  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+  "created":"2019-07-11T10:27:27.326Z",
   "publicKey": [
 	{
-	  "id": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a#keys-1",
+	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
 	  "type": "Ed25519VerificationKey2018",
-	  "controller": "did:corda:tcn:07438aee-3116-4a76-bc48-b2446ec01c8a",
-	  "publicKeyBase58": "GfHq2tTVk9z4eXgyW7mGhENuKu7WM8hES9emfJvBB4VXrgaL6kS1xs4nSs96"
+	  "controller": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+	  "publicKeyBase58": "GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"
 	}
   ]
 }'
@@ -258,10 +315,26 @@ A simple `GET` request specifying the id as fragment is used to retrieve a DID.
 HTTP Request:
 
 ```bash
-curl -X GET http://example.org/did:corda:tcn:00000000-0000-0000-0000-000000000000
+curl -X GET http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5
+
+```
+Response:
+``` bash
+{
+"@context":"https://w3id.org/did/v1",
+"id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+"created":"2019-07-11T10:27:27.326Z",
+"publicKey":[
+        {
+            "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
+            "type":"Ed25519VerificationKey2018",
+            "controller":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+            "publicKeyBase58":"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"
+        }
+    ]
+}
 ```
 
-Response:
 
  - The API will respond with status `200` for a request with a known ID.
  - The API will respond with status `404` for a request with an unknown ID.
@@ -276,7 +349,65 @@ The calculation of the current time is done by the DID owner without verificatio
 This is appropriate since this field is only used to determine a before/after relationship.
 Consumers of the DID document need to take into account that this value is potentially inaccurate.
 
+HTTP request:
+
+```bash
+curl -X POST \
+http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
+  -H 'content-type: multipart/form-data' \
+  -F instruction='{
+  "action": "update",
+  "signatures": [
+    {
+        "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
+        "type":"Ed25519Signature2018",
+        "signatureBase58":"57HQXkem7pXpfHnP3DPTyLqSQB9NuZNj7V4hS61kbkQA28hCuYtSmFQCABj8HBX2AmDss13iDkNY2H3zqRZsYnD4"
+    },
+    {
+        "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-2",
+        "type":"Ed25519Signature2018",
+        "signatureBase58":"26kkhZbQLSNvEKbPvx18GRfSoVMu2bDXutvnWcQQyrGxqz5VKijkFV2GohbkbafPa2WqVad7wnyLwx1zxjvVfvSa"
+    }
+  ]
+}' \
+  -F document'={
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+  "created":"2019-07-11T10:27:27.326Z",
+  "updated":"2019-07-11T10:29:15.116Z",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-2",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
+	  "publicKeyBase58": "GfHq2tTVk9z4eXgyHhSTmTRf4NFuTv7afqFroA8QQFXKm9fJcBtMRctowK33"
+	}
+  ]
+}'
+```
+
+
 ##### Delete (`DELETE {did}`)
+
+
+HTTP request:
+
+```bash
+curl -X DELETE \
+http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
+  -H 'content-type: multipart/form-data' \
+  -F instruction='{
+  "action": "delete",
+  "signatures": [
+	{
+	 "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-2",
+	 "type":"Ed25519Signature2018",
+	 "signatureBase58":"26kkhZbQLSNvEKbPvx18GRfSoVMu2bDXutvnWcQQyrGxqz5VKijkFV2GohbkbafPa2WqVad7wnyLwx1zxjvVfvSa"
+	}
+  ]
+}'
+```
+
 
 #### Caveats
 

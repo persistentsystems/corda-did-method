@@ -29,7 +29,6 @@ dependencyManagement {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-   
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile "junit:junit:$junit_version"
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
@@ -46,9 +45,6 @@ dependencies {
     testCompile "net.corda:corda-node-driver:$corda_release_version"
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'com.ninja-squad:springmockk:1.1.0'
-
-
-    compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version")
 
     compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
