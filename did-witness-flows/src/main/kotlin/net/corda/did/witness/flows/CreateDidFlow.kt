@@ -36,22 +36,7 @@ import net.corda.did.utils.loadState
  */
 @InitiatingFlow
 @StartableByRPC
-// ??? moritzplatt 2019-06-20 -- I'm unsure about passing a Fully formed `DidState` to the flow constructor
-// This assumes the caller can set originator, witnesses, participants which is not likely something we want to be set
-// from the outside. These fields should rather be generated in the flow itself.
-// i.e., consider the following constructor
-//
-//  class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>(), FlowLogicCommonMethods {
-//
-// then extract the parameters as follows:
-//
-//      DidState.originator: serviceHub.myInfo.legalIdentities.first()
-//      DidState.witnesses: By configuration
-//      DidState.status: envelope.instruction
-//      DidState.linearId: UniqueIdentifier(null, envelope.document.id())
-//      DidState.participants: implicit
 
-// nitesh solanki 2019-06-27 made changes as suggested
 class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
 	companion object {
@@ -80,14 +65,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
 		// query the ledger if did exist or not
 
-		// ??? moritzplatt 2019-06-20 -- calling both `UUID()` and `id()` seems like unnecessary duplication
-		// i.e.:
-		//
-		//        didState.envelope.document.id().map {
-		//            serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
-		//        }
 
-		// nitesh solanki 2019-06-27 made changes as suggested
 
 		var didStates: List<StateAndRef<DidState>> = listOf()
 		envelope.document.id().map {
@@ -100,12 +78,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 			throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
 		}
 
-		// Obtain a reference to the notary we want to use.
-		// ??? moritzplatt 2019-06-20 -- the preferred notary should come from configuration
-		// see https://corda.network/participation/notary-considerations.html#guidance-for-application-developers for
-		// reasoning
 
-		// nitesh solanki 2019-06-27 made changes as suggested
 		val notary = serviceHub.getNotaryFromConfig()
 
 		// Stage 1.

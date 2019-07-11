@@ -101,7 +101,7 @@ fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): Json
  * @receiver [JsonObject]
  * @return [JsonResult]
  */
-// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional representations?
+
 fun JsonObject.getMandatoryBase58Bytes(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {
 		Success(Base58.decode(value))

@@ -23,5 +23,4 @@ fun ApiResponse.toResponseObj(): ApiResponse {
 			message.toString()
 	)
 }
-// ??? moritzplatt 2019-06-20 -- what purpose has this method? seems to do a `copy`?
-//pranav 2019-06-27 removed as per comment
+

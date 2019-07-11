@@ -59,10 +59,7 @@ data class DidState(
  */
 @CordaSerializable
 enum class DidStatus {
-	// ??? moritzplatt 2019-06-20 -- misleading naming as this clashes with the concept of 'validity' of an envelope.
-	// consider 'ACTIVE'
 
-	// nitesh solanki 2019-06-27 made changes as suggested
 	ACTIVE,
 	DELETED
 }

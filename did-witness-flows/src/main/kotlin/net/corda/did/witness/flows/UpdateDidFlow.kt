@@ -34,8 +34,7 @@ import net.corda.did.utils.loadState
  */
 @InitiatingFlow
 @StartableByRPC
-// ??? moritzplatt 2019-06-20 -- consider passing the envelope only (see notes on CreateDidFLow)
-// nitesh solanki 2019-06-27 made changes as suggested.
+
 class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
 	companion object {
@@ -77,8 +76,7 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		val inputDidState = didStates.singleOrNull()!!
 
 		// Obtain a reference to the notary we want to use.
-		// ??? moritzplatt 2019-06-20 -- previous comment on notary selection applies
-		// nitesh solanki 2019-06-27 made changes as suggested.
+
 		val notary = serviceHub.getNotaryFromConfig()
 
 		// Stage 1.

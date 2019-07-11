@@ -61,7 +61,7 @@ class DidInstruction(json: String) : JsonBacked(json) {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 
-			// ??? moritzplatt 2019-06-20 -- this assumes the encoding to be `signatureBase58` when technically others are supported to
+
 			val value = signature.getMandatoryBase58Bytes("signatureBase58").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }

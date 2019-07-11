@@ -34,10 +34,7 @@ class CordaDid(
 	 */
 	fun toExternalForm() = did.toString()
 
-	// ??? moritzplatt 2019-06-20 -- see other comments as well. consider refactoring to remove logic from init block
-	// rather perform parsing from string in a dedicated method that returns a result
 
-	// nitesh solanki 2019-06-27 made changes as suggested
 	/** Contains methods for parsing from an external form of DID and an enum representing target Corda network for did*/
 	companion object {
 

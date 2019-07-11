@@ -34,10 +34,7 @@ import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping("/")
-// ??? moritzplatt 2019-06-20 -- consider passing connection parameters instead so the controller can manage the connection
-// itself. i.e. re-establishing connection in case it fails or adding functionality to re-establish a connection in case of errors
 
-// pranav 2019-06-25 added RPC reconnection library to reconnect if node connection is lost,docs@ https://docs.corda.net/clientrpc.html#reconnecting-rpc-clients
 /**
  * @property proxy The node RPC connection object instance
  * @property queryUtils Helper function used to query the ledger.
@@ -86,10 +83,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
 
-			// ??? moritzplatt 2019-06-20 -- suggestion here would be to remove this block and instead of querying, rely on the output of the startFlowDynamic call only
-			// the current implementation introduces a race condition between the `getDIDDocumentByLinearId` call and the
-			// consumption of the `returnValue`
-			//pranav 2019-06-27-- removed as per review comment
+
 
 			/**
 			 * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
@@ -98,15 +92,7 @@ class MainController(rpc: NodeRPCConnection) {
 			val envelopeVerified = envelope.validateCreation()
 			envelopeVerified.onFailure { apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason));return apiResult }
 
-			// ??? moritzplatt 2019-06-20 -- as described in comments on the flow logic, this should not be passed from the API
 
-			/* WIP :Need clarification from Moritz on how the witnesses can be fetched*/
-
-			// ??? moritzplatt 2019-06-20 -- the API should not be aware of the witnesses. The CorDapp should be aware
-			// of the set of witnesses by configuration. Considering all network members witnesses is incorrect.
-
-			// ??? moritzplatt 2019-06-20 -- consider comments on the flow constructor
-			//pranav: 2019-06-27 As per Moritz comments we are now just passing envelope to flow
 			/**
 			 * Passing the generated envelope as a parameter to the CreateDidFlow.
 			 *
@@ -114,10 +100,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
 
-			// ??? moritzplatt 2019-06-20 -- not familiar with Spring but `getOrThrow` is blocking.
-			// Maybe there is a pattern around futures (i.e. https://www.baeldung.com/spring-async)?
-			// Just a thought though
-			// pranav: 2019-06-27 added logic to for asynchronous execution of blocking code
+
 			/**
 			 * Executes the flow in a separate thread and returns result.
 			 *
@@ -182,8 +165,7 @@ class MainController(rpc: NodeRPCConnection) {
 					return ResponseEntity(response.toResponseObj(), HttpStatus.NOT_FOUND)
 
 				}
-				// ??? moritzplatt 2019-06-20 -- do not return the re-serialised version based on JsonObject. Signatures may not match
-				// pranav 2019-06-25 updated code to return raw document as a string
+
 				return ResponseEntity.ok().body(didJson)
 			}
 		} catch (e: IllegalArgumentException) {
@@ -231,8 +213,6 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
 
-			// ??? moritzplatt 2019-06-20 -- merge with assignment var didJson = try { ... }
-			//pranav 2019-06-27 --changed as per review comment
 			/**
 			 * Perform a check at the API layer to make sure that the data provided meets the criteria for update,before passing it to the flow.
 			 *
@@ -291,8 +271,7 @@ class MainController(rpc: NodeRPCConnection) {
 		}
 	}
 
-	// ??? moritzplatt 2019-06-20 -- does a `DELETE` require a document at all? it could be an instruction set only?
-	//pranav 2019-06-27 - updated the code to accept only instruction
+
 	/**
 	 * Method to delete a DID in the Corda ledger via REST
 	 *

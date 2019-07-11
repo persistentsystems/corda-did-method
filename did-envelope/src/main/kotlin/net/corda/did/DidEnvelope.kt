@@ -53,9 +53,7 @@ import java.net.URI
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 @CordaSerializable
 class DidEnvelope(
-		// ??? moritzplatt 2019-06-20 -- do these need to be vals? `rawInstruction` is unsused `rawDocument` only from test
 
-		// nitesh solanki 2019-06-27 yes, else corda serialization throws an exception
 		val rawInstruction: String,
 		val rawDocument: String
 ) {
@@ -88,8 +86,7 @@ class DidEnvelope(
 		// perform temporal validation, ensuring the created/updated times are sound
 		validateTemporal(precursor).onFailure { return it }
 
-		// perform key ownership for deletion (i.e. prove ownership of ALL keys)
-		// ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
+
 		validateKeysForModification(precursor).onFailure { return it }
 
 		return Success(Unit)
@@ -109,8 +106,7 @@ class DidEnvelope(
 		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
 		validate().onFailure { return it }
 
-		// perform key ownership for deletion (i.e. prove ownership of ALL keys)
-		// ??? moritzplatt 2019-06-20 -- is this what we want, i.e. even for deletion we require all keys?
+
 		validateKeysForModification(precursor).onFailure { return it }
 
 		return Success(Unit)
@@ -297,8 +293,8 @@ class DidEnvelope(
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
-			// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
-			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+
+		// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()
 		}

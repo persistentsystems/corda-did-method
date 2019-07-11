@@ -11,7 +11,7 @@ import net.corda.core.node.ServiceHub
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria
 
-// ??? moritzplatt 2019-06-20 -- these dont need to be encapsulated in an interface but can be standalone extension
+
 // methods just as well
 
 /**

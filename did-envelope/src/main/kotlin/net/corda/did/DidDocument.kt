@@ -46,46 +46,12 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 		}.onFailure { return it }
 
 		val cordaDID = CordaDid.parseExternalForm(id).onFailure { return Failure(DidDocumentFailure.InvalidDidFailure(it.reason)) }
-		// ??? moritzplatt 2019-06-20 -- this call could throw an exception. to keep in line with the monadic approach,
-		// consider refactoring the CordaDID class in the following way:
-		//
-		// class CordaDid(
-		//        val did: URI,
-		//        val network: Network,
-		//        val uuid: UUID
-		//) {
-		//
-		//    companion object {
-		//        fun parseExternalForm(externalForm: String): Result<CordaDid, ???> {
-		//           ...
-		//        }
-		//    }
-		//
-		//    fun toExternalForm() = did.toString()
-		//}
-		//
-		// This will allow you to stick to the monadic approach and chain success/failures further
 
 		return Success(cordaDID)
 	}
 
-	// ??? moritzplatt 2019-06-20 -- shouldn't return a nullable UUID but a failure if the UUID can't be retrieved
-	// it is mandatory
 
-	// ??? moritzplatt 2019-06-20 -- consider renaming the function:
-	// `UUID` is the type returned, not the concept behind it
 
-	// ??? moritzplatt 2019-06-20 -- this method feels unnecessary as the same result can be achieved by `id().uuid`
-
-	// nitesh solanki 2019-06-27 UUID() not needed
-
-	/*fun UUID(): DidDocumentResult<UUID?> = id().map{
-			return Success(it.uuid)
-		}.mapFailure {
-			// ??? moritzplatt 2019-06-20 -- strictly speaking, this wouldn't only apply for a UUID with invalid format
-			// but also if the UUID is missing from the document altogether
-			return Failure(DidDocumentFailure.InvalidUUIDFormatFailure(it.toString()))
-		}*/
 
 	/**
 	 * Returns the context from json did document

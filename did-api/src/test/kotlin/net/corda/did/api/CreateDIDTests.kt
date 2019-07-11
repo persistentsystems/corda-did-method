@@ -3,14 +3,7 @@
 *
 * */
 
-// ??? moritzplatt 2019-06-20 -- Gradle is missing a dependency:
-// `testCompile group: 'org.springframework.boot', name: 'spring-boot-test', version: '1.5.7.RELEASE'`
 
-//TODO is there a way to mock a Corda node so it can be tested via these tests?
-
-// ??? moritzplatt 2019-06-20 -- yes, using the Test Node Driver https://docs.corda.net/corda-api.html#public-api
-// see this for an example:
-// https://github.com/corda/samples/blob/0473ea84da6d96305af65dc5ec85120533931cbd/timesheet-example/workflows-kotlin/src/integrationTest/kotlin/com/example/DriverBasedTests.kt
 package net.corda.did.api
 
 import net.corda.core.crypto.sign
