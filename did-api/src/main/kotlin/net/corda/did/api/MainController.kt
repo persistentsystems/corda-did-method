@@ -6,11 +6,11 @@ import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
 import net.corda.did.api.MainController.Companion.logger
+import net.corda.did.utils.DIDAlreadyExistException
+import net.corda.did.utils.DIDNotFoundException
 import net.corda.did.witness.flows.CreateDidFlow
 import net.corda.did.witness.flows.DeleteDidFlow
 import net.corda.did.witness.flows.UpdateDidFlow
-import net.corda.did.utils.DIDAlreadyExistException
-import net.corda.did.utils.DIDNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -55,6 +55,7 @@ class MainController(rpc: NodeRPCConnection) {
 	private val proxy = rpc.proxy
 	private val queryUtils = QueryUtil(proxy)
 	private val apiUtils = APIUtils()
+
 	private val executorService = Executors.newSingleThreadExecutor()
 
 	/**
@@ -135,9 +136,6 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDAlreadyExistException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.CONFLICT).toResponseObj(), HttpStatus.CONFLICT))
 
-				} catch (e: Exception) {
-					logger.error(e.message)
-					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}
@@ -273,9 +271,6 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDDeletedException) {
 
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
-				} catch (e: Exception) {
-					logger.error(e.message)
-					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}
@@ -329,9 +324,6 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDDeletedException) {
 
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
-				} catch (e: Exception) {
-					logger.error(e.message)
-					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}

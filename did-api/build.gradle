@@ -55,6 +55,7 @@ dependencies {
     compile project(":did-contracts")
     compile project(":did-flows")
     compile project(":did-envelope")
+    compile project(":did-witness-flows")
 }
 test {
     exclude '**/*'
