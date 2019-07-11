@@ -136,6 +136,9 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDAlreadyExistException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.CONFLICT).toResponseObj(), HttpStatus.CONFLICT))
 
+				} catch (e: Exception) {
+					logger.error(e.message)
+					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}
@@ -271,6 +274,9 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDDeletedException) {
 
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
+				} catch (e: Exception) {
+					logger.error(e.message)
+					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}
@@ -324,6 +330,9 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDDeletedException) {
 
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
+				} catch (e: Exception) {
+					logger.error(e.message)
+					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
 
 			}
