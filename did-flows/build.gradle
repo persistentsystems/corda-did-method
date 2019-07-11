@@ -39,6 +39,7 @@ dependencies {
     cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
 
     modules project(':did-envelope')
+    testCompile project(":did-witness-flows")
 }
 
 jar {
