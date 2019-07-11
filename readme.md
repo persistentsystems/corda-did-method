@@ -290,7 +290,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
   -F document'={
   "@context": "https://w3id.org/did/v1",
   "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
-  "created":"1970-01-01T00:00:00Z",
+  "created":"2019-07-11T10:27:27.326Z",
   "publicKey": [
 	{
 	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
@@ -323,7 +323,7 @@ Response:
 {
 "@context":"https://w3id.org/did/v1",
 "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
-"created":"1970-01-01T00:00:00Z",
+"created":"2019-07-11T10:27:27.326Z",
 "publicKey":[
         {
             "id":"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1",
@@ -335,7 +335,6 @@ Response:
 }
 ```
 
-Response:
 
  - The API will respond with status `200` for a request with a known ID.
  - The API will respond with status `404` for a request with an unknown ID.
@@ -374,8 +373,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
   -F document'={
   "@context": "https://w3id.org/did/v1",
   "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5",
-  "created":"1970-01-01T00:00:00Z",
-  "updated":"2019-07-11T06:53:54.770Z",
+  "created":"2019-07-11T10:27:27.326Z",
+  "updated":"2019-07-11T10:29:15.116Z",
   "publicKey": [
 	{
 	  "id": "did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-2",
