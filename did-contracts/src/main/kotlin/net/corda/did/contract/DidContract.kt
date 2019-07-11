@@ -93,17 +93,12 @@ open class DidContract : Contract {
 
 		// validate did envelope
 
-
-
 		"the envelope presented is must be valid to create" using (DIDState.envelope.validateCreation() is Success)
 
 
 		DIDState.envelope.validateCreation().map { require(it == Unit) }.onFailure { throw IllegalArgumentException("Invalid Did envelope $it") }
 		"Status of newly created did must be 'VALID'" using (DIDState.isValid())
 		"Originator and witness nodes should be added to the participants list" using (DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
-
-
-
 
 		val UUID = DIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch UUID from did") }.uuid
 		"LinearId of the DidState must be equal to the UUID component of did" using (UUID == DIDState.linearId.id)
@@ -122,11 +117,9 @@ open class DidContract : Contract {
 
 		// TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
 
-
 		"Failed to update DID document" using (newDIDState.envelope.validateModification(oldDIDState.envelope.document) is Success)
 		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isValid())
 		"Status of the updated DID must be 'VALID'" using (newDIDState.isValid())
-
 
 		val oldDid = oldDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
 		val newDid = newDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
@@ -136,8 +129,6 @@ open class DidContract : Contract {
 		"Linear ID of the DID state should not change when updating DID document" using (oldDIDState.linearId == newDIDState.linearId)
 
 		// TODO state participants [List] and witness nodes [Set] changes is considered as a separate update transaction and hence separate command(DIDState update)--? should this be purely DID document update transaction
-
-
 
 		"DidState Originator should not change when updating DID document" using (oldDIDState.originator == newDIDState.originator)
 		"DidState witness nodes list should not change when updating DID document" using (oldDIDState.witnesses == newDIDState.witnesses)
@@ -160,8 +151,6 @@ open class DidContract : Contract {
 		"Failed to delete DID document" using (newDIDState.envelope.validateDeletion(oldDIDState.envelope.document) is Success)
 		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isValid())
 		"Status of the updated DID must be 'INVALID'" using (!newDIDState.isValid())
-
-
 
 		val oldDidKeys = oldDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }
 		val newDidKeys = newDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }

@@ -37,7 +37,6 @@ import net.corda.did.utils.loadState
 @InitiatingFlow
 @StartableByRPC
 
-
 class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<SignedTransaction>() {
 
 	companion object {
@@ -64,7 +63,6 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 	@Suspendable
 	override fun call(): SignedTransaction {
 
-
 		val cordaDID = CordaDid.parseExternalForm(did).onFailure { throw InvalidDIDException("Invalid DID passed") }
 
 		val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, cordaDID.uuid), DidState::class.java)
@@ -73,7 +71,6 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 			throw DIDNotFoundException("DID with id $did does not exist")
 		}
 		val inputDidState = didStates.singleOrNull()!!
-
 
 		val notary = serviceHub.getNotaryFromConfig()
 

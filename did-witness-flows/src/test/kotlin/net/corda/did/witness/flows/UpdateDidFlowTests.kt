@@ -15,7 +15,6 @@ import org.junit.Test
 import java.net.URI
 import kotlin.test.assertFailsWith
 
-
 /**
  * Test cases for [UpdateDidFlow]
  */

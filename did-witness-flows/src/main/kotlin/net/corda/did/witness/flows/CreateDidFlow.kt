@@ -65,8 +65,6 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
 		// query the ledger if did exist or not
 
-
-
 		var didStates: List<StateAndRef<DidState>> = listOf()
 		envelope.document.id().map {
 			didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
@@ -77,7 +75,6 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		if (didStates.isNotEmpty()) {
 			throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
 		}
-
 
 		val notary = serviceHub.getNotaryFromConfig()
 

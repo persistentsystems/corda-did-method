@@ -11,7 +11,6 @@ import net.corda.core.node.ServiceHub
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria
 
-
 // methods just as well
 
 /**

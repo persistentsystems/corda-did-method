@@ -83,8 +83,6 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
 
-
-
 			/**
 			 * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
 			 *
@@ -92,14 +90,12 @@ class MainController(rpc: NodeRPCConnection) {
 			val envelopeVerified = envelope.validateCreation()
 			envelopeVerified.onFailure { apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason));return apiResult }
 
-
 			/**
 			 * Passing the generated envelope as a parameter to the CreateDidFlow.
 			 *
 			 * Returns a flow handler
 			 * */
 			val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
-
 
 			/**
 			 * Executes the flow in a separate thread and returns result.
@@ -270,7 +266,6 @@ class MainController(rpc: NodeRPCConnection) {
 			return apiResult
 		}
 	}
-
 
 	/**
 	 * Method to delete a DID in the Corda ledger via REST

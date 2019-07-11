@@ -50,9 +50,6 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 		return Success(cordaDID)
 	}
 
-
-
-
 	/**
 	 * Returns the context from json did document
 	 *

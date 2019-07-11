@@ -61,7 +61,6 @@ class DidInstruction(json: String) : JsonBacked(json) {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 
-
 			val value = signature.getMandatoryBase58Bytes("signatureBase58").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }

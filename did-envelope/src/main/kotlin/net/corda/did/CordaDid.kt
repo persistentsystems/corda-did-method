@@ -34,7 +34,6 @@ class CordaDid(
 	 */
 	fun toExternalForm() = did.toString()
 
-
 	/** Contains methods for parsing from an external form of DID and an enum representing target Corda network for did*/
 	companion object {
 
