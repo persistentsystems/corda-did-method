@@ -294,7 +294,7 @@ class DidEnvelope(
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
 
-		// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()
 		}

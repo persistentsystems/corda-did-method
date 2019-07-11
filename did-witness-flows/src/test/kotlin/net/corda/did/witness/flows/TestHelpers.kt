@@ -60,7 +60,7 @@ abstract class AbstractFlowTestUtils {
 
 	@Before
 	fun setup() {
-		mockNetwork = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(TestCordapp.findCordapp("net.corda.did.state"), TestCordapp.findCordapp("net.corda.did.contract"), TestCordapp.findCordapp("net.corda.did.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
+		mockNetwork = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(TestCordapp.findCordapp("net.corda.did.state"), TestCordapp.findCordapp("net.corda.did.contract"), TestCordapp.findCordapp("net.corda.did.witness.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
 				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US"))), threadPerNode = true, notarySpecs = listOf(MockNetworkNotarySpec(notarySpec, false))))
 		originator = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US")))
 		w1 = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US")))
