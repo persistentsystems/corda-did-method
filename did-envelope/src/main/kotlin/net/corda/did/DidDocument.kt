@@ -18,7 +18,6 @@ import net.corda.getMandatoryBase58Bytes
 import net.corda.getMandatoryCryptoSuiteFromKeyID
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
-import java.lang.IllegalArgumentException
 import java.time.Instant
 import javax.xml.bind.DatatypeConverter
 

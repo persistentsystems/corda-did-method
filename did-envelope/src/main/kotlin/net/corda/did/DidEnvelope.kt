@@ -297,8 +297,8 @@ class DidEnvelope(
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
-		// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
-		// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+			// ??? moritzplatt 2019-06-20 -- Are you considering any work on supporting additional crypto suites?
+			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()
 		}
