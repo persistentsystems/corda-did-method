@@ -96,7 +96,14 @@ To build jar use command `./gradelw jar` .This will generate the following files
 
 
 ### Running the nodes
-The nodes need to have a config file with list of witness nodes.Refer to the [sample config](/did-flows/src/did-flows-1.0-SNAPSHOT.conf)
+The nodes need to have a config file with list of witness nodes. Example configuration shown below
+```bash
+nodes = [
+"O=PartyB,L=New York,C=US"
+]
+
+notary = "O=Notary,L=London,C=GB"
+```
 
 
 
