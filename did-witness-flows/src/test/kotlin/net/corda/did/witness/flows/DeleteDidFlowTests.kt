@@ -1,4 +1,4 @@
-package net.corda.did.flows
+package net.corda.did.witness.flows
 
 import com.natpryce.valueOrNull
 import net.corda.core.contracts.TransactionVerificationException

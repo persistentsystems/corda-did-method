@@ -6,9 +6,9 @@ import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
 import net.corda.did.api.MainController.Companion.logger
-import net.corda.did.flows.CreateDidFlow
-import net.corda.did.flows.DeleteDidFlow
-import net.corda.did.flows.UpdateDidFlow
+import net.corda.did.witness.flows.CreateDidFlow
+import net.corda.did.witness.flows.DeleteDidFlow
+import net.corda.did.witness.flows.UpdateDidFlow
 import net.corda.did.utils.DIDAlreadyExistException
 import net.corda.did.utils.DIDNotFoundException
 import org.springframework.http.HttpStatus

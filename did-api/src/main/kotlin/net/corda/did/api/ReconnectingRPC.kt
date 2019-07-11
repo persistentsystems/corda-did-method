@@ -358,7 +358,7 @@ class ReconnectingCordaRPCOps private constructor(
 					}
 					initialFeed.copy(updates = observable)
 				}
-			// TODO - add handlers for Observable return types.
+				// TODO - add handlers for Observable return types.
 				else                 -> result
 			}
 		}

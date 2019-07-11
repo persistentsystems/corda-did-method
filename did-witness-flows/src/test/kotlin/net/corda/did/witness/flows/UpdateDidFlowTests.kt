@@ -1,4 +1,4 @@
-package net.corda.did.flows
+package net.corda.did.witness.flows
 
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.crypto.sign

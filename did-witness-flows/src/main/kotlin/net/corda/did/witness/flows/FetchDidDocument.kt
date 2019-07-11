@@ -1,4 +1,4 @@
-package net.corda.did.flows
+package net.corda.did.witness.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.UniqueIdentifier

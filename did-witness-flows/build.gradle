@@ -4,7 +4,7 @@ apply plugin: "net.corda.plugins.quasar-utils"
 apply plugin: 'org.jetbrains.dokka'
 cordapp {
     info {
-        name "DID CorDapp Flows"
+        name "DID CorDapp Witness Flows"
         vendor "UNMAINTAINED"
         targetPlatformVersion corda_platform_version.toInteger()
         minimumPlatformVersion corda_platform_version.toInteger()
@@ -31,7 +31,9 @@ dependencies {
     cordapp "$corda_release_group:corda-finance-contracts:$corda_release_version"
     cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
 
+    cordapp project(":did-contracts")
     cordapp project(":did-envelope")
+    cordapp project(":did-flows")
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

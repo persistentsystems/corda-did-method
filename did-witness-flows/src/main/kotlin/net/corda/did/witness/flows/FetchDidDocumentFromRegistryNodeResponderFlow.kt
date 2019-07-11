@@ -1,4 +1,4 @@
-package net.corda.did.flows
+package net.corda.did.witness.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.UniqueIdentifier
@@ -9,6 +9,7 @@ import net.corda.core.flows.InitiatedBy
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.unwrap
 import net.corda.did.DidDocument
+import net.corda.did.flows.FetchDidDocumentFromRegistryNodeFlow
 import net.corda.did.state.DidState
 import net.corda.did.utils.loadState
 

@@ -3,19 +3,10 @@ package net.corda.did.flows
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
-import com.natpryce.valueOrNull
 import junit.framework.AssertionFailedError
-import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.crypto.sign
 import net.corda.core.identity.CordaX500Name
-import net.corda.core.transactions.SignedTransaction
-import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
-import net.corda.did.DidEnvelope
-import net.corda.did.state.DidState
-import net.corda.did.state.DidStatus
-import net.corda.testing.core.singleIdentity
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkNotarySpec
 import net.corda.testing.node.MockNetworkParameters
@@ -71,108 +62,6 @@ abstract class AbstractFlowTestUtils {
 	@After
 	fun tearDown() {
 		mockNetwork.stopNodes()
-	}
-
-	protected fun getDidStateForCreateOperation(): DidState {
-		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
-
-		val instruction = """{
-		|  "action": "create",
-		|  "signatures": [
-		|	{
-		|	  "id": "$originalKeyUri",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val envelope = DidEnvelope(instruction, originalDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
-	}
-
-	protected fun getDidStateForDeleteOperation(): DidState {
-		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
-
-		val instruction = """{
-		|  "action": "delete",
-		|  "signatures": [
-		|	{
-		|	  "id": "$originalKeyUri",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val envelope = DidEnvelope(instruction, originalDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.DELETED, UniqueIdentifier.fromString(UUID.toString()))
-	}
-
-	protected fun getDidStateForUpdateOperation(): DidState {
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$newKeyUri",
-		|	  "type": "${CryptoSuite.Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$newKeyPairEncoded"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val signatureFromOldKey = originalKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
-		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
-
-		val signatureFromNewKey = newKeyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
-		val signatureFromNewKeyEncoded = signatureFromNewKey.bytes.toBase58()
-
-		val instruction = """{
-		|  "action": "update",
-		|  "signatures": [
-		|	{
-		|	  "id": "$originalKeyUri",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$signatureFromOldKeyEncoded"
-		|	},
-		|	{
-		|	  "id": "$newKeyUri",
-		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$signatureFromNewKeyEncoded"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val envelope = DidEnvelope(instruction, newDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
-	}
-
-	protected fun createDID(envelope: DidEnvelope): SignedTransaction? {
-		val flow = CreateDidFlow(envelope)
-		val future = originator.startFlow(flow)
-		return future.getOrThrow()
-	}
-
-	protected fun deleteDID(envelope: DidEnvelope): SignedTransaction? {
-		createDID(getDidStateForCreateOperation().envelope)!!.tx
-		mockNetwork.waitQuiescent()
-		val flow = DeleteDidFlow(envelope.rawInstruction, envelope.document.id().valueOrNull()!!.toExternalForm())
-		val future = originator.startFlow(flow)
-		return future.getOrThrow()
-	}
-
-	protected fun updateDID(envelope: DidEnvelope): SignedTransaction? {
-		createDID(getDidStateForCreateOperation().envelope)!!.tx
-		mockNetwork.waitQuiescent()
-		val flow = UpdateDidFlow(envelope)
-		val future = originator.startFlow(flow)
-		return future.getOrThrow()
 	}
 }
 
