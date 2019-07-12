@@ -6,6 +6,11 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+/**
+ * Test cases for [FetchDidDocumentFlow]
+ *
+ * Nodes can fetch did from their local vault by invoking [FetchDidDocumentFlow] as a sub-flow.
+ */
 class FetchDidDocumentFlowTests : AbstractFlowTestUtils() {
 
 	@Test

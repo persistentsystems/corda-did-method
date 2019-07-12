@@ -36,8 +36,10 @@ import kotlin.test.assertFailsWith
 
 /**
  * Test cases for [FetchDidDocumentFromRegistryNodeFlow]
+ *
+ * Nodes can query for did from did-registry member node by invoking [FetchDidDocumentFromRegistryNodeFlow] as a sub-flow.
  */
-class FetchDidDocumentFromRegistryNodeFlowTest {
+class FetchDidDocumentFromRegistryNodeFlowTests {
 	lateinit var mockNetwork: MockNetwork
 	lateinit var originator: StartedMockNode
 	lateinit var w1: StartedMockNode
