@@ -59,9 +59,9 @@ A more dynamic approach to membership may be developed later.
 |-----------|-----------------------------------------------------------------|
 | `did-api` | Module for defining REST api                         |
 | `did-contracts` |  Module for defining Corda smart contracts.                   |
-| `did-flows`     | Module defining Corda flows for read operations.               |
-| `did-envelope` | Module defines the did envelope, document and instruction|
-| `did-witness-flows` | Module defining Corda flows for create,update and delete operations|
+| `did-flows`     | Module for defining Corda flows for read operations.               |
+| `did-envelope` | Module for defining the did envelope, document and instruction|
+| `did-witness-flows` | Module for defining Corda flows for create,update and delete operations|
 
 
 ## CorDapp design -CMN views
@@ -75,11 +75,11 @@ The CorDapp functions as registry which maps decentralized identifiers to a docu
 ### BPMN (create did process)
 ![BPMN (create did process)](/cmn_diagrams/BPMN.png)
 ## Transaction instance
-## Create view 
+## Create DID view 
 ![Create transaction instance view](/cmn_diagrams/Create-Transaction-Instance.png)
-## Update view
+## Update DID view
 ![Update transaction instance view](/cmn_diagrams/Update-Tranasction-Instance.png)
-## Delete view
+## Delete DID view
 ![Delete transaction instance view](/cmn_diagrams/Delete-Transaction-Instance.png)
 
 ### Pre-requisites
@@ -429,8 +429,4 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
 ##### Replication Issues During Unavailability of Witness Nodes
 
-### Corda DID Resolver ([`did-resolver`](did-resolver))
 
-### Corda DID CorDapp Contracts and States ([`did-contracts`](did-contracts))
-
-### Corda DID CorDapp Flows ([`did-flows`](did-flows))
