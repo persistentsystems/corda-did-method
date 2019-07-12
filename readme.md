@@ -59,8 +59,9 @@ A more dynamic approach to membership may be developed later.
 |-----------|-----------------------------------------------------------------|
 | `did-api` | Module for defining REST api                         |
 | `did-contracts` |  Module for defining Corda smart contracts.                   |
-| `did-flows`     | Module defining Corda flows.               |
+| `did-flows`     | Module defining Corda flows for read operations.               |
 | `did-envelope` | Module defines the did envelope, document and instruction|
+| `did-witness-flows` | Module defining Corda flows for create,update and delete operations|
 
 
 ## CorDapp design -CMN views
@@ -90,7 +91,8 @@ To build jar use command `./gradelw jar` .This will generate the following files
 | File | Description                                                     |
 |-----------|-----------------------------------------------------------------|
 | `did-contracts-1.0-SNAPSHOT.jar` | contains state and contracts                  |
-| `did-flows-1.0-SNAPSHOT.jar` |  contains flows                 |
+| `did-flows-1.0-SNAPSHOT.jar` |  contains flows for read                 |
+| `did-witness-flows-1.0-SNAPSHOT`| contains flows for create,update,delete
 
 
 
