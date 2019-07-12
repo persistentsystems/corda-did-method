@@ -92,7 +92,7 @@ To build jar use command `./gradelw jar` .This will generate the following files
 |-----------|-----------------------------------------------------------------|
 | `did-contracts-1.0-SNAPSHOT.jar` | contains state and contracts                  |
 | `did-flows-1.0-SNAPSHOT.jar` |  contains flows for read                 |
-| `did-witness-flows-1.0-SNAPSHOT`| contains flows for create,update,delete
+| `did-witness-flows-1.0-SNAPSHOT.jar`| contains flows for create,update,delete
 
 
 
