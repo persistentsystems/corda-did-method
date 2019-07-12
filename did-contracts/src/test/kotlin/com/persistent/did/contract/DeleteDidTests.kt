@@ -25,7 +25,7 @@ class DeleteDidTests : AbstractContractsStatesTestUtils() {
 
 	class DummyCommand : TypeOnlyCommandData()
 
-	private var ledgerServices = MockServices(listOf("net.corda.did.contract"))
+	private var ledgerServices = MockServices(listOf("com.persistent.did.contract"))
 
 	private fun getUpdatedEnvelope(): DidEnvelope {
 

@@ -24,7 +24,7 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 
 	class DummyCommand : TypeOnlyCommandData()
 
-	private var ledgerServices = MockServices(listOf("net.corda.did.contract"))
+	private var ledgerServices = MockServices(listOf("com.persistent.did.contract"))
 
 	@Test
 	fun `transaction must include Create command`() {

@@ -1,6 +1,5 @@
 package com.persistent.did.contract
 
-import com.persistent.did.contract.DidContract
 import com.persistent.did.contract.DidContract.Commands.Update
 import com.persistent.did.state.DidState
 import com.persistent.did.state.DidStatus
@@ -26,7 +25,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	class DummyCommand : TypeOnlyCommandData()
 
-	private var ledgerServices = MockServices(listOf("net.corda.did.contract"))
+	private var ledgerServices = MockServices(listOf("com.persistent.did.contract"))
 
 	private fun getUpdatedEnvelope(): DidEnvelope {
 		/*
