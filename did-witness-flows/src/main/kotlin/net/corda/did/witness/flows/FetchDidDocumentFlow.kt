@@ -15,7 +15,7 @@ import net.corda.did.utils.loadState
  * @property linearId the linearId of the [DidState].
  */
 @InitiatingFlow
-class FetchDidDocument(private val linearId: UniqueIdentifier) : FlowLogic<DidDocument>() {
+class FetchDidDocumentFlow(private val linearId: UniqueIdentifier) : FlowLogic<DidDocument>() {
 
 	/**
 	 * Loads the [DidState] from the ledger and returns the [DidDocument] or throws an exception if DID not found.

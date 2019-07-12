@@ -1,5 +1,6 @@
 package net.corda.did.witness.flows
 
+import co.paralleluniverse.fibers.Suspendable
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
@@ -7,11 +8,16 @@ import com.natpryce.valueOrNull
 import junit.framework.AssertionFailedError
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.crypto.sign
+import net.corda.core.flows.FlowLogic
+import net.corda.core.flows.InitiatingFlow
+import net.corda.core.flows.StartableByRPC
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite
+import net.corda.did.DidDocument
 import net.corda.did.DidEnvelope
 import net.corda.did.state.DidState
 import net.corda.did.state.DidStatus
@@ -26,6 +32,7 @@ import net.i2p.crypto.eddsa.KeyPairGenerator
 import org.junit.After
 import org.junit.Before
 import java.net.URI
+import java.util.UUID
 
 /**
  * Helper class for Flow tests
@@ -173,6 +180,16 @@ abstract class AbstractFlowTestUtils {
 		val flow = UpdateDidFlow(envelope)
 		val future = originator.startFlow(flow)
 		return future.getOrThrow()
+	}
+
+	@InitiatingFlow
+	@StartableByRPC
+	class TestInitiator(private val uuid: UUID) : FlowLogic<DidDocument>() {
+
+		@Suspendable
+		override fun call(): DidDocument {
+			return subFlow(FetchDidDocumentFlow(UniqueIdentifier(null, uuid)))
+		}
 	}
 }
 
