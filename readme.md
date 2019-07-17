@@ -1,8 +1,8 @@
 Corda DID Method Proof-of-Concept
 =================================
 
+###Introduction
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
-Additionally, it contains a [Universal Resolver Driver](https://github.com/decentralized-identity/universal-resolver) following the [Extensible Driver Architecture](https://medium.com/decentralized-identity/a-universal-resolver-for-self-sovereign-identifiers-48e6b4a5cc3c) paradigm.
 
 ![Corda DID System Architecture](architecture.svg)
 
@@ -107,16 +107,11 @@ nodes = [
 notary = "O=Notary,L=London,C=GB"
 ```
 
+## Developers can perform CRUD operations in two ways:
+* REST APIs
+* Flows
 
-
-Components
-----------
-
-This outlines the technical components that support the Corda DID method.
-All components are contained in this repository as Gradle _sub-modules_.
-All components are Kotlin applications.
-
-### Corda DID API ([`did-api`](did-api))
+### Corda DID REST APIs ([`did-api`](did-api))
 
 The DID API is the server component to be deployed by consortium member nodes in conjunction with the CorDapp.
 It provides Method specific APIs to _create_, _read_, _update_ or _delete_ DID documents.
@@ -410,6 +405,66 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 }'
 ```
 
+### Corda DID Flows ([`did-witness-flows`](did-witness-flows))
+The DID Flows is the CorDapp component to be deployed by consortium member nodes. It provides Method specific flows to create, read, update or delete DID documents.
+The DID flows can be invoked from RPC client or from another flows.
+
+##### Create (`CreateDidFlow`)
+This is used to create a new DID.
+Proof of ownership of the document has to be presented in the envelope as outlined in the API format.
+
+* invoke CreateDidFlow via RPC:
+```rpc.startFlowDynamic(CreateDidFlow::class.java, envelope)```
+
+* invoke CreateDidFlow from another flow:  
+```subFlow(CreateDidFlow(envelope))```
+
+where envelope is an instance of type `DidEnvelope`
+
+##### Read (`FetchDidDocumentFlow`)
+This is used to fetch a did document from node's local vault. It returns an instance of type `DidDocument`
+
+* invoke FetchDidDocumentFlow via RPC:
+```rpc.startFlowDynamic(FetchDidDocumentFlow::class.java, linearId)```
+
+* invoke FetchDidDocumentFlow from another flow:  
+```subFlow(FetchDidDocumentFlow(linearId))```
+
+where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the did.
+
+There might be a case where a node which is not part of the DID Business Network may request DID document from one of the DID consortium nodes.
+In such situations, nodes can invoke `FetchDidDocumentFromRegistryNodeFlow` defined in ([`did-flows`](did-flows)) module.
+
+* invoke FetchDidFetchDidDocumentFromRegistryNodeFlowDocumentFlow via RPC:
+```rpc.startFlowDynamic(FetchDidDocumentFromRegistryNodeFlow::class.java, didRegistryNode, linearId)```
+
+* invoke FetchDidDocumentFromRegistryNodeFlow from another flow:  
+```subFlow(FetchDidDocumentFromRegistryNodeFlow(didRegistryNode, linearId))```
+
+where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the did && didRegistryNode is an instance of type `Party` representing the did consortium node. 
+
+##### Update (`UpdateDidFlow`)
+This is used to update an existing DID.
+
+* invoke UpdateDidFlow via RPC:
+```rpc.startFlowDynamic(UpdateDidFlow::class.java, envelope)```
+
+* invoke UpdateDidFlow from another flow:  
+```subFlow(UpdateDidFlow(envelope))```
+
+where envelope is an instance of type `DidEnvelope`
+
+##### Delete (`DeleteDidFlow`)
+This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It only updates the DidState with status `Deleted` 
+
+* invoke DeleteDidFlow via RPC:    
+```rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)```
+
+* invoke DeleteDidFlow from another flow:  
+```subFlow(DeleteDidFlow(instruction, did))```
+
+where instruction is the instruction JSON object (in string form) containing signatures of did-owner on the did-document to be deactivated
+&& did is the did to be deleted.
 
 #### Caveats
 
