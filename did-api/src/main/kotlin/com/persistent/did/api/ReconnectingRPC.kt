@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
  *
  * *This class is not a stable API. Any project that wants to use it, must copy and paste it.*
  */
-// TODO moritzplatt 2019-07-16 -- remove unused methods and constructors
+
 class ReconnectingCordaRPCOps private constructor(
 		private val reconnectingRPCConnection: ReconnectingRPCConnection,
 		private val observersPool: ExecutorService,

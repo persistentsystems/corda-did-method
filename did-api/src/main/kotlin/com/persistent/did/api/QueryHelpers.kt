@@ -15,7 +15,7 @@ import net.corda.did.DidDocument
  * */
 class QueryUtil(private val proxy: CordaRPCOps) {
 
-	// TODO moritzplatt 2019-07-16 -- this should return a nullable instead of an empty string if not found
+
 	/**
 	 * @param[linearId] Takes uuid as input.
 	 * @return Raw DID document.
@@ -24,7 +24,7 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 		val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
 		val results = proxy.vaultQueryBy<DidState>(criteria).states
 
-		// TODO moritzplatt 2019-07-16 -- use `let` and elvis operator instead of forcing NPE through `!!`
+
 
 		val responseState = results.let {
 			if (it.size != 1) {
@@ -46,7 +46,7 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 	 * @param[linearId] Takes uuid as input.
 	 * @return  DidDocument class object.
 	 * */
-	// TODO moritzplatt 2019-07-16 -- should not throw an exception but return null if not found
+
 	fun getCompleteDIDDocumentByLinearId(linearId: String): DidDocument? {
 		val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
 		val results = proxy.vaultQueryBy<DidState>(criteria).states
