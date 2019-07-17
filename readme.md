@@ -255,11 +255,10 @@ This format is chosen to circumvent issues with canonical document representatio
 
 This is used to create a new DID.
 Proof of ownership of the document has to be presented in the envelope.
-<br /> 
-<br /> 
+
 Payload includes
-- The document consisting of the encoded public key,type of public key,controller of public key
-- The instruction consisting of action to perform (create), encoded signature and type of signature
+- The document consisting of the encoded public key,type of public key,controller of public key.
+- The instruction consisting of action to perform (create), encoded signature on the document and type of signature.
 
 Instruction:
 
@@ -372,10 +371,9 @@ Should no previous update be recorded, the update will only be successful if the
 The calculation of the current time is done by the DID owner without verification of its accuracy by the consortium.
 This is appropriate since this field is only used to determine a before/after relationship.
 Consumers of the DID document need to take into account that this value is potentially inaccurate.
-<br /> 
-<br /> 
+
 Payload includes
-- The document consisting of the new encoded public key,type of public key,controller of public key
+- The document consisting of the new encoded public key,type of public key,controller of public key.
 - The instruction consisting of action to perform (update), encoded signature(s) on this document using all private keys(including the one being added) assosiated with the public keys in the document and type of signature.
 
 HTTP request:
@@ -415,11 +413,18 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 }'
 ```
 
+ - The API will respond with status `200` if update is successful.
+ - The API will respond with status `404` for a request with an unknown ID.
+ - The API will respond with status `400` for other cases of incorrect payload(mismatched signatures,malformed document,instruction etc.).
+ 
+ 
 
 ##### Delete (`DELETE {did}`)
 
 This method is used to disable the identity on the ledger.Once deleted the identity cannot be used again.Delete accepts only instruction as payload , the instruction contains signature for the public on the latest DID document from the ledger.
 
+Payload includes:
+- The instruction consisting of action to perform (delete), encoded signature on the latest DID document on the ledger using all private keys assosiated with public keys present in the document and type of the signature.
 
 HTTP request:
 
@@ -438,6 +443,11 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
   ]
 }'
 ```
+
+
+ - The API will respond with status `200` if delete is successful.
+ - The API will respond with status `404` for a request with an unknown ID.
+ - The API will respond with status `400` for other cases of incorrect payload(mismatched signatures,malformed instruction etc.).
 
 ### Corda DID Flows ([`did-witness-flows`](did-witness-flows))
 The DID Flows is the CorDapp component to be deployed by consortium member nodes. It provides Method specific flows to create, read, update or delete DID documents.
