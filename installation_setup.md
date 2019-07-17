@@ -1,5 +1,4 @@
-
-##Setup
+## Setup
 ### Pre-requisites
 Please refer to the [set up](https://docs.corda.net/getting-set-up.html) instructions.
 
