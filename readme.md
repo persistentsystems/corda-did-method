@@ -2,8 +2,6 @@ Corda DID Method Proof-of-Concept
 =================================
 
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
-Additionally, it contains a [Universal Resolver Driver](https://github.com/decentralized-identity/universal-resolver) following the [Extensible Driver Architecture](https://medium.com/decentralized-identity/a-universal-resolver-for-self-sovereign-identifiers-48e6b4a5cc3c) paradigm.
-
 ![Corda DID System Architecture](architecture.svg)
 
 The system architecture outlined above illustrates the high level components without going into implementation details.
@@ -21,10 +19,6 @@ Once this validation was successful, DID documents will be replicated from the _
 Witness nodes will perform the a cryptographic integrity check as part of the [contract](https://docs.corda.net/key-concepts-contracts.html) underpinning this transaction.
 
 Once replicated, anyone with access to one of the consortium nodes can request the DID document by querying the REST API of an arbitrary node for the document ID.
-Systems that aim to support multiple DID methods including the Corda DID method can utilise a [Universal Resolver](https://github.com/decentralized-identity/universal-resolver) that uses the Corda driver.
-The driver will translate the request in the universal format to the Corda specific format.
-It is also aware of the consortium nodes for a given supported environment.
-The driver thus exclusively requires the id as input.
 
 Corda DID Format
 ----------------
