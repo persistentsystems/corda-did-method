@@ -21,10 +21,8 @@ open class Server
  * @param[args] Arguments passed to the spring boot server during initialization
  * */
 fun main(args: Array<String>) {
-
 	val app = SpringApplication(Server::class.java)
 	app.setBannerMode(Banner.Mode.OFF)
 	app.isWebEnvironment = true
 	app.run(*args)
-
 }

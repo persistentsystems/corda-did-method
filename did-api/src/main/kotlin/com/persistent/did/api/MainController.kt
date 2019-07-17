@@ -11,9 +11,10 @@ import net.corda.core.messaging.startFlow
 import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
+import net.corda.did.CordaDid
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,9 +30,9 @@ import java.util.concurrent.Executors
 
 /**
  *  A Spring Boot Server API controller for interacting with the node via RPC.
- *
  */
 
+@Suppress("unused")
 @RestController
 @RequestMapping("/")
 
@@ -63,9 +64,12 @@ class MainController(rpc: NodeRPCConnection) {
 	 * @param[instruction] Contains the encoded signature on the document as well as the action to be performed by the backend create,update,delete etc.
 	 * @return A json response with a status code of 200 if create operation was a success,409 if conflict, 400 due to any other error in the sent parameters.
 	 * */
-	@PutMapping(value = "{did}",
-			produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
-	fun createDID(@PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String, @RequestPart("document") document: String): DeferredResult<ResponseEntity<Any?>> {
+	@PutMapping(value = ["{did}"], produces = [APPLICATION_JSON_VALUE], consumes = [MULTIPART_FORM_DATA_VALUE])
+	fun createDID(
+			@PathVariable(value = "did") did: String,
+			@RequestPart("instruction") instruction: String,
+			@RequestPart("document") document: String
+	): DeferredResult<ResponseEntity<Any?>> {
 		/**
 		 * Creates an instance of Deferred Result, this will be used to send responses from tasks running in separate threads
 		 *
@@ -81,14 +85,20 @@ class MainController(rpc: NodeRPCConnection) {
 			 *  Checks if the provided 'did' is in the correct format.
 			 *
 			 * */
-			net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
+			CordaDid.parseExternalForm(did).onFailure {
+				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()))
+				return apiResult
+			}
 
 			/**
 			 * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
 			 *
 			 * */
 			val envelopeVerified = envelope.validateCreation()
-			envelopeVerified.onFailure { apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason));return apiResult }
+			envelopeVerified.onFailure {
+				apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason))
+				return apiResult
+			}
 
 			/**
 			 * Passing the generated envelope as a parameter to the CreateDidFlow.
@@ -104,36 +114,27 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			executorService.submit {
 				try {
-
 					val result = flowHandler.use { it.returnValue.getOrThrow() }
 					apiResult.setResult(ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
 				} catch (e: IllegalArgumentException) {
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
-
 				} catch (e: DIDDeletedException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.CONFLICT))
 				} catch (e: DIDAlreadyExistException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.CONFLICT).toResponseObj(), HttpStatus.CONFLICT))
-
 				} catch (e: Exception) {
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
-
 			}
-
 			return apiResult
-
 		} catch (e: Exception) {
 			logger.error(e.message)
 			apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 			return apiResult
 		}
-
 	}
-/*
-* Fetch DID document
-* */
+
 	/**
 	 * Method to fetch a DID from the Corda ledger via REST
 	 *
@@ -142,39 +143,32 @@ class MainController(rpc: NodeRPCConnection) {
 	 * */
 	@GetMapping("{did}", produces = [APPLICATION_JSON_VALUE])
 	fun fetchDIDDocument(@PathVariable(value = "did") did: String): ResponseEntity<Any?> {
-
 		try {
 			/**
 			 * Converts the "did" from external form to uuid form else returns an error
 			 *
 			 * */
-			val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()) }
+			val uuid = CordaDid.parseExternalForm(did).onFailure {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj())
+			}
 
 			builder {
 				/**
 				 * Query the ledger using the uuid and return raw document else return an error.
-				 *
 				 * */
 				val didJson = queryUtils.getDIDDocumentByLinearId(uuid.uuid.toString())
-				if (didJson.isEmpty()) {
+				if (didJson.isNullOrEmpty()) {
 					val response = ApiResponse(APIMessage.NOT_FOUND)
 					return ResponseEntity(response.toResponseObj(), HttpStatus.NOT_FOUND)
-
 				}
-
 				return ResponseEntity.ok().body(didJson)
 			}
 		} catch (e: IllegalArgumentException) {
 			logger.error(e.toString())
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj())
-
 		} catch (e: IllegalStateException) {
 			logger.error(e.toString())
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj())
-
-		} catch (e: DIDDeletedException) {
-			return ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND)
-
 		} catch (e: Exception) {
 			logger.error(e.toString())
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse(e.message).toResponseObj())
@@ -189,9 +183,12 @@ class MainController(rpc: NodeRPCConnection) {
 	 * @param[instruction] Contains the encoded signature on the document as well as the action to be performed by the backend create,update,delete etc.
 	 * @return A json response with a status code of 200 if update operation was a success,404 if not found, 400 due to any other error in the sent parameters.
 	 * */
-	@PostMapping(value = "{did}",
-			produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
-	fun updateDID(@PathVariable(value = "did") did: String, @RequestParam("instruction") instruction: String, @RequestParam("document") document: String): DeferredResult<ResponseEntity<Any?>> {
+	@PostMapping(value = ["{did}"], produces = [APPLICATION_JSON_VALUE], consumes = [MULTIPART_FORM_DATA_VALUE])
+	fun updateDID(
+			@PathVariable(value = "did") did: String,
+			@RequestParam("instruction") instruction: String,
+			@RequestParam("document") document: String
+	): DeferredResult<ResponseEntity<Any?>> {
 		/**
 		 * Creates an instance of Deferred Result, this will be used to send responses from tasks running in separate threads
 		 *
@@ -207,7 +204,9 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Converts the "did" from external form to uuid form else returns an error
 			 *
 			 * */
-			val uuid = net.corda.did.CordaDid.parseExternalForm(did).onFailure { apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult }
+			val uuid = CordaDid.parseExternalForm(did).onFailure {
+				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult
+			}
 
 			/**
 			 * Perform a check at the API layer to make sure that the data provided meets the criteria for update,before passing it to the flow.
@@ -215,10 +214,14 @@ class MainController(rpc: NodeRPCConnection) {
 			 * */
 			try {
 				val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.uuid.toString())
+				if (didJson == null) {
+					val response = ApiResponse(APIMessage.NOT_FOUND)
+					apiResult.setErrorResult(ResponseEntity(response.toResponseObj(), HttpStatus.NOT_FOUND))
+					return apiResult
+				}
 				val envelopeVerified = envelope.validateModification(didJson)
 				envelopeVerified.onFailure { apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason));return apiResult }
 			} catch (e: NullPointerException) {
-
 				apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.NOT_FOUND).toResponseObj(), HttpStatus.NOT_FOUND))
 				return apiResult
 			} catch (e: DIDDeletedException) {
@@ -254,12 +257,8 @@ class MainController(rpc: NodeRPCConnection) {
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
-
 			}
-
-
 			return apiResult
-
 		} catch (e: Exception) {
 			logger.error(e.message)
 			apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
@@ -274,9 +273,11 @@ class MainController(rpc: NodeRPCConnection) {
 	 * @param[instruction] Contains the encoded signature on the latest DID document as well as the action to be performed by the backend (delete).
 	 * @return A json response with a status code of 200 if delete operation was a success,404 if not found , 400 due to any other error in the sent parameters.
 	 * */
-	@DeleteMapping(value = "{did}",
-			produces = arrayOf(MediaType.APPLICATION_JSON_VALUE), consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
-	fun deleteDID(@PathVariable(value = "did") did: String, @RequestPart("instruction") instruction: String): DeferredResult<ResponseEntity<Any?>> {
+	@DeleteMapping(value = ["{did}"], produces = [APPLICATION_JSON_VALUE], consumes = [MULTIPART_FORM_DATA_VALUE])
+	fun deleteDID(
+			@PathVariable(value = "did") did: String,
+			@RequestPart("instruction") instruction: String
+	): DeferredResult<ResponseEntity<Any?>> {
 		val apiResult = DeferredResult<ResponseEntity<Any?>>()
 		try {
 			/**
@@ -292,27 +293,19 @@ class MainController(rpc: NodeRPCConnection) {
 			executorService.submit {
 				try {
 					val result = flowHandler.use { it.returnValue.getOrThrow() }
-
 					apiResult.setResult(ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
 				} catch (e: IllegalArgumentException) {
-
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
-
 				} catch (e: DIDNotFoundException) {
-
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.NOT_FOUND).toResponseObj(), HttpStatus.NOT_FOUND))
 				} catch (e: DIDDeletedException) {
-
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
 				} catch (e: Exception) {
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}
-
 			}
-
 			return apiResult
-
 		} catch (e: Exception) {
 			logger.error(e.message)
 			apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))

@@ -41,7 +41,7 @@ enum class APIMessage(val message: String) {
 	/** Error message if no signature is provided in the instruction*/
 	NO_SIGNATURE("No signature was provided for target."),
 	/** Error message if signature are signed with different suite from the keys provided*/
-	CRYPTOSUITE_MISMATCH("Signing key suite and signature are different."),
+	CRYPTO_SUITE_MISMATCH("Signing key suite and signature are different."),
 	/** Error message if no signature is provided for any of the keys*/
 	NO_MATCHING_SIGNATURE("No signature is provided for any of the keys."),
 	/** Error message if instruction is missing a signature for the target*/
@@ -56,5 +56,4 @@ enum class APIMessage(val message: String) {
 	INCORRECT_FORMAT("The DID requested is not in the correct format."),
 	/** Error message if DID provided as request parameter is different from the one in document body*/
 	MISMATCH_DID("There is a mismatch in the DID provided in request parameter and one in document")
-
 }
