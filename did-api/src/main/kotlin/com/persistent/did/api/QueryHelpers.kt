@@ -15,23 +15,30 @@ import net.corda.did.DidDocument
  * */
 class QueryUtil(private val proxy: CordaRPCOps) {
 
+
 	/**
 	 * @param[linearId] Takes uuid as input.
 	 * @return Raw DID document.
 	 * */
-	fun getDIDDocumentByLinearId(linearId: String): String {
+	fun getDIDDocumentByLinearId(linearId: String): String? {
 		val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
 		val results = proxy.vaultQueryBy<DidState>(criteria).states
-		try {
-			val responseState = results.singleOrNull()!!.state
-			if (responseState.data.status == DidStatus.DELETED) {
-				throw  DIDDeletedException(APIMessage.DID_DELETED.message)
-			}
-			return responseState.data.envelope.rawDocument
 
-		} catch (e: NullPointerException) {
-			return ""
+
+
+		val responseState = results.let {
+			if (it.size != 1) {
+				return null
+			} else {
+				val result = it.single()
+				result.state
+			}
 		}
+
+		if (responseState.data.status == DidStatus.DELETED) {
+			return null
+		}
+		return responseState.data.envelope.rawDocument
 
 	}
 
@@ -39,12 +46,20 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 	 * @param[linearId] Takes uuid as input.
 	 * @return  DidDocument class object.
 	 * */
-	fun getCompleteDIDDocumentByLinearId(linearId: String): DidDocument {
+
+	fun getCompleteDIDDocumentByLinearId(linearId: String): DidDocument? {
 		val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
 		val results = proxy.vaultQueryBy<DidState>(criteria).states
-		val responseState = results.singleOrNull()!!.state
+		val responseState = results.let {
+			if (it.size != 1) {
+				return null
+			} else {
+				val result = it.single()
+				result.state
+			}
+		}
 		if (responseState.data.status == DidStatus.DELETED) {
-			throw  DIDDeletedException(APIMessage.DID_DELETED.message)
+			return null
 		}
 		return responseState.data.envelope.document
 

@@ -27,21 +27,17 @@ open class NodeRPCConnection(
 		@Value("\${$CORDA_NODE_HOST}") private val host: String,
 		@Value("\${$CORDA_USER_NAME}") private val username: String,
 		@Value("\${$CORDA_USER_PASSWORD}") private val password: String,
-		@Value("\${$CORDA_RPC_PORT}") private val rpcPort: Int) {
+		@Value("\${$CORDA_RPC_PORT}") private val rpcPort: Int
+) {
 
-	lateinit var rpcConnection: ReconnectingCordaRPCOps
-		private set
-	lateinit var proxy: ReconnectingCordaRPCOps
-		private set
+	lateinit var rpcConnection: ReconnectingCordaRPCOps private set
+	lateinit var proxy: ReconnectingCordaRPCOps private set
 
 	/** Construct a node RPC connection object */
 	@PostConstruct
 	fun initialiseNodeRPCConnection() {
-
 		val rpcAddress = NetworkHostAndPort(host, rpcPort)
 		rpcConnection = ReconnectingCordaRPCOps(rpcAddress, username, password)
 		proxy = rpcConnection
-
 	}
-
 }

@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit
  *
  * *This class is not a stable API. Any project that wants to use it, must copy and paste it.*
  */
+
 class ReconnectingCordaRPCOps private constructor(
 		private val reconnectingRPCConnection: ReconnectingRPCConnection,
 		private val observersPool: ExecutorService,
@@ -68,17 +69,7 @@ class ReconnectingCordaRPCOps private constructor(
 			observersPool ?: Executors.newCachedThreadPool(),
 			observersPool != null)
 
-	constructor(
-			nodeHostAndPorts: List<NetworkHostAndPort>,
-			username: String,
-			password: String,
-			sslConfiguration: ClientRpcSslOptions? = null,
-			classLoader: ClassLoader? = null,
-			observersPool: ExecutorService? = null
-	) : this(
-			ReconnectingRPCConnection(nodeHostAndPorts, username, password, sslConfiguration, classLoader),
-			observersPool ?: Executors.newCachedThreadPool(),
-			observersPool != null)
+
 
 	private companion object {
 		private val log = contextLogger()
@@ -128,15 +119,7 @@ class ReconnectingCordaRPCOps private constructor(
 	 * [runFlow] - starts a flow and returns the [FlowHandle].
 	 * [hasFlowCompleted] - Runs a vault query and is able to recreate the result of the flow.
 	 */
-	fun <T> runFlowAndReturnResultWithLogicalRetry(runFlow: (CordaRPCOps) -> FlowHandle<T>, hasFlowCompleted: (CordaRPCOps) -> T?, timeout: Duration = 4.seconds): T {
-		return try {
-			runFlow(this).returnValue.get()
-		} catch (e: CouldNotStartFlowException) {
-			log.error("Couldn't start flow: ${e.message}")
-			Thread.sleep(timeout.toMillis())
-			hasFlowCompleted(this) ?: runFlowAndReturnResultWithLogicalRetry(runFlow, hasFlowCompleted, timeout)
-		}
-	}
+
 
 	/**
 	 * Helper class useful for reconnecting to a Node.
@@ -358,7 +341,7 @@ class ReconnectingCordaRPCOps private constructor(
 					}
 					initialFeed.copy(updates = observable)
 				}
-				// TODO - add handlers for Observable return types.
+			// TODO - add handlers for Observable return types.
 				else                 -> result
 			}
 		}

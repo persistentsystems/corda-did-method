@@ -11,7 +11,7 @@ On a high level, persistence of DID documents will be provided by a _consortium_
 The Corda DID method allows targeting three networks by specification: [The Corda Network](https://corda.network/) (UAT and Live [environments](https://corda.network/policy/environments.html)) as well as [Testnet](https://docs.corda.net/head/corda-testnet-intro.html).
 
 End users that aim to _create_, _read_, _update_ or _delete_ DID documents can do so by interacting with a trusted node of their choosing.
-The API provided for interaction is exposing REST endpoints over HTTPS, using a JSON based envelope format closely aligned with the JSON-LD examples found in the [draft community report](https://w3c-ccg.github.io/did-spec/#dfn-did-document).
+The API provided for interaction is exposing REST endpoints over HTTP, using a JSON based envelope format closely aligned with the JSON-LD examples found in the [draft community report](https://w3c-ccg.github.io/did-spec/#dfn-did-document).
 
 When users interact with consortium member nodes, their requests will be handled by a _web server_ that transforms the requests into a [format suitable for Corda](https://docs.corda.net/clientrpc.html).
 The web server component is running in a process independent of Corda.
@@ -21,10 +21,6 @@ Once this validation was successful, DID documents will be replicated from the _
 Witness nodes will perform the a cryptographic integrity check as part of the [contract](https://docs.corda.net/key-concepts-contracts.html) underpinning this transaction.
 
 Once replicated, anyone with access to one of the consortium nodes can request the DID document by querying the REST API of an arbitrary node for the document ID.
-Systems that aim to support multiple DID methods including the Corda DID method can utilise a [Universal Resolver](https://github.com/decentralized-identity/universal-resolver) that uses the Corda driver.
-The driver will translate the request in the universal format to the Corda specific format.
-It is also aware of the consortium nodes for a given supported environment.
-The driver thus exclusively requires the id as input.
 
 Corda DID Format
 ----------------
@@ -307,7 +303,7 @@ Response:
 
 ##### Read (`GET {did}`)
 
-A simple `GET` request specifying the id as fragment is used to retrieve a DID.
+A simple `GET` request specifying the id as fragment is used to retrieve a DID document.The DID document contains a list of public keys, the type of the public key,information about encodings used on those public keys and the controller of each public key.
 
 HTTP Request:
 
@@ -335,6 +331,7 @@ Response:
 
  - The API will respond with status `200` for a request with a known ID.
  - The API will respond with status `404` for a request with an unknown ID.
+ - The API will respond with status `400` for a request with an ID with incorrect format.
 
 ##### Update (`POST {did}`)
 
@@ -385,6 +382,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
 
 ##### Delete (`DELETE {did}`)
+
+This method is used to disable the identity on the ledger.Once deleted the identity cannot be used again.Delete accepts only instruction as payload , the instruction contains signature for the public on the latest DID document from the ledger.
 
 
 HTTP request:

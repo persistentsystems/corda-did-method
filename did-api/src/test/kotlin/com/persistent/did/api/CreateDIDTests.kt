@@ -3,7 +3,6 @@
 *
 * */
 
-
 package com.persistent.did.api
 
 import net.corda.core.crypto.sign
