@@ -11,8 +11,6 @@ import net.corda.core.node.ServiceHub
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria
 
-// methods just as well
-
 /**
  * returns a notary from cordapp-config file or throws an exception if notary not found in the nodes network map cache.
  *

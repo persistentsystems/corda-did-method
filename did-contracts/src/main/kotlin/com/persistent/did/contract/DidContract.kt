@@ -5,6 +5,8 @@ import com.natpryce.map
 import com.natpryce.onFailure
 import com.persistent.did.contract.DidContract.Commands
 import com.persistent.did.contract.DidContract.Commands.Create
+import com.persistent.did.contract.DidContract.Commands.Delete
+import com.persistent.did.contract.DidContract.Commands.Update
 import com.persistent.did.contract.DidContract.Companion.DID_CONTRACT_ID
 import com.persistent.did.state.DidState
 import net.corda.core.contracts.CommandData
@@ -40,10 +42,10 @@ open class DidContract : Contract {
 		val command = tx.commandsOfType(Commands::class.java).single()
 
 		when (command.value) {
-			is Create          -> verifyDidCreate(tx, command.signers.toSet())
-			is Commands.Update -> verifyDidUpdate(tx, command.signers.toSet())
-			is Commands.Delete -> verifyDidDelete(tx, command.signers.toSet())
-			else               -> throw IllegalArgumentException("Unrecognized command")
+			is Create -> verifyDidCreate(tx, command.signers.toSet())
+			is Update -> verifyDidUpdate(tx, command.signers.toSet())
+			is Delete -> verifyDidDelete(tx, command.signers.toSet())
+			else      -> throw IllegalArgumentException("Unrecognized command")
 		}
 
 		// TODO
@@ -84,24 +86,22 @@ open class DidContract : Contract {
 	 */
 	open fun verifyDidCreate(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
 
-		val DIDState = tx.outputsOfType<DidState>().single()
+		val didState = tx.outputsOfType<DidState>().single()
 		"DID Create transaction should have zero inputs" using (tx.inputs.isEmpty())
 		"DID Create transaction should have only one output" using (tx.outputs.size == 1)
 		// TODO need to discuss this
 
-		"DID Create transaction must be signed by the DID originator" using (setOfSigners.size == 1 && setOfSigners.contains(DIDState.originator.owningKey))
+		"DID Create transaction must be signed by the DID originator" using (setOfSigners.size == 1 && setOfSigners.contains(didState.originator.owningKey))
 
 		// validate did envelope
+		"the envelope presented is must be valid to create" using (didState.envelope.validateCreation() is Success)
 
-		"the envelope presented is must be valid to create" using (DIDState.envelope.validateCreation() is Success)
+		didState.envelope.validateCreation().map { require(it == Unit) }.onFailure { throw IllegalArgumentException("Invalid Did envelope $it") }
+		"Status of newly created did must be 'VALID'" using (didState.isActive())
+		"Originator and witness nodes should be added to the participants list" using (didState.participants.containsAll(didState.witnesses + didState.originator))
 
-
-		DIDState.envelope.validateCreation().map { require(it == Unit) }.onFailure { throw IllegalArgumentException("Invalid Did envelope $it") }
-		"Status of newly created did must be 'VALID'" using (DIDState.isValid())
-		"Originator and witness nodes should be added to the participants list" using (DIDState.participants.containsAll(DIDState.witnesses + DIDState.originator))
-
-		val UUID = DIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch UUID from did") }.uuid
-		"LinearId of the DidState must be equal to the UUID component of did" using (UUID == DIDState.linearId.id)
+		val UUID = didState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch UUID from did") }.uuid
+		"LinearId of the DidState must be equal to the UUID component of did" using (UUID == didState.linearId.id)
 
 	}
 
@@ -118,8 +118,8 @@ open class DidContract : Contract {
 		// TODO need to discuss on the signature requirement. How many nodes from consortium should be signing this transaction?
 
 		"Failed to update DID document" using (newDIDState.envelope.validateModification(oldDIDState.envelope.document) is Success)
-		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isValid())
-		"Status of the updated DID must be 'VALID'" using (newDIDState.isValid())
+		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isActive())
+		"Status of the updated DID must be 'VALID'" using (newDIDState.isActive())
 
 		val oldDid = oldDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
 		val newDid = newDIDState.envelope.document.id().onFailure { throw IllegalArgumentException("Unable to fetch id from document") }
@@ -140,23 +140,18 @@ open class DidContract : Contract {
 	 * @param tx The [LedgerTransaction]
 	 * @param setOfSigners list of signers for Delete DID transaction
 	 */
-
 	open fun verifyDidDelete(tx: LedgerTransaction, setOfSigners: Set<PublicKey>) {
-
 		val oldDIDState = tx.inputsOfType<DidState>().single()
 		val newDIDState = tx.outputsOfType<DidState>().single()
 
 		// validate modification
 
 		"Failed to delete DID document" using (newDIDState.envelope.validateDeletion(oldDIDState.envelope.document) is Success)
-		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isValid())
-		"Status of the updated DID must be 'INVALID'" using (!newDIDState.isValid())
+		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isActive())
+		"Status of the updated DID must be 'INVALID'" using (!newDIDState.isActive())
 
 		val oldDidKeys = oldDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }
 		val newDidKeys = newDIDState.envelope.document.publicKeys().onFailure { throw java.lang.IllegalArgumentException("Unable to fetch public keys from document") }
-
-
-
 
 		"Delete transaction should not change the public Keys in DID document" using (oldDidKeys == newDidKeys)
 

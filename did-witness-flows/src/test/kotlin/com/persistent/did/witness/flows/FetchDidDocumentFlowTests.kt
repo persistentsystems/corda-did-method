@@ -21,7 +21,7 @@ class FetchDidDocumentFlowTests : AbstractFlowTestUtils() {
 		// query for did
 		val flow = TestInitiator(UUID)
 		val future = originator.startFlow(flow)
-		assertEquals(future.getOrThrow().document1, originalDocument)
+		assertEquals(future.getOrThrow().didDocument, originalDocument)
 	}
 
 	@Test

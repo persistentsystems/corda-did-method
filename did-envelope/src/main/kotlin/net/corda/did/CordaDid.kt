@@ -15,10 +15,11 @@ import net.corda.did.Network.Testnet
 import java.net.URI
 import java.util.UUID
 
+// TODO moritzplatt 2019-07-16 -- double check KDoc method description and `did` description seem incorrect
 /**
  * The Corda notation for did
  *
- * @property did The instruction JSON object containing signatures of did-owner on the did-document to be deactivated.
+ * @property did The did .
  * @property network the target corda-network.
  * @property uuid the did to be deleted.
  */
@@ -44,20 +45,21 @@ class CordaDid(
 		 */
 		fun parseExternalForm(externalForm: String): Result<CordaDid, CordaDidFailure> {
 			val did = URI.create(externalForm)
-			if (did.scheme != "did")
-				return Failure(CordaDidFailure.CordaDidValidationFailure.InvalidDidSchemeFailure(did.scheme))
 
+			if (did.scheme != "did")
+				return Failure(InvalidDidSchemeFailure(did.scheme))
+
+			// TODO moritzplatt 2019-07-16 -- this should take the current network running on into consideration
 			val regex = """did:corda:(tcn|tcn-uat|testnet):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
 
-			val (n, u) = regex.find(externalForm)?.destructured
-					?: return Failure(CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure())
+			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(MalformedCordaDidFailure())
 
 			val network = n.toNetwork().onFailure { return it }
 
 			val uuid = try {
 				UUID.fromString(u)
 			} catch (e: IllegalArgumentException) {
-				return Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaDidUUIDFailure())
+				return Failure(InvalidCordaDidUUIDFailure())
 			}
 
 			return Success(CordaDid(did, network, uuid))
@@ -74,7 +76,7 @@ class CordaDid(
 			"tcn"     -> Success(CordaNetwork)
 			"tcn-uat" -> Success(CordaNetworkUAT)
 			"testnet" -> Success(Testnet)
-			else      -> Failure(CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure())
+			else      -> Failure(InvalidCordaNetworkFailure())
 		}
 	}
 }

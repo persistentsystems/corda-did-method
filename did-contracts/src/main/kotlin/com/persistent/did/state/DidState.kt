@@ -1,5 +1,6 @@
 package com.persistent.did.state
 
+import com.natpryce.onFailure
 import com.natpryce.valueOrNull
 import com.persistent.did.contract.DidContract
 import net.corda.core.contracts.BelongsToContract
@@ -33,33 +34,32 @@ data class DidState(
 ) : LinearState, QueryableState {
 
 	/**
-	 *
 	 * @param schema [MappedSchema] object
 	 */
 	override fun generateMappedObject(schema: MappedSchema): PersistentState {
-		val did = this.envelope.document.id().valueOrNull()!!.toExternalForm()
+
+		val did = envelope.document.id().onFailure { throw IllegalArgumentException("Invalid did format")  }
 		return when (schema) {
 			is DidStateSchemaV1 -> DidStateSchemaV1.PersistentDidState(
-					originator = this.originator,
-					didExternalForm = did,
-					status = this.status,
-					linearId = this.linearId.id
+					originator = originator,
+					didExternalForm = did.toExternalForm(),
+					status = status,
+					linearId = linearId.id
 			)
 			else                -> throw IllegalArgumentException("Unrecognised schema $schema")
 		}
 	}
 
 	override fun supportedSchemas() = listOf(DidStateSchemaV1)
-	fun isValid() = status == DidStatus.ACTIVE
+
+	fun isActive() = status == DidStatus.ACTIVE
 }
 
 /**
- *
  * Enum to represent the status of [DidState]
  */
 @CordaSerializable
 enum class DidStatus {
-
 	ACTIVE,
 	DELETED
 }

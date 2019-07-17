@@ -126,7 +126,7 @@ class FetchDidDocumentFromRegistryNodeFlowTests {
 		mockNetwork.waitQuiescent()
 		val flow = TestInitiator(originator.info.legalIdentities.first(), UUID)
 		val future = originator.startFlow(flow)
-		assertEquals(future.getOrThrow().document1, originalDocument)
+		assertEquals(future.getOrThrow().didDocument, originalDocument)
 	}
 
 	@Test

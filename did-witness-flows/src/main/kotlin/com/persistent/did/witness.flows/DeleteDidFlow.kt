@@ -39,6 +39,7 @@ import net.corda.did.DidInstruction
 
 class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<SignedTransaction>() {
 
+	@Suppress("ClassName")
 	companion object {
 		object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on new DidState.")
 		object VERIFYING_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")

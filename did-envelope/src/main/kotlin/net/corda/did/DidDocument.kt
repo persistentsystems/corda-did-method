@@ -30,10 +30,12 @@ import javax.xml.bind.DatatypeConverter
  * that the document tree these operations work on will not be stored in a field to keep serialisation size small. This
  * means that usage of the convenience methods has a high computational overhead.
  *
- * @property document1 String representation of did document.
+ * @property didDocument String representation of did document json as specified in the w3-spec.
+ * Ref: https://w3c-ccg.github.io/did-spec/#did-documents
  */
+// TODO moritzplatt 2019-07-16 -- use descriptive variable names. what does `document1` hold?
 @CordaSerializable
-data class DidDocument(val document1: String) : JsonBacked(document1) {
+data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 
 	/**
 	 * Returns the id from json did document
@@ -43,9 +45,13 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 	fun id(): DidDocumentResult<CordaDid> {
 		val id = json.getMandatoryString("id").mapFailure {
 			InvalidDocumentJsonFailure(it)
-		}.onFailure { return it }
+		}.onFailure {
+			return it
+		}
 
-		val cordaDID = CordaDid.parseExternalForm(id).onFailure { return Failure(DidDocumentFailure.InvalidDidFailure(it.reason)) }
+		val cordaDID = CordaDid.parseExternalForm(id).onFailure {
+			return Failure(InvalidDidFailure(it.reason))
+		}
 
 		return Success(cordaDID)
 	}
@@ -81,6 +87,7 @@ data class DidDocument(val document1: String) : JsonBacked(document1) {
 			}.onFailure { return it }
 
 			// TODO moritzplatt 2019-02-13 -- Support other encodings
+			// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
 			val value = key.getMandatoryBase58Bytes("publicKeyBase58").mapFailure {
 				InvalidDocumentJsonFailure(it)
 			}.onFailure { return it }

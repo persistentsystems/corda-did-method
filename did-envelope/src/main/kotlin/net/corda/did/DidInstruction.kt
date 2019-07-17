@@ -95,7 +95,7 @@ private fun String.toAction(): DidInstructionResult<Action> = when (this) {
 	"create" -> Success(Create)
 	"update" -> Success(Update)
 	"delete" -> Success(Delete)
-	else     -> Failure(DidInstructionFailure.UnknownActionFailure(this))
+	else     -> Failure(UnknownActionFailure(this))
 }
 
 @Suppress("UNUSED_PARAMETER", "unused")

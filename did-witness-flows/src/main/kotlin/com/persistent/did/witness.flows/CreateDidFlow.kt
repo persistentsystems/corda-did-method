@@ -39,6 +39,7 @@ import net.corda.did.DidEnvelope
 
 class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
+	@Suppress("ClassName")
 	companion object {
 		object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on new DidState.")
 		object VERIFYING_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
@@ -83,12 +84,11 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
 		val config = serviceHub.getAppContext().config
 		val nodes = config.get("nodes") as ArrayList<*>
+		// TODO moritzplatt 2019-07-16 -- rewrite as `nodes.map { ... }`
 		val witnessNodesList = arrayListOf<Party>()
-		for (any in nodes.toSet()) {
-			witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(any.toString()))!!)
-		}
-
+		nodes.map { witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(it.toString()))!!) }
 		val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
+
 		// Generate an unsigned transaction.
 		val txCommand = Command(DidContract.Commands.Create(), listOf(ourIdentity.owningKey))
 		val txBuilder = TransactionBuilder(notary)

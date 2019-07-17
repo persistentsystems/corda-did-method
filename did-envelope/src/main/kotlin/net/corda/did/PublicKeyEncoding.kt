@@ -15,6 +15,7 @@ package net.corda.did
  * @property[PublicKeyBase58] base58 encoding of public key
  * @property[PublicKeyMultibase] Multibase encoding of public key
  */
+// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
 @Suppress("MemberVisibilityCanBePrivate")
 enum class PublicKeyEncoding(
 		val encodingId: String

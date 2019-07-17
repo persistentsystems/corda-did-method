@@ -11,6 +11,7 @@ import java.net.URI
  *@property[controller] Id of the controller of the public key .
  *@property[value] value of the public key in bytes.
  */
+// TODO moritzplatt 2019-07-16 -- this defines `equals` but not `hasChode`. ensure this is safe where used
 class QualifiedPublicKey(
 		val id: URI,
 		val type: CryptoSuite,
@@ -26,5 +27,9 @@ class QualifiedPublicKey(
 				type == otherKey.type &&
 				controller == otherKey.controller &&
 				java.util.Arrays.equals(value, otherKey.value)
+	}
+
+	override fun hashCode(): Int {
+		return id.hashCode()
 	}
 }

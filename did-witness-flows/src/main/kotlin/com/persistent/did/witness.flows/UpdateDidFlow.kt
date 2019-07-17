@@ -37,6 +37,7 @@ import net.corda.did.DidEnvelope
 
 class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() {
 
+	@Suppress("ClassName")
 	companion object {
 		object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on new DidState.")
 		object VERIFYING_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")

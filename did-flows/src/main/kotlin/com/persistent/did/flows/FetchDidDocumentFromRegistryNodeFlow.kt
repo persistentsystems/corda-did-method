@@ -4,6 +4,8 @@ import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
+import net.corda.core.flows.StartableByRPC
+import net.corda.core.flows.StartableByService
 import net.corda.core.identity.Party
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.unwrap
@@ -17,14 +19,16 @@ import java.util.UUID
  * @property did the UUID part of the did to be queried for
  */
 @InitiatingFlow
+@StartableByRPC
 class FetchDidDocumentFromRegistryNodeFlow(private val didRegistryNode: Party, private val did: UUID) : FlowLogic<DidDocument>() {
 
+	@Suppress("ClassName")
 	companion object {
 		object INITIATING_FLOW_SESSION : ProgressTracker.Step("Initiating flow session with did-registry node")
-		object SENDING_AND_RECEIVEING : ProgressTracker.Step("Fetching DID from vault")
+		object SENDING_AND_RECEIVING : ProgressTracker.Step("Fetching DID from vault")
 	}
 
-	override val progressTracker = ProgressTracker(INITIATING_FLOW_SESSION, SENDING_AND_RECEIVEING)
+	override val progressTracker = ProgressTracker(INITIATING_FLOW_SESSION, SENDING_AND_RECEIVING)
 
 	/**
 	 * Starts flow session with did-registry node and receives the did document
@@ -37,7 +41,7 @@ class FetchDidDocumentFromRegistryNodeFlow(private val didRegistryNode: Party, p
 		progressTracker.currentStep = INITIATING_FLOW_SESSION
 		val didRegistryNodeSession = initiateFlow(didRegistryNode)
 
-		progressTracker.currentStep = SENDING_AND_RECEIVEING
+		progressTracker.currentStep = SENDING_AND_RECEIVING
 		return didRegistryNodeSession.sendAndReceive<DidDocument>(UniqueIdentifier(null, did)).unwrap { it }
 	}
 }

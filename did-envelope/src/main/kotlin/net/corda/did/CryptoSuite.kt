@@ -25,11 +25,9 @@ import net.corda.did.CryptoSuiteFailure.UnknownCryptoSuiteIDFailure
 enum class CryptoSuite(
 		val keyID: String,
 		val signatureID: String
-) { //enum for ed25519
+) {
 	Ed25519("Ed25519VerificationKey2018", "Ed25519Signature2018"),
-	//enum for RSA
 	RSA("RsaVerificationKey2018", "RsaSignature2018"),
-	//enum for EdDsaSASecp256k1
 	EdDsaSASecp256k1("EdDsaSAPublicKeySecp256k1", "EdDsaSASignatureSecp256k1");
 
 	companion object {
@@ -38,14 +36,14 @@ enum class CryptoSuite(
 			it.signatureID == signatureID
 		}?.let {
 			Success(it)
-		} ?: Failure(CryptoSuiteFailure.UnknownCryptoSuiteIDFailure(signatureID))
+		} ?: Failure(UnknownCryptoSuiteIDFailure(signatureID))
 
 		/** Identify suite using Key Id*/
 		fun fromKeyID(keyID: String): Result<CryptoSuite, CryptoSuiteFailure> = values().firstOrNull {
 			it.keyID == keyID
 		}?.let {
 			Success(it)
-		} ?: Failure(CryptoSuiteFailure.UnknownCryptoSuiteIDFailure(keyID))
+		} ?: Failure(UnknownCryptoSuiteIDFailure(keyID))
 	}
 }
 

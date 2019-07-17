@@ -1,6 +1,5 @@
 package com.persistent.did.contract
 
-import com.persistent.did.contract.DidContract
 import com.persistent.did.contract.DidContract.Commands.Delete
 import com.persistent.did.state.DidState
 import com.persistent.did.state.DidStatus

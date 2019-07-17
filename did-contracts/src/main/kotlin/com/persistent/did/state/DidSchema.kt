@@ -22,7 +22,11 @@ object DidSchema
  */
 
 @CordaSerializable
-object DidStateSchemaV1 : MappedSchema(schemaFamily = DidSchema::class.java, version = 1, mappedTypes = listOf(PersistentDidState::class.java)) {
+object DidStateSchemaV1 : MappedSchema(
+		schemaFamily = DidSchema::class.java,
+		version = 1,
+		mappedTypes = listOf(PersistentDidState::class.java)
+) {
 	@Entity
 	@Table(name = "did_states", indexes = [Index(name = "did_external_form_idx", columnList = "did_external_form")])
 	class PersistentDidState(
@@ -36,5 +40,6 @@ object DidStateSchemaV1 : MappedSchema(schemaFamily = DidSchema::class.java, ver
 			var status: DidStatus,
 
 			@Column(name = "linear_id", nullable = false)
-			var linearId: UUID) : PersistentState()
+			var linearId: UUID
+	) : PersistentState()
 }

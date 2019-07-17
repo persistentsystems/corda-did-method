@@ -1,6 +1,5 @@
 package com.persistent.did.contract
 
-import com.persistent.did.contract.DidContract
 import com.persistent.did.contract.DidContract.Commands.Create
 import com.persistent.did.state.DidState
 import com.persistent.did.utils.AbstractContractsStatesTestUtils
@@ -18,7 +17,6 @@ import java.net.URI
 
 /**
  * Test cases for [DidState] evolution specifically for [Create] command.
- *
  */
 class CreateDidTests : AbstractContractsStatesTestUtils() {
 

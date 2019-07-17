@@ -7,6 +7,8 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
+import net.corda.core.flows.StartableByRPC
+import net.corda.core.flows.StartableByService
 import net.corda.did.DidDocument
 
 /**
@@ -15,6 +17,7 @@ import net.corda.did.DidDocument
  * @property linearId the linearId of the [DidState].
  */
 @InitiatingFlow
+@StartableByRPC
 class FetchDidDocumentFlow(private val linearId: UniqueIdentifier) : FlowLogic<DidDocument>() {
 
 	/**

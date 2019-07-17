@@ -53,7 +53,6 @@ import java.net.URI
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
 @CordaSerializable
 class DidEnvelope(
-
 		val rawInstruction: String,
 		val rawDocument: String
 ) {
@@ -105,7 +104,6 @@ class DidEnvelope(
 
 		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
 		validate().onFailure { return it }
-
 
 		validateKeysForModification(precursor).onFailure { return it }
 
@@ -161,6 +159,7 @@ class DidEnvelope(
 
 		// Temporary: Fail is there is at least one RSA or EdDsaSASecp256k1 key
 		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
+		// TODO moritzplatt 2019-07-16 -- will support for these crypto suites be added?
 		publicKeys.firstOrNull {
 			it.type != Ed25519
 		}?.let {
@@ -253,6 +252,7 @@ class DidEnvelope(
 	/**
 	 * @param precursor The precursor document
 	 */
+	// TODO moritzplatt 2019-07-16 -- unused method. which logic do we use for validating deleting documents. make sure this is documented!
 	// validate that _at least one_ key in the precursor document has a signature in the current one
 	private fun validateKeysForDelete(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		val precursorKeys = precursor.publicKeys().mapFailure {
@@ -295,6 +295,7 @@ class DidEnvelope(
 			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
 
 			// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
+			// TODO moritzplatt 2019-07-16 -- will support for these crypto suites be added?
 			RSA              -> TODO()
 			EdDsaSASecp256k1 -> TODO()
 		}
