@@ -255,6 +255,11 @@ This format is chosen to circumvent issues with canonical document representatio
 
 This is used to create a new DID.
 Proof of ownership of the document has to be presented in the envelope.
+<br /> 
+<br /> 
+Payload includes
+- The document consisting of the encoded public key,type of public key,controller of public key
+- The instruction consisting of action to perform (create), encoded signature and type of signature
 
 Instruction:
 
@@ -367,6 +372,11 @@ Should no previous update be recorded, the update will only be successful if the
 The calculation of the current time is done by the DID owner without verification of its accuracy by the consortium.
 This is appropriate since this field is only used to determine a before/after relationship.
 Consumers of the DID document need to take into account that this value is potentially inaccurate.
+<br /> 
+<br /> 
+Payload includes
+- The document consisting of the new encoded public key,type of public key,controller of public key
+- The instruction consisting of action to perform (update), encoded signature(s) on this document using all private keys(including the one being added) assosiated with the public keys in the document and type of signature.
 
 HTTP request:
 
