@@ -123,27 +123,6 @@
 
 <path fill="none" stroke="#4472C4" stroke-width="2.0031" stroke-linejoin="round" stroke-miterlimit="10" d="M340.172,291.522"/>
 <g>
-	<g>
-		
-			<line fill="none" stroke="#A6A6A6" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="4,4" x1="295.861" y1="364.865" x2="295.861" y2="397.438"/>
-		<g>
-			<polygon fill="#A6A6A6" points="292.158,367.675 295.861,366.101 299.564,367.675 295.861,358.896 			"/>
-		</g>
-		<g>
-			<polygon fill="#A6A6A6" points="292.158,394.631 295.861,396.203 299.564,394.631 295.861,403.408 			"/>
-		</g>
-	</g>
-</g>
-<g>
-	<g>
-		
-			<line fill="none" stroke="#A6A6A6" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="4,4" x1="599.861" y1="379.865" x2="599.861" y2="397.438"/>
-		<g>
-			<polygon fill="#A6A6A6" points="596.158,382.675 599.861,381.101 603.564,382.675 599.861,373.896 			"/>
-		</g>
-		<g>
-			<polygon fill="#A6A6A6" points="596.158,394.631 599.861,396.203 603.564,394.631 599.861,403.408 			"/>
-		</g>
-	</g>
+
 </g>
 </svg>
