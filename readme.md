@@ -1,6 +1,14 @@
 Corda DID Method Proof-of-Concept
 =================================
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Specifications](#specifications) 
+3. [CorDapp design -CMN views](#cmn)
+4. [Setup and Developer documentation](#setup)
+5. [Caveats](#caveats)
+6. [Risks/Known Attack Surface](#risks)
 
+<a name="introduction"></a>
 ### Introduction
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
 
@@ -22,7 +30,9 @@ Witness nodes will perform the a cryptographic integrity check as part of the [c
 
 Once replicated, anyone with access to one of the consortium nodes can request the DID document by querying the REST API of an arbitrary node for the document ID.
 
-Corda DID Format
+<a name="specifications"></a>
+## Specifications
+### Corda DID Format
 ----------------
 
 A Corda DID specifies the `corda` method, a target network (currently `testnet`, `tcn-uat`, `tcn`) and a UUID formatted as per [RFC 4122](https://tools.ietf.org/html/rfc4122#section-3).
@@ -59,12 +69,13 @@ A more dynamic approach to membership may be developed later.
 | `did-envelope` | Module for defining the did envelope, document and instruction|
 | `did-witness-flows` | Module for defining Corda flows for create,update and delete operations|
 
-
+<a name="cmn"></a>
 ## CorDapp design -CMN views
 Detailed design of the CorDapp can be viewed [here](/cmn_diagram.md)
+<a name="setup"></a>
 ## Setup and Developer documentation
 The steps for setting up the project are [here](/installation_setup.md)
-
+<a name="caveats"></a>
 #### Caveats
 
  - Not all cryptographic suites to be supported as per the [Linked Data Cryptographic Suite Registry Draft Community Group Report](https://w3c-ccg.github.io/ld-cryptosuite-registry) (09 December 2018) are supported.
@@ -76,7 +87,7 @@ The steps for setting up the project are [here](/installation_setup.md)
 | `RsaSignature2018`          	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
 | `EdDsaSASignatureSecp256k1` 	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
 
-
+<a name="risks"></a>
 #### Risks/Known Attack Surface
 
 ##### Denial-of-Service Attack on Edge-Nodes
