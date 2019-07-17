@@ -391,7 +391,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
 ##### Delete (`DELETE {did}`)
 
-This method is used to disable the identity on the ledger.Once deleted the identity cannot be used again.Delete acceptsonly instruction as payload , the instruction contains signature on the latest DID document from the ledger 
+This method is used to disable the identity on the ledger.Once deleted the identity cannot be used again.Delete acceptsonly instruction as payload , the instruction contains signature for the public on the latest DID document from the ledger.
 
 
 HTTP request:
