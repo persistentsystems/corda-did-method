@@ -60,15 +60,6 @@ A more dynamic approach to membership may be developed later.
 
 
 
-### Directory Structure
-| Directory | Description                                                     |
-|-----------|-----------------------------------------------------------------|
-| `did-api` | Module for defining REST api                         |
-| `did-contracts` |  Module for defining Corda smart contracts.                   |
-| `did-flows`     | Module for defining Corda flows for read operations.               |
-| `did-envelope` | Module for defining the did envelope, document and instruction|
-| `did-witness-flows` | Module for defining Corda flows for create,update and delete operations|
-
 <a name="cmn"></a>
 ## CorDapp design -CMN views
 Detailed design of the CorDapp can be viewed [here](/cmn_diagram.md)
