@@ -17,7 +17,7 @@ import net.corda.did.DidEnvelope
 
 /**
  * @property envelope The DidEnvelope object.
- * @property originator The Corda
+ * @property originator The Corda node (also a trusted anchor node in DID context)
  * @property witnesses Set of witness nodes who will be replicating the did.
  * @property status Status to identify the state of a did.
  * @property linearId equal to the [CordaDid.uuid].
