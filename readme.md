@@ -87,6 +87,8 @@ The steps for setting up the project are [here](/installation_setup.md)
 | `RsaSignature2018`          	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
 | `EdDsaSASignatureSecp256k1` 	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
 
+
+
 <a name="risks"></a>
 #### Risks/Known Attack Surface
 
