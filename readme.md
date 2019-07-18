@@ -357,6 +357,8 @@ This method is used to disable the identity on the ledger.Once deleted the ident
 Payload includes:
 - The instruction consisting of action to perform (delete), encoded signature on the latest DID document on the ledger using all private keys assosiated with public keys present in the document and type of the signature.
 
+To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest did document present in the ledger signed with corresponding private keys for all the public keys present in the document.
+
 HTTP request:
 
 ```bash
@@ -431,7 +433,7 @@ where envelope is an instance of type `DidEnvelope`
 
 ##### Delete (`DeleteDidFlow`)
 This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It only updates the DidState with status `Deleted` 
-
+To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest did document present in the ledger signed with corresponding private keys for all the public keys present in the document.
 * invoke DeleteDidFlow via RPC:    
 ```rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)```
 
