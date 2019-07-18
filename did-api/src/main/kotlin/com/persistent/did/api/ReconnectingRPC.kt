@@ -69,8 +69,6 @@ class ReconnectingCordaRPCOps private constructor(
 			observersPool ?: Executors.newCachedThreadPool(),
 			observersPool != null)
 
-
-
 	private companion object {
 		private val log = contextLogger()
 		private fun proxy(reconnectingRPCConnection: ReconnectingRPCConnection, observersPool: ExecutorService): CordaRPCOps {
@@ -119,7 +117,6 @@ class ReconnectingCordaRPCOps private constructor(
 	 * [runFlow] - starts a flow and returns the [FlowHandle].
 	 * [hasFlowCompleted] - Runs a vault query and is able to recreate the result of the flow.
 	 */
-
 
 	/**
 	 * Helper class useful for reconnecting to a Node.

@@ -491,7 +491,6 @@ class DeleteDIDAPITest {
 		|  ]
 		|}""".trimMargin()
 
-
 		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
 
 		val encodedSignature1 = signature1.bytes.toBase58()
@@ -550,6 +549,7 @@ class DeleteDIDAPITest {
 		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultDelete)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 	}
+
 	@Test
 	fun `Deleting a DID using incorrect keys to sign document should fail`() {
 		val kp = KeyPairGenerator().generateKeyPair()
