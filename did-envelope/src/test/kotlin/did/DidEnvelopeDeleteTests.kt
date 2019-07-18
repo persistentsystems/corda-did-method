@@ -51,22 +51,7 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val signature = keyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = keyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -80,7 +65,7 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
 		val actual = envelope.validateDeletion(DidDocument(originalDocument))
 
@@ -115,23 +100,8 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
 		val bogusKeys = KeyPairGenerator().generateKeyPair()
-		val signature = bogusKeys.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = bogusKeys.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -145,7 +115,7 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
 		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
@@ -183,24 +153,9 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey1"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
 		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
 		val keyPair2 = KeyPairGenerator().generateKeyPair()
-		val signature = keyPair2.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = keyPair2.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -214,7 +169,7 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
 		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
