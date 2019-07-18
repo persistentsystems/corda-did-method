@@ -1,5 +1,4 @@
 
-
 ## Directory Structure
 | Directory | Description                                                     |
 |-----------|-----------------------------------------------------------------|
@@ -11,6 +10,7 @@
 
 ## Setup
 ### Pre-requisites
+The CorDapp is tested against Corda OS 4.0.
 Please refer to the [set up](https://docs.corda.net/getting-set-up.html) instructions.
 
 ### Build step
