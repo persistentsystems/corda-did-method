@@ -4,7 +4,7 @@ Corda DID Method Proof-of-Concept
 1. [Introduction](#introduction)
 2. [Specifications](#specifications) 
 3. [CorDapp design -CMN views](#cmn)
-4. [Setup and Developer documentation](#setup)
+4. [Setup](#setup)
 5. [Caveats](#caveats)
 6. [Risks/Known Attack Surface](#risks)
 
@@ -446,7 +446,7 @@ where instruction is the instruction JSON object (in string form) containing sig
 ## CorDapp design -CMN views
 Detailed design of the CorDapp can be viewed [here](/cmn_diagram.md)
 <a name="setup"></a>
-## Setup and Developer documentation
+## Setup
 The steps for setting up the project are [here](/installation_setup.md)
 <a name="caveats"></a>
 #### Caveats
