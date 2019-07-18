@@ -82,7 +82,7 @@ class DidEnvelopeDeleteTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument))
+		val actual = envelope.validateDeletion(DidDocument(originalDocument))
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -147,7 +147,7 @@ class DidEnvelopeDeleteTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<InvalidSignatureFailure>(
@@ -216,7 +216,7 @@ class DidEnvelopeDeleteTests {
 
 		val envelope = DidEnvelope(instruction, newDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<UntargetedPublicKeyFailure>())
 	}
