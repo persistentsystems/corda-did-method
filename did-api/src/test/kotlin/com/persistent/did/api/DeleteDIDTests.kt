@@ -108,7 +108,6 @@ class DeleteDIDAPITest {
 		|  ]
 		|}""".trimMargin()
 		val instructionDeletejsonFile = MockMultipartFile("instruction", "", "application/json", instructionDelete.toByteArray())
-		//val documentDeletejsonFile = MockMultipartFile("document", "", "application/json", documentDelete.toByteArray())
 		val deleteBuilder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionDeletejsonFile).with { request ->
 			request.method = "DELETE"
 			request
