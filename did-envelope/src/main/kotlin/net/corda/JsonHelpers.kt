@@ -14,7 +14,10 @@ import net.corda.JsonFailure.MissingPropertyFailure
 import net.corda.core.crypto.AddressFormatException
 import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite
+import org.apache.commons.codec.binary.Hex
+import java.util.Base64
 import java.net.URI
+import io.ipfs.multiformats.multibase.MultiBase
 
 /**
  *
@@ -102,9 +105,25 @@ fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): Json
  * @return [JsonResult]
  */
 
-fun JsonObject.getMandatoryBase58Bytes(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
+fun JsonObject.getMandatoryEncoding(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {
-		Success(Base58.decode(value))
+		when(key){
+			"publicKeyBase58"->Success(Base58.decode(value))
+			"signatureBase58"->Success(Base58.decode(value))
+			"publicKeyHex"->Success(Hex.decodeHex(value.toCharArray()))
+			"signatureHex"->Success(Hex.decodeHex(value.toCharArray()))
+			"publicKeyBase64"->Success(Base64.getDecoder().decode(value))
+			"signatureBase64"->Success(Base64.getDecoder().decode(value))
+			"publicKeyMultibase"->Success(MultiBase.decode(value))
+			"signatureMultibase"->Success(MultiBase.decode(value))
+			"publicKeyPem"->{
+				var encodedString=value.replace("\n", "").replace("\r", "")
+				encodedString=encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
+				Success(encodedString.toByteArray())
+			}
+			else->Failure(InvalidBase58Representation(value))
+		}
+
 	} catch (e: AddressFormatException) {
 		Failure(InvalidBase58Representation(value))
 	}

@@ -19,8 +19,8 @@ import net.corda.did.DidInstructionFailure.InvalidDidFailure
 import net.corda.did.DidInstructionFailure.InvalidInstructionJsonFailure
 import net.corda.did.DidInstructionFailure.UnknownActionFailure
 import net.corda.getMandatoryArray
-import net.corda.getMandatoryBase58Bytes
 import net.corda.getMandatoryCryptoSuiteFromSignatureID
+import net.corda.getMandatoryEncoding
 import net.corda.getMandatoryString
 import net.corda.getMandatoryUri
 
@@ -60,8 +60,13 @@ class DidInstruction(json: String) : JsonBacked(json) {
 			val id = signature.getMandatoryUri("id").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
+			val listOfEncodings= arrayOf("signatureBase58")
+			val encodingUsed=listOfEncodings.filter { signature.has(it) }
+			if(encodingUsed.size!=1){
+				throw Exception("Incorrect number of supported encoding schemes provided for signatures")
+			}
 
-			val value = signature.getMandatoryBase58Bytes("signatureBase58").mapFailure {
+			val value = signature.getMandatoryEncoding(encodingUsed.first()).mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 
