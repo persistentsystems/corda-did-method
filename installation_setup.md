@@ -20,11 +20,12 @@ To build jar use command `./gradelw jar` .This will generate the following files
 |-----------|-----------------------------------------------------------------|
 | `did-contracts-1.0-SNAPSHOT.jar` | contains state and contracts                  |
 | `did-flows-1.0-SNAPSHOT.jar` |  contains flows for read                 |
-| `did-witness-flows-1.0-SNAPSHOT.jar`| contains flows for create,update,delete
+| `did-witness-flows-1.0-SNAPSHOT.jar`| contains flows for create, update, delete
 
 
 ### Running the node as witness
-The nodes need to have a config file with list of witness nodes. Example configuration shown below
+* Complete the [pre-requisite](https://docs.corda.net/getting-set-up.html) and [network bootstrapper](https://docs.corda.net/network-bootstrapper.html) setup.
+* Create a file with name `did-witness-flows-1.0-SNAPSHOT.jar.conf` with below content and place it under the config directory.
 ```bash
 nodes = [
 "O=PartyB,L=New York,C=US"
@@ -32,3 +33,6 @@ nodes = [
 
 notary = "O=Notary,L=London,C=GB"
 ```
+where nodes is a pre-defined list of witness nodes. Replace the nodes and notary with appropriate values
+* Place the jars generated in the above build step into the cordapp directory of node file system.
+* Run the corda node using `java -jar corda.jar`
