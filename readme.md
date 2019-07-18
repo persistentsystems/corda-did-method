@@ -26,7 +26,7 @@ The web server component is running in a process independent of Corda.
 User calls ‘proxied’ through this way will invoke a [Flow](https://docs.corda.net/key-concepts-flows.html) on one of the consortium nodes.
 As part of this flow, consortium nodes will validate that the id provided by the user is valid and that the message has cryptographic integrity (i.e. that the DID document is signed properly).
 Once this validation was successful, DID documents will be replicated from the _trusted node_ (i.e. the node the user chose to interact with via REST) to all _witness nodes_ (i.e. all other nodes in the consortium).
-Witness nodes will perform the a cryptographic integrity check as part of the [contract](https://docs.corda.net/key-concepts-contracts.html) underpinning this transaction.
+Witness nodes will perform a cryptographic integrity check as part of the [contract](https://docs.corda.net/key-concepts-contracts.html) underpinning this transaction.
 
 Once replicated, anyone with access to one of the consortium nodes can request the DID document by querying the REST API of an arbitrary node for the document ID.
 
@@ -70,7 +70,7 @@ It provides Method specific APIs to _create_, _read_, _update_ or _delete_ DID d
 
 The Corda DID method achieves proof-of-ownership of a *document* by requiring proof-of-ownership of the *keys* contained in the document.
 
-To implement that, any DID document must be be wrapped in an envelope.
+To implement that, any DID document must be wrapped in an envelope.
 This envelope must contain signatures by all private keys associated with the public keys contained in the documents.
 
 ![Corda DID API](did_envelope.svg)
@@ -346,7 +346,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
  - The API will respond with status `200` if update is successful.
  - The API will respond with status `404` for a request with an unknown ID.
- - The API will respond with status `400` for other cases of incorrect payload(mismatched signatures,malformed document,instruction etc.).
+ - The API will respond with status `400` for other cases of incorrect payload (mismatched signatures,malformed document,instruction etc.).
  
  
 
@@ -378,7 +378,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
  - The API will respond with status `200` if delete is successful.
  - The API will respond with status `404` for a request with an unknown ID.
- - The API will respond with status `400` for other cases of incorrect payload(mismatched signatures,malformed instruction etc.).
+ - The API will respond with status `400` for other cases of incorrect payload (mismatched signatures,malformed instruction etc.).
 
 ### Corda DID Flows ([`did-witness-flows`](did-witness-flows))
 The DID Flows is the CorDapp component to be deployed by consortium member nodes. It provides Method specific flows to create, read, update or delete DID documents.
@@ -444,10 +444,10 @@ where instruction is the instruction JSON object (in string form) containing sig
 
 <a name="cmn"></a>
 ## CorDapp design -CMN views
-Detailed design of the CorDapp can be viewed [here](/cmn_diagram.md)
+Detailed design of the CorDapp can be viewed [here.](/cmn_diagram.md)
 <a name="setup"></a>
 ## Setup
-The steps for setting up the project are [here](/installation_setup.md)
+The steps for setting up the project are [here.](/installation_setup.md)
 <a name="caveats"></a>
 #### Caveats
 
