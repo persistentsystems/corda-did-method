@@ -11,8 +11,8 @@ import net.corda.core.serialization.CordaSerializable
 import net.corda.did.Action.Create
 import net.corda.did.Action.Delete
 import net.corda.did.Action.Update
+import net.corda.did.CryptoSuite.EcdsaSecp256k1
 import net.corda.did.CryptoSuite.Ed25519
-import net.corda.did.CryptoSuite.EdDsaSASecp256k1
 import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure
@@ -30,8 +30,12 @@ import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureCountFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.SignatureTargetFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UnsupportedCryptoSuiteFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UntargetedPublicKeyFailure
+import net.corda.isValidEcdsaSignature
 import net.corda.isValidEd25519Signature
+import net.corda.isValidRSASignature
+import net.corda.toEcdsaPublicKey
 import net.corda.toEd25519PublicKey
+import net.corda.toRSAPublicKey
 import java.net.URI
 
 /**
@@ -156,15 +160,6 @@ class DidEnvelope(
 		// At least one signature per key is required.
 		if (signatures.size < publicKeys.size)
 			return Failure(SignatureCountFailure())
-
-		// Temporary: Fail is there is at least one RSA or EdDsaSASecp256k1 key
-		// TODO moritzplatt 2019-02-13 -- once all crypto suites are supported, remove this provision
-		// TODO moritzplatt 2019-07-16 -- will support for these crypto suites be added?
-		publicKeys.firstOrNull {
-			it.type != Ed25519
-		}?.let {
-			return Failure(UnsupportedCryptoSuiteFailure(it.type))
-		}
 
 		// Fail if there are public keys that do not have a corresponding signature
 		val pairings = publicKeys.map { publicKey ->
@@ -292,12 +287,9 @@ class DidEnvelope(
 	 */
 	private fun ByteArray.isValidSignature(originalMessage: ByteArray, publicKey: QualifiedPublicKey): Boolean {
 		return when (publicKey.type) {
-			Ed25519          -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
-
-		// TODO moritzplatt 2019-02-13 -- Implement this for other supported crypto suites
-		// TODO moritzplatt 2019-07-16 -- will support for these crypto suites be added?
-			RSA              -> TODO()
-			EdDsaSASecp256k1 -> TODO()
+			Ed25519        -> isValidEd25519Signature(originalMessage, publicKey.value.toEd25519PublicKey())
+			RSA            -> isValidRSASignature(originalMessage, publicKey.value.toRSAPublicKey())
+			EcdsaSecp256k1 -> isValidEcdsaSignature(originalMessage, publicKey.value.toEcdsaPublicKey())
 		}
 	}
 

@@ -10,6 +10,7 @@ import net.corda.assertSuccess
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
 import net.corda.did.CryptoSuite.Ed25519
+import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UntargetedPublicKeyFailure
 import net.i2p.crypto.eddsa.KeyPairGenerator
@@ -51,22 +52,7 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val signature = keyPair.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = keyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -80,9 +66,9 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument))
+		val actual = envelope.validateDeletion(DidDocument(originalDocument))
 
 		assertThat(actual, isA<Success<Unit>>())
 	}
@@ -115,23 +101,8 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
 		val bogusKeys = KeyPairGenerator().generateKeyPair()
-		val signature = bogusKeys.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = bogusKeys.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -145,9 +116,9 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
 		@Suppress("RemoveExplicitTypeArguments")
 		assertThat(actual, isA<InvalidSignatureFailure>(
@@ -156,7 +127,7 @@ class DidEnvelopeDeleteTests {
 	}
 
 	@Test
-	fun `Deletion fails for an envelope with irrelevant signatures`() {
+	fun `Deletion fails for an envelope with irrelevant ed25519 signatures`() {
 		/*
 		 * Generate valid base Document
 		 */
@@ -183,24 +154,9 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val newDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "updated": "2019-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "${Ed25519.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey1"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
 		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
 		val keyPair2 = KeyPairGenerator().generateKeyPair()
-		val signature = keyPair2.private.sign(newDocument.toByteArray(Charsets.UTF_8))
+		val signature = keyPair2.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val encodedSignature = signature.bytes.toBase58()
 
 		val instruction = """{
@@ -214,9 +170,60 @@ class DidEnvelopeDeleteTests {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, newDocument)
+		val envelope = DidEnvelope(instruction, originalDocument)
 
-		val actual = envelope.validateModification(DidDocument(originalDocument)).assertFailure()
+		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
+
+		assertThat(actual, isA<UntargetedPublicKeyFailure>())
+	}
+
+	@Test
+	fun `Deletion fails for an envelope with irrelevant rsa signatures`() {
+		/*
+		 * Generate valid base Document
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
+
+		/*
+		 * Generate a key pair for the original document
+		 */
+		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
+		val keyPair1 = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
+		val encodedKey1 = keyPair1.public.encoded.toBase58()
+
+		val originalDocument = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri1",
+		|	  "type": "${RSA.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyBase58": "$encodedKey1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
+		val keyPair2 = KeyPairGenerator().generateKeyPair()
+		val signature = keyPair2.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
+		val encodedSignature = signature.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "delete",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri2",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$encodedSignature"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val envelope = DidEnvelope(instruction, originalDocument)
+
+		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
 
 		assertThat(actual, isA<UntargetedPublicKeyFailure>())
 	}

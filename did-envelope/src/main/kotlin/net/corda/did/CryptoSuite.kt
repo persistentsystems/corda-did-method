@@ -28,7 +28,7 @@ enum class CryptoSuite(
 ) {
 	Ed25519("Ed25519VerificationKey2018", "Ed25519Signature2018"),
 	RSA("RsaVerificationKey2018", "RsaSignature2018"),
-	EdDsaSASecp256k1("EdDsaSAPublicKeySecp256k1", "EdDsaSASignatureSecp256k1");
+	EcdsaSecp256k1("EcdsaVerificationKeySecp256k1", "EcdsaSignatureSecp256k1");
 
 	companion object {
 		/** Identify suite using Signature Id*/
