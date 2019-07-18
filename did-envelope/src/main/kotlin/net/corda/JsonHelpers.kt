@@ -7,6 +7,7 @@ import com.natpryce.Result
 import com.natpryce.Success
 import com.natpryce.flatMap
 import com.natpryce.mapFailure
+import io.ipfs.multiformats.multibase.MultiBase
 import net.corda.JsonFailure.InvalidBase58Representation
 import net.corda.JsonFailure.InvalidCryptoSuiteFailure
 import net.corda.JsonFailure.InvalidUriFailure
@@ -15,9 +16,8 @@ import net.corda.core.crypto.AddressFormatException
 import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite
 import org.apache.commons.codec.binary.Hex
-import java.util.Base64
 import java.net.URI
-import io.ipfs.multiformats.multibase.MultiBase
+import java.util.Base64
 
 /**
  *
@@ -107,21 +107,21 @@ fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): Json
 
 fun JsonObject.getMandatoryEncoding(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {
-		when(key){
-			"publicKeyBase58"->Success(Base58.decode(value))
-			"signatureBase58"->Success(Base58.decode(value))
-			"publicKeyHex"->Success(Hex.decodeHex(value.toCharArray()))
-			"signatureHex"->Success(Hex.decodeHex(value.toCharArray()))
-			"publicKeyBase64"->Success(Base64.getDecoder().decode(value))
-			"signatureBase64"->Success(Base64.getDecoder().decode(value))
-			"publicKeyMultibase"->Success(MultiBase.decode(value))
-			"signatureMultibase"->Success(MultiBase.decode(value))
-			"publicKeyPem"->{
-				var encodedString=value.replace("\n", "").replace("\r", "")
-				encodedString=encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
+		when (key) {
+			"publicKeyBase58"    -> Success(Base58.decode(value))
+			"signatureBase58"    -> Success(Base58.decode(value))
+			"publicKeyHex"       -> Success(Hex.decodeHex(value.toCharArray()))
+			"signatureHex"       -> Success(Hex.decodeHex(value.toCharArray()))
+			"publicKeyBase64"    -> Success(Base64.getDecoder().decode(value))
+			"signatureBase64"    -> Success(Base64.getDecoder().decode(value))
+			"publicKeyMultibase" -> Success(MultiBase.decode(value))
+			"signatureMultibase" -> Success(MultiBase.decode(value))
+			"publicKeyPem"       -> {
+				var encodedString = value.replace("\n", "").replace("\r", "")
+				encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
 				Success(encodedString.toByteArray())
 			}
-			else->Failure(InvalidBase58Representation(value))
+			else                 -> Failure(InvalidBase58Representation(value))
 		}
 
 	} catch (e: AddressFormatException) {

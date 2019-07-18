@@ -60,9 +60,9 @@ class DidInstruction(json: String) : JsonBacked(json) {
 			val id = signature.getMandatoryUri("id").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
-			val listOfEncodings= arrayOf("signatureBase58")
-			val encodingUsed=listOfEncodings.filter { signature.has(it) }
-			if(encodingUsed.size!=1){
+			val listOfEncodings = arrayOf("signatureBase58")
+			val encodingUsed = listOfEncodings.filter { signature.has(it) }
+			if (encodingUsed.size != 1) {
 				throw Exception("Incorrect number of supported encoding schemes provided for signatures")
 			}
 

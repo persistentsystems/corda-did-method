@@ -13,7 +13,6 @@ import net.corda.core.serialization.CordaSerializable
 import net.corda.did.DidDocumentFailure.InvalidDidFailure
 import net.corda.did.DidDocumentFailure.InvalidDocumentJsonFailure
 import net.corda.did.DidDocumentFailure.InvalidTimeStampFormatFailure
-import net.corda.did.DidDocumentFailure.InvalidEncoding
 import net.corda.getMandatoryArray
 import net.corda.getMandatoryCryptoSuiteFromKeyID
 import net.corda.getMandatoryEncoding
@@ -89,14 +88,14 @@ data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 
 			// TODO moritzplatt 2019-02-13 -- Support other encodings
 			// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
-			val listOfEncodings= arrayOf("publicKeyBase58")
-			val encodingUsed=listOfEncodings.filter { key.has(it) }
-			if(encodingUsed.size!=1){
-				 throw Exception("Incorrect number of supported encoding schemes provided for public keys")
+			val listOfEncodings = arrayOf("publicKeyBase58")
+			val encodingUsed = listOfEncodings.filter { key.has(it) }
+			if (encodingUsed.size != 1) {
+				throw Exception("Incorrect number of supported encoding schemes provided for public keys")
 			}
-			val value= key.getMandatoryEncoding(encodingUsed.first()).mapFailure {
-					InvalidDocumentJsonFailure(it)
-				}.onFailure { return it }
+			val value = key.getMandatoryEncoding(encodingUsed.first()).mapFailure {
+				InvalidDocumentJsonFailure(it)
+			}.onFailure { return it }
 
 
 
@@ -147,7 +146,7 @@ sealed class DidDocumentFailure : FailureCode() {
 	class InvalidDocumentJsonFailure(underlying: JsonFailure) : DidDocumentFailure()
 	class InvalidDidFailure(underlying: CordaDidFailure) : DidDocumentFailure()
 	class InvalidTimeStampFormatFailure(input: String) : DidDocumentFailure()
-	class InvalidEncoding(input: String):DidDocumentFailure()
+	class InvalidEncoding(input: String) : DidDocumentFailure()
 }
 
 private typealias DidDocumentResult<T> = Result<T, DidDocumentFailure>
