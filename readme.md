@@ -432,7 +432,7 @@ This is used to update an existing DID.
 where envelope is an instance of type `DidEnvelope`
 
 ##### Delete (`DeleteDidFlow`)
-This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It only updates the DidState with status `Deleted` 
+This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It only updates the DidState with status `Deleted`. 
 To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest did document present in the ledger signed with corresponding private keys for all the public keys present in the document.
 * invoke DeleteDidFlow via RPC:    
 ```rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)```
