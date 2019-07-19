@@ -119,7 +119,7 @@ fun JsonObject.getMandatoryEncoding(key: String): JsonResult<ByteArray> = getMan
 			"publicKeyPem"       -> {
 				var encodedString = value.replace("\n", "").replace("\r", "")
 				encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
-				Success(encodedString.toByteArray())
+				Success(Base64.getDecoder().decode(encodedString.toByteArray()))
 			}
 			else                 -> Failure(InvalidBase58Representation(value))
 		}

@@ -88,7 +88,7 @@ data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 
 			// TODO moritzplatt 2019-02-13 -- Support other encodings
 			// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
-			val listOfEncodings = arrayOf("publicKeyBase58")
+			val listOfEncodings = arrayOf("publicKeyBase58","publicKeyBase64","publicKeyHex","publicKeyMultibase","publicKeyPem")
 			val encodingUsed = listOfEncodings.filter { key.has(it) }
 			if (encodingUsed.size != 1) {
 				throw Exception("Incorrect number of supported encoding schemes provided for public keys")

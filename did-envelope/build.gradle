@@ -23,7 +23,7 @@ dependencies {
 //    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '2.10.1'
 //    // https://mvnrepository.com/artifact/io.ipfs.multiformats/kotlin-multibase
     compile group: 'io.ipfs.multiformats', name: 'kotlin-multibase', version: '1.0.0'
-    
+
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
 
