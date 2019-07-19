@@ -1,3 +1,4 @@
+
 Corda DID Method Proof-of-Concept
 =================================
 ## Table of Contents
@@ -7,6 +8,7 @@ Corda DID Method Proof-of-Concept
 4. [Setup](#setup)
 5. [Caveats](#caveats)
 6. [Risks/Known Attack Surface](#risks)
+7. [Partnership](#partner)
 
 <a name="introduction"></a>
 ### Introduction
@@ -470,5 +472,11 @@ The steps for setting up the project are [here.](/installation_setup.md)
 ##### Denial-of-Service Attack on Edge-Nodes
 
 ##### Replication Issues During Unavailability of Witness Nodes
-
-
+<a name="partner"></a>
+### Partnership
+The product was built by Persistent in partnership with [r3](https://www.r3.com/).
+<p align="center">
+   <a href="https://www.r3.com/">
+     <img src="16-11-02_R3_Master Logo-01.jpg" alt="R3" width="200">
+  </a>
+</p>
