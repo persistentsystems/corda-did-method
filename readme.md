@@ -14,7 +14,7 @@ Corda DID Method Proof-of-Concept
 ### Introduction
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
 
-![Corda DID System Architecture](architecture.svg)
+![Corda DID System Architecture](images/architecture.svg)
 
 The system architecture outlined above illustrates the high level components without going into implementation details.
 On a high level, persistence of DID documents will be provided by a _consortium_ of trusted nodes operating within a _network_.
@@ -75,7 +75,7 @@ The Corda DID method achieves proof-of-ownership of a *document* by requiring pr
 To implement that, any DID document must be wrapped in an envelope.
 This envelope must contain signatures by all private keys associated with the public keys contained in the documents.
 
-![Corda DID API](did_envelope.svg)
+![Corda DID API](images/did_envelope.svg)
 
 Envelopes that do not contain signatures for all public keys will be rejected.
 Envelopes using unsupported cryptographic suites or unsupported serialisation mechanisms will be rejected.
