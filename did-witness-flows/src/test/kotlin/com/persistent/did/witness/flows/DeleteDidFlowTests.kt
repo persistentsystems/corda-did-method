@@ -2,7 +2,6 @@ package com.persistent.did.witness.flows
 
 import com.natpryce.valueOrNull
 import com.persistent.did.state.DidState
-import com.persistent.did.state.DidStatus
 import com.persistent.did.utils.DIDNotFoundException
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.crypto.sign
@@ -25,26 +24,22 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 	@Test
 	fun `delete did successfully`() {
 		// delete did
-		deleteDID(getDidStateForDeleteOperation().envelope)!!.tx
+		deleteDID(getEnvelopeForDeleteOperation())!!.tx
 		mockNetwork.waitQuiescent()
 
-		// confirm did state with status as 'DELETED' on all 3 nodes
 		w1.transaction {
 			val states = w1.services.vaultService.queryBy(DidState::class.java).states
-			assert(states.size == 1)
-			assert(states[0].state.data.status == DidStatus.DELETED)
+			assert(states.isEmpty())
 		}
 
 		w2.transaction {
 			val states = w2.services.vaultService.queryBy(DidState::class.java).states
-			assert(states.size == 1)
-			assert(states[0].state.data.status == DidStatus.DELETED)
+			assert(states.isEmpty())
 		}
 
 		originator.transaction {
 			val states = originator.services.vaultService.queryBy(DidState::class.java).states
-			assert(states.size == 1)
-			assert(states[0].state.data.status == DidStatus.DELETED)
+			assert(states.isEmpty())
 		}
 	}
 
@@ -194,13 +189,13 @@ class DeleteDidFlowTests : AbstractFlowTestUtils() {
 
 	@Test
 	fun `SignedTransaction returned by the flow is signed by the did originator`() {
-		val signedTx = deleteDID(getDidStateForDeleteOperation().envelope)!!
+		val signedTx = deleteDID(getEnvelopeForDeleteOperation())!!
 		signedTx.verifySignaturesExcept(listOf(w1.info.singleIdentity().owningKey, w2.info.singleIdentity().owningKey))
 	}
 
 	@Test
 	fun `flow throws DIDNotFound exception for invalid did`() {
-		val flow = DeleteDidFlow(getDidStateForDeleteOperation().envelope.rawInstruction, getDidStateForDeleteOperation().envelope.document.id().valueOrNull()!!.toExternalForm())
+		val flow = DeleteDidFlow(getEnvelopeForDeleteOperation().rawInstruction, getEnvelopeForDeleteOperation().document.id().valueOrNull()!!.toExternalForm())
 		val future = originator.startFlow(flow)
 		mockNetwork.waitQuiescent()
 		assertFailsWith<DIDNotFoundException> { future.getOrThrow() }

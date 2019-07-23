@@ -15,7 +15,6 @@ import net.corda.did.DidDocument
  * */
 class QueryUtil(private val proxy: CordaRPCOps) {
 
-
 	/**
 	 * @param[linearId] Takes uuid as input.
 	 * @return Raw DID document.
@@ -23,8 +22,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 	fun getDIDDocumentByLinearId(linearId: String): String? {
 		val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(linearId)))
 		val results = proxy.vaultQueryBy<DidState>(criteria).states
-
-
 
 		val responseState = results.let {
 			if (it.size != 1) {

@@ -2,7 +2,6 @@ package com.persistent.did.contract
 
 import com.persistent.did.contract.DidContract.Commands.Update
 import com.persistent.did.state.DidState
-import com.persistent.did.state.DidStatus
 import com.persistent.did.utils.AbstractContractsStatesTestUtils
 import com.persistent.did.utils.assertSuccess
 import net.corda.core.contracts.TypeOnlyCommandData
@@ -27,7 +26,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	private var ledgerServices = MockServices(listOf("com.persistent.did.contract"))
 
-	private fun getUpdatedEnvelope(): DidEnvelope {
+	private fun getEnvelopeForDelete(): DidEnvelope {
 		/*
 		* Generate a new key pair
 		*/
@@ -77,7 +76,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `transaction must include Update command`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())
@@ -96,7 +95,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `transaction must have one input`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
@@ -114,48 +113,10 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `transaction must have one output`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
-				this.fails()
-			}
-			transaction {
-				input(DidContract.DID_CONTRACT_ID, getDidState())
-				output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
-				this.verifies()
-			}
-		}
-	}
-
-	@Test
-	fun `status of precursor did must be VALID`() {
-		val envelope = getUpdatedEnvelope()
-		ledgerServices.ledger {
-			transaction {
-				input(DidContract.DID_CONTRACT_ID, getDidState().copy(status = DidStatus.DELETED))
-				output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
-				this.fails()
-			}
-			transaction {
-				input(DidContract.DID_CONTRACT_ID, getDidState())
-				output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
-				this.verifies()
-			}
-		}
-	}
-
-	@Test
-	fun `status of updated did must be VALID`() {
-		val envelope = getUpdatedEnvelope()
-		ledgerServices.ledger {
-			transaction {
-				input(DidContract.DID_CONTRACT_ID, getDidState())
-				output(DidContract.DID_CONTRACT_ID, getDidState().copy(envelope = envelope, status = DidStatus.DELETED))
 				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Update())
 				this.fails()
 			}
@@ -170,7 +131,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `id of the updated did document should not change`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 
 		/*
 		* Generate a new key pair
@@ -236,7 +197,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `linearId of did state should not change when updating did`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())
@@ -255,7 +216,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `did originator should not change when updating did`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())
@@ -274,7 +235,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `witness node list should not change when updating did`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())
@@ -293,7 +254,7 @@ class UpdateDidTests : AbstractContractsStatesTestUtils() {
 
 	@Test
 	fun `participants list should not change while updating did`() {
-		val envelope = getUpdatedEnvelope()
+		val envelope = getEnvelopeForDelete()
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, getDidState())

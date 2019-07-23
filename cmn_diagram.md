@@ -2,10 +2,10 @@
 The CorDapp functions as registry which maps decentralized identifiers to a document containing associated public keys. This needs to be deployed by any node that wants to act as a member node of a DID business network. The CorDapp consists of states, flows and contracts.
 ### State view 
 This is the State view CMN representation of `DidState` which contains following properties:
-* `Envelope`: Object encapsulating the did-document and instruction
-* `Originator`: Trusted anchor node chosen by the user
-* `Witnesses`: List of nodes that will be replicating the did
-* `LinearId`: UUID part of the did
+* `Envelope`: Object encapsulating the did-document and instruction.
+* `Originator`: Trusted anchor node chosen by the user.
+* `Witnesses`: List of nodes that will be replicating the did.
+* `LinearId`: UUID part of the did.
 
 ![State View](/cmn_diagrams/State.png)
 

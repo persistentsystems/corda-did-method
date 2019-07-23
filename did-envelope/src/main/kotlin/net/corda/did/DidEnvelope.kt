@@ -100,11 +100,11 @@ class DidEnvelope(
 	 * @param precursor The precursor document.
 	 */
 
-	// nitesh solanki 2019-06-27  for deletion there is no temporal checks since we are not passing new doc to delete api
+	// To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest did document present in the ledger signed with corresponding private keys for all the public keys present in the document.
 	fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
-		}.ensureIs(Update, Delete)
+		}.ensureIs(Delete)
 
 		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
 		validate().onFailure { return it }
@@ -249,6 +249,7 @@ class DidEnvelope(
 	 */
 	// TODO moritzplatt 2019-07-16 -- unused method. which logic do we use for validating deleting documents. make sure this is documented!
 	// validate that _at least one_ key in the precursor document has a signature in the current one
+	@Suppress("unused")
 	private fun validateKeysForDelete(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		val precursorKeys = precursor.publicKeys().mapFailure {
 			MalformedPrecursorFailure(it)

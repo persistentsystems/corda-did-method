@@ -27,7 +27,6 @@ import net.corda.did.DidEnvelope
 /**
  * Initiating flow to UPDATE a DID on ledger as specified in the w3 specification.
  * Ref: https://w3c-ccg.github.io/did-spec/#update
- * The delete operation only deactivates the did on ledger by updating the [DidState] with status as [DidStatus.DELETED]
  *
  * @property envelope the [DidEnvelope] object
  * @property ProgressTracker tracks the progress in the various stages of transaction
@@ -63,18 +62,14 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 	override fun call(): SignedTransaction {
 
 		// query the ledger if did exist or not
-		// ??? moritzplatt 2019-06-20 -- previous comments on UUID vs id apply
-
-		// nitesh solanki 2019-06-27 made changes as suggested.
-
 		val did = envelope.document.id().onFailure { throw InvalidDIDException("Invalid DID passed") }
 
 		val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, did.uuid), DidState::class.java)
 
-		if (didStates.isEmpty()) {
-			throw DIDNotFoundException("DID with id ${did.toExternalForm()} does not exist")
+		val inputDidState = didStates.let {
+			if(it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
+			else it.single()
 		}
-		val inputDidState = didStates.singleOrNull()!!
 
 		// Obtain a reference to the notary we want to use.
 
@@ -101,7 +96,7 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		// Sign the transaction.
 		val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-		// Stage 5.
+		// Stage 4.
 		progressTracker.currentStep = FINALISING_TRANSACTION
 
 		val otherPartySession = inputDidState.state.data.witnesses.map { initiateFlow(it) }.toSet()

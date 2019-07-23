@@ -9,18 +9,12 @@ import net.corda.assertFailure
 import net.corda.assertSuccess
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
-import net.corda.did.CryptoSuite.EcdsaSecp256k1
 import net.corda.did.CryptoSuite.Ed25519
-import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidSignatureFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.UntargetedPublicKeyFailure
 import net.i2p.crypto.eddsa.KeyPairGenerator
-import org.bouncycastle.jce.ECNamedCurveTable
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.junit.Test
 import java.net.URI
-import java.security.SecureRandom
-import java.security.Security
 import java.util.UUID
 import java.security.KeyPairGenerator as JavaKeyPairGenerator
 
@@ -132,7 +126,7 @@ class DidEnvelopeDeleteTests {
 	}
 
 	@Test
-	fun `Deletion fails for an envelope with irrelevant ed25519 signatures`() {
+	fun `Deletion fails for an envelope with irrelevant signatures`() {
 		/*
 		 * Generate valid base Document
 		 */
@@ -170,113 +164,6 @@ class DidEnvelopeDeleteTests {
 		|	{
 		|	  "id": "$keyUri2",
 		|	  "type": "Ed25519Signature2018",
-		|	  "signatureBase58": "$encodedSignature"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val envelope = DidEnvelope(instruction, originalDocument)
-
-		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
-
-		assertThat(actual, isA<UntargetedPublicKeyFailure>())
-	}
-
-	@Test
-	fun `Deletion fails for an envelope with irrelevant rsa signatures`() {
-		/*
-		 * Generate valid base Document
-		 */
-		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
-
-		/*
-		 * Generate a key pair for the original document
-		 */
-		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-		val keyPair1 = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
-		val encodedKey1 = keyPair1.public.encoded.toBase58()
-
-		val originalDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "${RSA.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey1"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
-		val keyPair2 = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
-		val signature = keyPair2.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-		val encodedSignature = signature.bytes.toBase58()
-
-		val instruction = """{
-		|  "action": "delete",
-		|  "signatures": [
-		|	{
-		|	  "id": "$keyUri2",
-		|	  "type": "RsaSignature2018",
-		|	  "signatureBase58": "$encodedSignature"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val envelope = DidEnvelope(instruction, originalDocument)
-
-		val actual = envelope.validateDeletion(DidDocument(originalDocument)).assertFailure()
-
-		assertThat(actual, isA<UntargetedPublicKeyFailure>())
-	}
-
-	@Test
-	fun `Deletion fails for an envelope with irrelevant ecdsa signatures`() {
-		Security.addProvider(BouncyCastleProvider())
-		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
-		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
-		g.initialize(ecSpec, SecureRandom())
-
-		/*
-		 * Generate valid base Document
-		 */
-		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
-
-		/*
-		 * Generate a key pair for the original document
-		 */
-		val keyUri1 = URI("${documentId.toExternalForm()}#keys-1")
-		val keyPair1 = g.generateKeyPair()
-		val encodedKey1 = keyPair1.public.encoded.toBase58()
-
-		val originalDocument = """{
-		|  "@context": "https://w3id.org/did/v1",
-		|  "id": "${documentId.toExternalForm()}",
-		|  "created": "1970-01-01T00:00:00Z",
-		|  "publicKey": [
-		|	{
-		|	  "id": "$keyUri1",
-		|	  "type": "${EcdsaSecp256k1.keyID}",
-		|	  "controller": "${documentId.toExternalForm()}",
-		|	  "publicKeyBase58": "$encodedKey1"
-		|	}
-		|  ]
-		|}""".trimMargin()
-
-		val keyUri2 = URI("${documentId.toExternalForm()}#keys-2")
-		val keyPair2 = g.generateKeyPair()
-		val signature = keyPair2.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
-		val encodedSignature = signature.bytes.toBase58()
-
-		val instruction = """{
-		|  "action": "delete",
-		|  "signatures": [
-		|	{
-		|	  "id": "$keyUri2",
-		|	  "type": "EcdsaSignatureSecp256k1",
 		|	  "signatureBase58": "$encodedSignature"
 		|	}
 		|  ]
