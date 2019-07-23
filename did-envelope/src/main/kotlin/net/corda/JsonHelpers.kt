@@ -13,8 +13,8 @@ import com.nimbusds.jose.jwk.OctetSequenceKey
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.util.JSONObjectUtils
 import io.ipfs.multiformats.multibase.MultiBase
-import net.corda.JsonFailure.InvalidBase58Representation
 import net.corda.JsonFailure.InvalidCryptoSuiteFailure
+import net.corda.JsonFailure.InvalidEncoding
 import net.corda.JsonFailure.InvalidUriFailure
 import net.corda.JsonFailure.MissingPropertyFailure
 import net.corda.core.crypto.AddressFormatException
@@ -61,7 +61,7 @@ fun JsonObject.getMandatoryObject(key: String): JsonResult<JsonObject> = getObje
  * @return [JsonResult]
  */
 
-fun JsonObject.getMandatoryString(key: String): JsonResult<String> = getString(key)?.let { value ->
+fun JsonObject.getMandatoryString(key: String?): JsonResult<String> = getString(key)?.let { value ->
 	Success(value)
 } ?: Failure(MissingPropertyFailure(key))
 
@@ -110,43 +110,91 @@ fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): Json
  * @return [JsonResult]
  */
 
-fun JsonObject.getMandatoryEncoding(key: String): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
+fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {
 		when (key) {
-			"publicKeyBase58"    -> Success(Base58.decode(value))
-			"signatureBase58"    -> Success(Base58.decode(value))
-			"publicKeyHex"       -> Success(Hex.decodeHex(value.toCharArray()))
-			"publicKeyBase64"    -> Success(Base64.getDecoder().decode(value))
-			"publicKeyMultibase" -> Success(MultiBase.decode(value))
+			"publicKeyBase58"    -> {
+				try {
+					val decodedValue = Base58.decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			"signatureBase58"    -> {
+				try {
+					val decodedValue = Base58.decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			"publicKeyHex"       -> {
+				try {
+					val decodedValue = Hex.decodeHex(value.toCharArray())
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			"publicKeyBase64"    -> {
+				try {
+					val decodedValue = Base64.getDecoder().decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			"publicKeyMultibase" -> {
+				try {
+					val decodedValue = MultiBase.decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
 			"publicKeyPem"       -> {
-				var encodedString = value.replace("\n", "").replace("\r", "")
-				encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
-				Success(Base64.getDecoder().decode(encodedString.toByteArray()))
+				try {
+					var encodedString = value.replace("\n", "").replace("\r", "")
+					encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
+					Success(Base64.getDecoder().decode(encodedString.toByteArray()))
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
 			}
 			"publicKeyJwk"       -> {
-				val parsedObject = JSONObjectUtils.parse(value)
-				val kty = KeyType.parse(JSONObjectUtils.getString(parsedObject, "kty"))
-				when (kty) {
-					KeyType.RSA -> {
-						val rsaKey = RSAKey.parse(parsedObject)
-						return Success(rsaKey.toRSAPublicKey().encoded)
+				try {
+					val parsedObject = JSONObjectUtils.parse(value)
+					val kty = KeyType.parse(JSONObjectUtils.getString(parsedObject, "kty"))
+					when (kty) {
+						KeyType.RSA -> {
+							val rsaKey = RSAKey.parse(parsedObject)
+							return Success(rsaKey.toRSAPublicKey().encoded)
+						}
+						KeyType.EC  -> {
+							val ecKey = ECKey.parse(parsedObject)
+							return Success(ecKey.toECPublicKey().encoded)
+						}
+						KeyType.OCT -> {
+							val octetKey = OctetSequenceKey.parse(parsedObject)
+							return Success(octetKey.toByteArray())
+						}
 					}
-					KeyType.EC  -> {
-						val ecKey = ECKey.parse(parsedObject)
-						return Success(ecKey.toECPublicKey().encoded)
-					}
-					KeyType.OCT -> {
-						val octetKey = OctetSequenceKey.parse(parsedObject)
-						return Success(octetKey.toByteArray())
-					}
+					Failure(InvalidEncoding(value))
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
 				}
-				Failure(InvalidBase58Representation(value))
 			}
-			else                 -> Failure(InvalidBase58Representation(value))
+			else                 -> Failure(InvalidEncoding(value))
 		}
 
 	} catch (e: AddressFormatException) {
-		Failure(InvalidBase58Representation(value))
+		Failure(InvalidEncoding(value))
 	}
 }
 
@@ -158,12 +206,12 @@ typealias JsonResult<T> = Result<T, JsonFailure>
  *
  * @property [MissingPropertyFailure] Specifies that a property is missing in JSON payload.
  * @property [InvalidUriFailure] Specifies if uri is invalid.
- * @property [InvalidBase58Representation] Specifies if base58 representation is wrong.
+ * @property [InvalidEncoding] Specifies if base58 representation is wrong.
  * @property [InvalidCryptoSuiteFailure] Specifies if the provided crypto suite is invalid
  * */
 sealed class JsonFailure : FailureCode() {
-	class MissingPropertyFailure(val key: String) : JsonFailure()
+	class MissingPropertyFailure(val key: String?) : JsonFailure()
 	class InvalidUriFailure(val value: String) : JsonFailure()
-	class InvalidBase58Representation(val value: String) : JsonFailure()
+	class InvalidEncoding(val value: String) : JsonFailure()
 	class InvalidCryptoSuiteFailure(val value: String) : JsonFailure()
 }

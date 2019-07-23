@@ -61,12 +61,9 @@ class DidInstruction(json: String) : JsonBacked(json) {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 			val listOfEncodings = arrayOf("signatureBase58")
-			val encodingUsed = listOfEncodings.filter { signature.has(it) }
-			if (encodingUsed.size != 1) {
-				throw Exception("Incorrect number of supported encoding schemes provided for signatures")
-			}
+			val encodingUsed = listOfEncodings.filter { signature.has(it) }.singleOrNull()
 
-			val value = signature.getMandatoryEncoding(encodingUsed.first()).mapFailure {
+			val value = signature.getMandatoryEncoding(encodingUsed).mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 
