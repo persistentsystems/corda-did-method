@@ -238,7 +238,7 @@ class DeleteDIDAPITest {
 		|}""".trimMargin()
 		val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).param("instruction", instructionNew).param("document", documentNew)
 		val resultUpdate = mockMvc.perform(updateBuilder).andReturn()
-		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isNotFound())
+		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().is4xxClientError())
 
 	}
 
