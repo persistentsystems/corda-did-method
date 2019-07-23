@@ -1,7 +1,6 @@
 package com.persistent.did.state
 
 import com.natpryce.onFailure
-import com.natpryce.valueOrNull
 import com.persistent.did.contract.DidContract
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
@@ -38,7 +37,7 @@ data class DidState(
 	 */
 	override fun generateMappedObject(schema: MappedSchema): PersistentState {
 
-		val did = envelope.document.id().onFailure { throw IllegalArgumentException("Invalid did format")  }
+		val did = envelope.document.id().onFailure { throw IllegalArgumentException("Invalid did format") }
 		return when (schema) {
 			is DidStateSchemaV1 -> DidStateSchemaV1.PersistentDidState(
 					originator = originator,
@@ -60,6 +59,5 @@ data class DidState(
  */
 @CordaSerializable
 enum class DidStatus {
-	ACTIVE,
-	DELETED
+	ACTIVE
 }

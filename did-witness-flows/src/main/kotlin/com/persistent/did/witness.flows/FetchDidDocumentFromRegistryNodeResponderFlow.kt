@@ -21,6 +21,7 @@ import net.corda.did.DidDocument
  * fetch the [DidDocument] and hence obtain the publicKey needed to verify the signature.
  *
  * @property session the flow session between initiator and responder.
+ * @property ProgressTracker tracks the progress in the various stages of transaction
  */
 @InitiatedBy(FetchDidDocumentFromRegistryNodeFlow::class)
 class FetchDidDocumentFromRegistryNodeResponderFlow(private val session: FlowSession) : FlowLogic<Unit>() {

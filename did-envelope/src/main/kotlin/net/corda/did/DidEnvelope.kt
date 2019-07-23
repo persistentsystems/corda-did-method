@@ -100,7 +100,7 @@ class DidEnvelope(
 	fun validateDeletion(precursor: DidDocument): Result<Unit, ValidationFailure> {
 		instruction.action().onFailure {
 			return Failure(MalformedInstructionFailure(it.reason))
-		}.ensureIs(Update, Delete)
+		}.ensureIs(Delete)
 
 		// perform base validation, ensuring that the document is valid, not yet taking into account the precursor
 		validate().onFailure { return it }

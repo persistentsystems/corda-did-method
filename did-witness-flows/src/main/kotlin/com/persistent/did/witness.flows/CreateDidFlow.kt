@@ -32,7 +32,7 @@ import net.corda.did.DidEnvelope
  * The did will be created on the [DidState.originator] and [DidState.witnesses] nodes.
  *
  * @property envelope the [DidEnvelope] object.
- * @property progressTracker
+ * @property progressTracker tracks the progress in the various stages of transaction
  */
 @InitiatingFlow
 @StartableByRPC
@@ -84,9 +84,11 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 
 		val config = serviceHub.getAppContext().config
 		val nodes = config.get("nodes") as ArrayList<*>
-		// TODO moritzplatt 2019-07-16 -- rewrite as `nodes.map { ... }`
+
 		val witnessNodesList = arrayListOf<Party>()
-		nodes.map { witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(it.toString()))!!) }
+		nodes.map {
+			witnessNodesList.add(serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse(it.toString()))!!)
+		}
 		val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
 
 		// Generate an unsigned transaction.
@@ -105,7 +107,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		// Sign the transaction.
 		val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-		// Stage 5.
+		// Stage 4.
 		progressTracker.currentStep = FINALISING_TRANSACTION
 
 		val otherPartySession = didState.witnesses.minus(ourIdentity).map { initiateFlow(it) }.toSet()

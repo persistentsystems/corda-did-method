@@ -24,7 +24,6 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.did.CordaDid
 import net.corda.did.DidEnvelope
-import net.corda.did.DidInstruction
 
 /**
  * Initiating flow to DELETE a DID on ledger as specified in the w3 specification. The delete operation only deactivates the did on ledger by updating the [DidState] with status as [DidStatus.DELETED].
@@ -32,7 +31,7 @@ import net.corda.did.DidInstruction
  *
  * @property instruction The instruction JSON object containing signatures of did-owner on the did-document to be deactivated.
  * @property did the did to be deleted.
- * @property ProgressTracker for tracking the steps in transaction
+ * @property ProgressTracker tracks the progress in the various stages of transaction
  */
 @InitiatingFlow
 @StartableByRPC
@@ -68,10 +67,10 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 
 		val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, cordaDID.uuid), DidState::class.java)
 
-		if (didStates.isEmpty()) {
-			throw DIDNotFoundException("DID with id $did does not exist")
+		val inputDidState = didStates.let {
+			if(it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
+			else it.single()
 		}
-		val inputDidState = didStates.singleOrNull()!!
 
 		val notary = serviceHub.getNotaryFromConfig()
 
@@ -79,10 +78,9 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 		progressTracker.currentStep = GENERATING_TRANSACTION
 
 		// Generate an unsigned transaction.
-		val txCommand = Command(DidContract.Commands.Delete(), listOf(ourIdentity.owningKey))
+		val txCommand = Command(DidContract.Commands.Delete(DidEnvelope(instruction, inputDidState.state.data.envelope.rawDocument)), listOf(ourIdentity.owningKey))
 		val txBuilder = TransactionBuilder(notary)
 				.addInputState(inputDidState)
-				.addOutputState(inputDidState.state.data.copy(status = DidStatus.DELETED, envelope = DidEnvelope(DidInstruction(instruction).source, inputDidState.state.data.envelope.document.source)), DidContract.DID_CONTRACT_ID)
 				.addCommand(txCommand)
 
 		// Stage 2.
@@ -95,7 +93,7 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 		// Sign the transaction.
 		val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-		// Stage 5.
+		// Stage 4.
 		progressTracker.currentStep = FINALISING_TRANSACTION
 
 		val otherPartySession = inputDidState.state.data.witnesses.map { initiateFlow(it) }.toSet()

@@ -98,7 +98,7 @@ abstract class AbstractFlowTestUtils {
 		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.ACTIVE, UniqueIdentifier.fromString(UUID.toString()))
 	}
 
-	protected fun getDidStateForDeleteOperation(): DidState {
+	protected fun getEnvelopeForDeleteOperation(): DidEnvelope {
 		val signatureFromOldKey = originalKeyPair.private.sign(originalDocument.toByteArray(Charsets.UTF_8))
 		val signatureFromOldKeyEncoded = signatureFromOldKey.bytes.toBase58()
 
@@ -113,8 +113,7 @@ abstract class AbstractFlowTestUtils {
 		|  ]
 		|}""".trimMargin()
 
-		val envelope = DidEnvelope(instruction, originalDocument)
-		return DidState(envelope, originator.info.singleIdentity(), setOf(w1.info.singleIdentity(), w2.info.singleIdentity()), DidStatus.DELETED, UniqueIdentifier.fromString(UUID.toString()))
+		return DidEnvelope(instruction, originalDocument)
 	}
 
 	protected fun getDidStateForUpdateOperation(): DidState {
