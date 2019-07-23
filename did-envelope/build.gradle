@@ -19,8 +19,8 @@ dependencies {
     compile "com.natpryce:result4k:2.0.0"
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
     compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
-//    // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
-//    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '2.10.1'
+    // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.2.1'
 //    // https://mvnrepository.com/artifact/io.ipfs.multiformats/kotlin-multibase
     compile group: 'io.ipfs.multiformats', name: 'kotlin-multibase', version: '1.0.0'
 

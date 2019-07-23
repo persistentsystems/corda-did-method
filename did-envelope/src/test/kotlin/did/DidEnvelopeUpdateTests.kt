@@ -9,8 +9,8 @@ import net.corda.assertFailure
 import net.corda.assertSuccess
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
-import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.EcdsaSecp256k1
+import net.corda.did.CryptoSuite.Ed25519
 import net.corda.did.CryptoSuite.RSA
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.InvalidTemporalRelationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.MissingSignatureFailure

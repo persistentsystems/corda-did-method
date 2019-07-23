@@ -7,6 +7,11 @@ import com.natpryce.Result
 import com.natpryce.Success
 import com.natpryce.flatMap
 import com.natpryce.mapFailure
+import com.nimbusds.jose.jwk.ECKey
+import com.nimbusds.jose.jwk.KeyType
+import com.nimbusds.jose.jwk.OctetSequenceKey
+import com.nimbusds.jose.jwk.RSAKey
+import com.nimbusds.jose.util.JSONObjectUtils
 import io.ipfs.multiformats.multibase.MultiBase
 import net.corda.JsonFailure.InvalidBase58Representation
 import net.corda.JsonFailure.InvalidCryptoSuiteFailure
@@ -111,15 +116,31 @@ fun JsonObject.getMandatoryEncoding(key: String): JsonResult<ByteArray> = getMan
 			"publicKeyBase58"    -> Success(Base58.decode(value))
 			"signatureBase58"    -> Success(Base58.decode(value))
 			"publicKeyHex"       -> Success(Hex.decodeHex(value.toCharArray()))
-			"signatureHex"       -> Success(Hex.decodeHex(value.toCharArray()))
 			"publicKeyBase64"    -> Success(Base64.getDecoder().decode(value))
-			"signatureBase64"    -> Success(Base64.getDecoder().decode(value))
 			"publicKeyMultibase" -> Success(MultiBase.decode(value))
-			"signatureMultibase" -> Success(MultiBase.decode(value))
 			"publicKeyPem"       -> {
 				var encodedString = value.replace("\n", "").replace("\r", "")
 				encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
 				Success(Base64.getDecoder().decode(encodedString.toByteArray()))
+			}
+			"publicKeyJwk"       -> {
+				val parsedObject = JSONObjectUtils.parse(value)
+				val kty = KeyType.parse(JSONObjectUtils.getString(parsedObject, "kty"))
+				when (kty) {
+					KeyType.RSA -> {
+						val rsaKey = RSAKey.parse(parsedObject)
+						return Success(rsaKey.toRSAPublicKey().encoded)
+					}
+					KeyType.EC  -> {
+						val ecKey = ECKey.parse(parsedObject)
+						return Success(ecKey.toECPublicKey().encoded)
+					}
+					KeyType.OCT -> {
+						val octetKey = OctetSequenceKey.parse(parsedObject)
+						return Success(octetKey.toByteArray())
+					}
+				}
+				Failure(InvalidBase58Representation(value))
 			}
 			else                 -> Failure(InvalidBase58Representation(value))
 		}
