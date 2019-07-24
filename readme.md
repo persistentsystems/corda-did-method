@@ -40,7 +40,7 @@ Once replicated, anyone with access to one of the consortium nodes can request t
 A Corda DID specifies the `corda` method, a target network (for e.g. `testnet`, `tcn-uat`, `tcn`) and a UUID formatted as per [RFC 4122](https://tools.ietf.org/html/rfc4122#section-3).
 
 ```regexp
-did:corda:(.+):[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}
+did:corda:([a-z]+(?:\-?[a-z]+)*):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})
 ```
 
 I.e.

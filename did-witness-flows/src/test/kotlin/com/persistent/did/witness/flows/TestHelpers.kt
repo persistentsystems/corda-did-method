@@ -17,6 +17,7 @@ import net.corda.core.identity.CordaX500Name
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.toBase58
+import net.corda.did.CordaDid
 import net.corda.did.CryptoSuite
 import net.corda.did.DidDocument
 import net.corda.did.DidEnvelope
@@ -43,7 +44,7 @@ abstract class AbstractFlowTestUtils {
 	lateinit var w2: StartedMockNode
 	val notarySpec = CordaX500Name(organisation = "Notary", locality = "TestVillage", country = "US")
 	val UUID = java.util.UUID.randomUUID()
-	val documentId = net.corda.did.CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
+	val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID}").assertSuccess()
 	val originalKeyUri = URI("${documentId.toExternalForm()}#keys-1")
 	val originalKeyPair = KeyPairGenerator().generateKeyPair()
 	val originalKeyPairEncoded = originalKeyPair.public.encoded.toBase58()
