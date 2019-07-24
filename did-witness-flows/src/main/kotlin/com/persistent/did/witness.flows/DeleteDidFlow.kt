@@ -68,7 +68,7 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 		val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, cordaDID.uuid), DidState::class.java)
 
 		val inputDidState = didStates.let {
-			if(it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
+			if (it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
 			else it.single()
 		}
 
@@ -102,11 +102,12 @@ class DeleteDidFlow(val instruction: String, val did: String) : FlowLogic<Signed
 	}
 }
 
-@InitiatedBy(DeleteDidFlow::class)
 /**
- * Receiver finality flow
+ * Receiver finality flow for [DeleteDidFlow]
  * @property[otherPartySession] FlowSession
- * */
+ *
+ */
+@InitiatedBy(DeleteDidFlow::class)
 class DeleteDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
 	@Suspendable
 	override fun call() {
