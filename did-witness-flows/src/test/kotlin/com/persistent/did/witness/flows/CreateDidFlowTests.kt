@@ -46,6 +46,31 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 	}
 
 	@Test
+	fun `create did should fail after did deletion with same id`() {
+		// create and delete did
+		deleteDID(getEnvelopeForDeleteOperation())!!.tx
+		mockNetwork.waitQuiescent()
+
+		// check if did is deleted on all 3 test nodes
+		w1.transaction {
+			val states = w1.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.isEmpty())
+		}
+
+		w2.transaction {
+			val states = w2.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.isEmpty())
+		}
+
+		originator.transaction {
+			val states = originator.services.vaultService.queryBy(DidState::class.java).states
+			assert(states.isEmpty())
+		}
+		// re-create did
+		assertFailsWith<DIDAlreadyExistException> { createDID(getDidStateForCreateOperation().envelope) }
+	}
+
+	@Test
 	fun `DID creation succeeds for an envelope with multiple keys`() {
 		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${java.util.UUID.randomUUID()}").assertSuccess()
 

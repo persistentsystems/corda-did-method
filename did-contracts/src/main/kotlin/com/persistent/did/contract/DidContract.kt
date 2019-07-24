@@ -62,7 +62,7 @@ open class DidContract : Contract {
 		 * Create Command
 		 * Ref: https://w3c-ccg.github.io/did-spec/#create
 		 */
-		class Create : Commands
+		class Create(val networkType: String) : Commands
 
 		/** Update Command
 		 *  Ref: https://w3c-ccg.github.io/did-spec/#create
@@ -88,6 +88,11 @@ open class DidContract : Contract {
 		"DID Create transaction should have only one output" using (tx.outputs.size == 1)
 
 		"DID Create transaction must be signed by the DID originator" using (setOfSigners.size == 1 && setOfSigners.contains(didState.originator.owningKey))
+
+		// validate the network type
+		val networkType = tx.commandsOfType<Create>().single().value.networkType
+		val network = didState.envelope.document.id().onFailure { throw IllegalArgumentException("Invalid did") }
+		"Invalid network type found in did" using(networkType == network.network)
 
 		// validate did envelope
 		"the envelope presented is must be valid to create" using (didState.envelope.validateCreation() is Success)
