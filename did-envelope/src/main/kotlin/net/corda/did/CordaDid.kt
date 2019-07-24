@@ -50,7 +50,7 @@ class CordaDid(
 				return Failure(InvalidDidSchemeFailure(did.scheme))
 
 			// TODO moritzplatt 2019-07-16 -- this should take the current network running on into consideration
-			val regex = """did:corda:(.+):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
+			val regex = """did:corda:([a-z]+(?:\-?[a-z]+)*):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
 
 			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(MalformedCordaDidFailure())
 
