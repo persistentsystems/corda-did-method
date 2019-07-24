@@ -31,10 +31,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 				result.state
 			}
 		}
-
-		if (responseState.data.status == DidStatus.DELETED) {
-			return null
-		}
 		return responseState.data.envelope.rawDocument
 
 	}
@@ -54,9 +50,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 				val result = it.single()
 				result.state
 			}
-		}
-		if (responseState.data.status == DidStatus.DELETED) {
-			return null
 		}
 		return responseState.data.envelope.document
 
