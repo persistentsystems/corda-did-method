@@ -616,9 +616,9 @@ The steps for setting up the project are [here.](/installation_setup.md)
 
 |                             	| `publicKeyPem` 	| `publicKeyJwk` 	| `publicKeyHex` 	| `publicKeyBase64` 	| `publicKeyBase58` 	| `publicKeyMultibase` 	|
 |-----------------------------	|----------------	|----------------	|----------------	|-------------------	|-------------------	|----------------------	|
-| `Ed25519Signature2018`      	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✔         	|           ✖          	|
-| `RsaSignature2018`          	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
-| `EdDsaSASignatureSecp256k1` 	|        ✖       	|        ✖       	|        ✖       	|         ✖         	|         ✖         	|           ✖          	|
+| `Ed25519Signature2018`      	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔         	|           ✔           	|
+| `RsaSignature2018`          	|        ✔       	|        ✔        	|        ✔        	|         ✔         	|         ✔          	|           ✔           	|
+| `EdDsaSASignatureSecp256k1` 	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔          	|           ✔           	|
 
 
 
