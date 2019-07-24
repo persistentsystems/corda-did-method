@@ -1,5 +1,6 @@
 package com.persistent.did.utils
 
+import com.persistent.did.state.DidState
 import net.corda.core.CordaRuntimeException
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.LinearState
@@ -37,6 +38,19 @@ fun <T : ContractState> ServiceHub.loadState(linearId: UniqueIdentifier, clazz: 
 	val queryCriteria = QueryCriteria.LinearStateQueryCriteria(null,
 			listOf(linearId), Vault.StateStatus.UNCONSUMED, null)
 	return this.vaultService.queryBy(clazz, queryCriteria).states
+}
+
+/**
+ * returns true if Did exist on ledger (CONSUMED as well as UNCONSUMED)
+ *
+ * @param linearId the linearId of the [DidState] to be queried
+ * @receiver [ServiceHub]
+ * @return [Boolean]
+ */
+fun ServiceHub.checkIfDidExist(linearId: UniqueIdentifier): Boolean {
+	val queryCriteria = QueryCriteria.LinearStateQueryCriteria(null,
+			listOf(linearId), Vault.StateStatus.ALL, null)
+	return this.vaultService.queryBy(DidState::class.java, queryCriteria).states.isNotEmpty()
 }
 
 class NotaryNotFoundException(override val message: String) : CordaRuntimeException(message)
