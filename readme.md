@@ -37,10 +37,10 @@ Once replicated, anyone with access to one of the consortium nodes can request t
 ### Corda DID Format
 ----------------
 
-A Corda DID specifies the `corda` method, a target network (currently `testnet`, `tcn-uat`, `tcn`) and a UUID formatted as per [RFC 4122](https://tools.ietf.org/html/rfc4122#section-3).
+A Corda DID specifies the `corda` method, a target network (for e.g. `testnet`, `tcn-uat`, `tcn`) and a UUID formatted as per [RFC 4122](https://tools.ietf.org/html/rfc4122#section-3).
 
 ```regexp
-did:corda:(testnet|tcn-uat|tcn):[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}
+did:corda:(.+):[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}
 ```
 
 I.e.
@@ -48,6 +48,7 @@ I.e.
  - `did:corda:testnet:3df6b0a1-6b02-4053-8900-8c36b6d35fa1`
  - `did:corda:tcn:3df6b0a1-6b02-4053-8900-8c36b6d35fa1`
  - `did:corda:tcn-uat:3df6b0a1-6b02-4053-8900-8c36b6d35fa1`
+ - `did:corda:persistent-private:3df6b0a1-6b02-4053-8900-8c36b6d35fa1`
 
 ### Corda DID-Network Mapping
 
@@ -60,6 +61,8 @@ A more dynamic approach to membership may be developed later.
 | `tcn-uat` | [The Corda Network](https://corda.network/)                     | UAT   | --to be defined--       |
 | `tcn`     | [The Corda Network](https://corda.network/)                     | Live  | --to be defined--       |
  
+Users may choose to deploy DID Methods on a custom network. The node will have to specify the type of network in cordapp-config file.
+
 ### Corda DID Operation Definition
 Corda DID supports CRUD operations. Developers can perform CRUD operations in two ways:
 * REST APIs
@@ -354,7 +357,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
 ##### Delete (`DELETE {did}`)
 
-This method is used to disable the identity on the ledger.Once deleted the identity cannot be used again.Delete accepts only instruction as payload , the instruction contains signature(s) for the public key(s) of the latest DID document on the ledger.
+This method is used to disable the identity on the ledger. Once deleted the identity cannot be used again. Delete accepts only instruction as payload , the instruction contains signature(s) for the public key(s) of the latest DID document on the ledger.
 
 Payload includes:
 - The instruction consisting of action to perform (delete), encoded signature on the latest DID document on the ledger using all private keys associated with public keys present in the document and type of the signature.

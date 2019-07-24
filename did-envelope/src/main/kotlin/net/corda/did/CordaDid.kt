@@ -62,20 +62,6 @@ class CordaDid(
 
 			return Success(CordaDid(did, n, uuid))
 		}
-
-		/**
-		 * Returns an enum representing target Corda network for did
-		 *
-		 * @receiver [String]
-		 * @return [Network]
-		 *
-		 */
-		private fun String.toNetwork(): Result<Network, CordaDidFailure> = when (this) {
-			"tcn"     -> Success(CordaNetwork)
-			"tcn-uat" -> Success(CordaNetworkUAT)
-			"testnet" -> Success(Testnet)
-			else      -> Failure(InvalidCordaNetworkFailure())
-		}
 	}
 }
 
