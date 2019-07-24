@@ -1,7 +1,6 @@
 package com.persistent.did.api
 
 import com.persistent.did.state.DidState
-import com.persistent.did.state.DidStatus
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.vaultQueryBy
@@ -32,9 +31,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 			}
 		}
 
-		if (responseState.data.status == DidStatus.DELETED) {
-			return null
-		}
 		return responseState.data.envelope.rawDocument
 
 	}
@@ -54,9 +50,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 				val result = it.single()
 				result.state
 			}
-		}
-		if (responseState.data.status == DidStatus.DELETED) {
-			return null
 		}
 		return responseState.data.envelope.document
 

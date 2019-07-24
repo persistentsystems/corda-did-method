@@ -5,10 +5,15 @@
 
 package com.persistent.did.api
 
+import com.nimbusds.jose.jwk.OctetSequenceKey
+import io.ipfs.multiformats.multibase.MultiBase
 import net.corda.core.crypto.sign
 import net.corda.core.utilities.toBase58
+import net.corda.core.utilities.toBase64
+import net.corda.core.utilities.toHex
 import net.corda.did.CryptoSuite
 import net.i2p.crypto.eddsa.KeyPairGenerator
+import org.json.simple.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.springframework.mock.web.MockMultipartFile
@@ -21,6 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.io.FileInputStream
 import java.lang.Thread.sleep
 import java.net.URI
+import java.util.Base64
 import java.util.Properties
 import java.util.UUID
 
@@ -419,6 +425,375 @@ class CreateDIDAPITest {
 		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
 		sleep(2000)
 		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID using base64 encoding`() {
+		val kp = KeyPairGenerator().generateKeyPair()
+
+		val pub = kp.public.encoded.toBase64()
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase64": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+		sleep(2000)
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID using Hex encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+
+		val pub = kp.public.encoded.toHex()
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyHex": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+		sleep(2000)
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID using Multibase encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+
+		val pub = MultiBase.encode(MultiBase.Base.BASE32, kp.public.encoded)
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyMultibase": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+		sleep(2000)
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID using PEM encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+		val encoder = Base64.getEncoder()
+		val keyBegin = "-----BEGIN PUBLIC KEY-----"
+		val keyEnd = "-----END PUBLIC KEY-----"
+		val pub = keyBegin + String(encoder.encode(kp.public.encoded)) + keyEnd
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyPem": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+		sleep(2000)
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID using JWK encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+		val eddsaJWK = OctetSequenceKey.Builder(kp.public.encoded).build()
+		val pub = JSONObject.escape(eddsaJWK.toString())
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyJwk": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk()).andReturn()
+		sleep(2000)
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(status().isOk()).andExpect(content().json(document)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID  fails for invalid encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+		val eddsaJWK = OctetSequenceKey.Builder(kp.public.encoded).build()
+		val pub = JSONObject.escape(eddsaJWK.toString())
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyJwT": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID  fails for mismatching encoding `() {
+		val kp = KeyPairGenerator().generateKeyPair()
+		val eddsaJWK = OctetSequenceKey.Builder(kp.public.encoded).build()
+		val pub = JSONObject.escape(eddsaJWK.toString())
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.Ed25519.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyPem": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase64()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase64": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(asyncDispatch(result)).andExpect(status().is4xxClientError()).andReturn()
 
 	}
 

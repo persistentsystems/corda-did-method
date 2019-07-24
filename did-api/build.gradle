@@ -39,6 +39,9 @@ dependencies {
     compile "net.corda:corda-jackson:$corda_release_version"
     compile "net.corda:corda-rpc:$corda_release_version"
     compile "net.corda:corda:$corda_release_version"
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.2.1'
+    compile group: 'io.ipfs.multiformats', name: 'kotlin-multibase', version: '1.0.0'
     testCompile "net.corda:corda-node-driver:$corda_release_version"
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'com.ninja-squad:springmockk:1.1.0'

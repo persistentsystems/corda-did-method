@@ -12,6 +12,7 @@ import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
 import net.corda.did.CordaDid
+import net.corda.did.DidInstruction
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -80,7 +81,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Takes instruction,document and did as input, validates them and returns an envelope Object.
 			 *
 			 * */
-			val envelope = apiUtils.generateEnvelope(instruction, document, did)
+			val envelope = apiUtils.generateEnvelope(instruction, document, did, "create")
 			/**
 			 *  Checks if the provided 'did' is in the correct format.
 			 *
@@ -118,8 +119,6 @@ class MainController(rpc: NodeRPCConnection) {
 					apiResult.setResult(ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
 				} catch (e: IllegalArgumentException) {
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
-				} catch (e: DIDDeletedException) {
-					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.CONFLICT))
 				} catch (e: DIDAlreadyExistException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.CONFLICT).toResponseObj(), HttpStatus.CONFLICT))
 				} catch (e: Exception) {
@@ -199,34 +198,13 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Takes instruction,document and did as input, validates them and returns an envelope Object.
 			 *
 			 * */
-			val envelope = apiUtils.generateEnvelope(instruction, document, did)
+			val envelope = apiUtils.generateEnvelope(instruction, document, did, "update")
 			/**
 			 * Converts the "did" from external form to uuid form else returns an error
 			 *
 			 * */
-			val uuid = CordaDid.parseExternalForm(did).onFailure {
+			CordaDid.parseExternalForm(did).onFailure {
 				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult
-			}
-
-			/**
-			 * Perform a check at the API layer to make sure that the data provided meets the criteria for update,before passing it to the flow.
-			 *
-			 * */
-			try {
-				val didJson = queryUtils.getCompleteDIDDocumentByLinearId(uuid.uuid.toString())
-				if (didJson == null) {
-					val response = ApiResponse(APIMessage.NOT_FOUND)
-					apiResult.setErrorResult(ResponseEntity(response.toResponseObj(), HttpStatus.NOT_FOUND))
-					return apiResult
-				}
-				val envelopeVerified = envelope.validateModification(didJson)
-				envelopeVerified.onFailure { apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason));return apiResult }
-			} catch (e: NullPointerException) {
-				apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.NOT_FOUND).toResponseObj(), HttpStatus.NOT_FOUND))
-				return apiResult
-			} catch (e: DIDDeletedException) {
-				apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
-				return apiResult
 			}
 
 			/**
@@ -250,9 +228,6 @@ class MainController(rpc: NodeRPCConnection) {
 				} catch (e: DIDNotFoundException) {
 
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.NOT_FOUND).toResponseObj(), HttpStatus.NOT_FOUND))
-				} catch (e: DIDDeletedException) {
-
-					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
 				} catch (e: Exception) {
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
@@ -280,6 +255,15 @@ class MainController(rpc: NodeRPCConnection) {
 	): DeferredResult<ResponseEntity<Any?>> {
 		val apiResult = DeferredResult<ResponseEntity<Any?>>()
 		try {
+			/** validating if instruction and did are in the correct format**/
+			CordaDid.parseExternalForm(did).onFailure {
+				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult
+			}
+			val didInstruction = DidInstruction(instruction)
+			if (didInstruction.json["action"] != "delete") {
+				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_ACTION).toResponseObj()))
+				return apiResult
+			}
 			/**
 			 * Passing the instruction and did to the DeleteDidFlow
 			 *
@@ -298,8 +282,6 @@ class MainController(rpc: NodeRPCConnection) {
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				} catch (e: DIDNotFoundException) {
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.NOT_FOUND).toResponseObj(), HttpStatus.NOT_FOUND))
-				} catch (e: DIDDeletedException) {
-					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.DID_DELETED).toResponseObj(), HttpStatus.NOT_FOUND))
 				} catch (e: Exception) {
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))

@@ -88,9 +88,9 @@ data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 
 			// TODO moritzplatt 2019-02-13 -- Support other encodings
 			// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
-			val listOfEncodings = arrayOf("publicKeyBase58", "publicKeyBase64", "publicKeyHex", "publicKeyMultibase", "publicKeyPem", "publicKeyJwk")
-			val encodingUsed = listOfEncodings.filter { key.has(it) }.singleOrNull()
-			var value = key.getMandatoryEncoding(encodingUsed).mapFailure {
+			val listOfEncodings = arrayOf(PublicKeyEncoding.PublicKeyBase58, PublicKeyEncoding.PublicKeyBase64, PublicKeyEncoding.PublicKeyHex, PublicKeyEncoding.PublicKeyMultibase, PublicKeyEncoding.PublicKeyPem, PublicKeyEncoding.PublicKeyJwk)
+			val encodingUsed = listOfEncodings.filter { key.has(it.encodingId) }.singleOrNull()
+			var value = key.getMandatoryEncoding(encodingUsed?.encodingId).mapFailure {
 				InvalidDocumentJsonFailure(it)
 			}.onFailure { return it }
 

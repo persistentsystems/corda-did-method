@@ -4,6 +4,7 @@ import com.natpryce.onFailure
 import com.persistent.did.api.APIMessage.CRYPTO_SUITE_MISMATCH
 import com.persistent.did.api.APIMessage.DID_EMPTY
 import com.persistent.did.api.APIMessage.DOCUMENT_EMPTY
+import com.persistent.did.api.APIMessage.INCORRECT_ACTION
 import com.persistent.did.api.APIMessage.INSTRUCTION_EMPTY
 import com.persistent.did.api.APIMessage.INVALID_PUBLIC_KEY
 import com.persistent.did.api.APIMessage.INVALID_SIGNATURE
@@ -86,7 +87,7 @@ class APIUtils {
 	 *
 	 * @return  The DidEnvelope class object
 	 * */
-	fun generateEnvelope(instruction: String, document: String, did: String): DidEnvelope {
+	fun generateEnvelope(instruction: String, document: String, did: String, action: String): DidEnvelope {
 
 		if (instruction.isEmpty()) {
 			logger.info("instruction is empty")
@@ -104,6 +105,10 @@ class APIUtils {
 		}
 
 		val envelope = DidEnvelope(instruction, document)
+		if (envelope.instruction.json["action"] != action) {
+			throw IllegalArgumentException(ApiResponse(INCORRECT_ACTION).message)
+
+		}
 		val envelopeDid = envelope.document.id().onFailure { throw IllegalArgumentException(DID_EMPTY.message) }
 
 		if (envelopeDid.toExternalForm() != did) {

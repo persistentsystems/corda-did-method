@@ -20,6 +20,8 @@ import net.corda.JsonFailure.MissingPropertyFailure
 import net.corda.core.crypto.AddressFormatException
 import net.corda.core.crypto.Base58
 import net.corda.did.CryptoSuite
+import net.corda.did.PublicKeyEncoding
+import net.corda.did.SignatureEncoding
 import org.apache.commons.codec.binary.Hex
 import java.net.URI
 import java.util.Base64
@@ -113,7 +115,7 @@ fun JsonObject.getMandatoryCryptoSuiteFromSignatureID(signatureID: String): Json
 fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMandatoryString(key).flatMap { value ->
 	try {
 		when (key) {
-			"publicKeyBase58"    -> {
+			PublicKeyEncoding.PublicKeyBase58.encodingId    -> {
 				try {
 					val decodedValue = Base58.decode(value)
 					Success(decodedValue)
@@ -122,7 +124,7 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 				}
 
 			}
-			"signatureBase58"    -> {
+			SignatureEncoding.SignatureBase58.encodingId    -> {
 				try {
 					val decodedValue = Base58.decode(value)
 					Success(decodedValue)
@@ -131,7 +133,7 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 				}
 
 			}
-			"publicKeyHex"       -> {
+			PublicKeyEncoding.PublicKeyHex.encodingId       -> {
 				try {
 					val decodedValue = Hex.decodeHex(value.toCharArray())
 					Success(decodedValue)
@@ -140,7 +142,16 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 				}
 
 			}
-			"publicKeyBase64"    -> {
+			SignatureEncoding.SignatureHex.encodingId       -> {
+				try {
+					val decodedValue = Hex.decodeHex(value.toCharArray())
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			PublicKeyEncoding.PublicKeyBase64.encodingId    -> {
 				try {
 					val decodedValue = Base64.getDecoder().decode(value)
 					Success(decodedValue)
@@ -149,7 +160,16 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 				}
 
 			}
-			"publicKeyMultibase" -> {
+			SignatureEncoding.SignatureBase64.encodingId    -> {
+				try {
+					val decodedValue = Base64.getDecoder().decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			PublicKeyEncoding.PublicKeyMultibase.encodingId -> {
 				try {
 					val decodedValue = MultiBase.decode(value)
 					Success(decodedValue)
@@ -158,7 +178,16 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 				}
 
 			}
-			"publicKeyPem"       -> {
+			SignatureEncoding.SignatureMultibase.encodingId -> {
+				try {
+					val decodedValue = MultiBase.decode(value)
+					Success(decodedValue)
+				} catch (e: Exception) {
+					Failure(InvalidEncoding(value))
+				}
+
+			}
+			PublicKeyEncoding.PublicKeyPem.encodingId       -> {
 				try {
 					var encodedString = value.replace("\n", "").replace("\r", "")
 					encodedString = encodedString.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
@@ -167,7 +196,7 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 					Failure(InvalidEncoding(value))
 				}
 			}
-			"publicKeyJwk"       -> {
+			PublicKeyEncoding.PublicKeyJwk.encodingId       -> {
 				try {
 					val parsedObject = JSONObjectUtils.parse(value)
 					val kty = KeyType.parse(JSONObjectUtils.getString(parsedObject, "kty"))
@@ -190,7 +219,7 @@ fun JsonObject.getMandatoryEncoding(key: String?): JsonResult<ByteArray> = getMa
 					Failure(InvalidEncoding(value))
 				}
 			}
-			else                 -> Failure(InvalidEncoding(value))
+			else                                            -> Failure(InvalidEncoding(value))
 		}
 
 	} catch (e: AddressFormatException) {

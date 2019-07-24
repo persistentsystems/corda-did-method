@@ -60,10 +60,10 @@ class DidInstruction(json: String) : JsonBacked(json) {
 			val id = signature.getMandatoryUri("id").mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
-			val listOfEncodings = arrayOf("signatureBase58")
-			val encodingUsed = listOfEncodings.filter { signature.has(it) }.singleOrNull()
+			val listOfEncodings = arrayOf(SignatureEncoding.SignatureBase58, SignatureEncoding.SignatureMultibase, SignatureEncoding.SignatureBase64, SignatureEncoding.SignatureHex)
+			val encodingUsed = listOfEncodings.filter { signature.has(it.encodingId) }.singleOrNull()
 
-			val value = signature.getMandatoryEncoding(encodingUsed).mapFailure {
+			val value = signature.getMandatoryEncoding(encodingUsed?.encodingId).mapFailure {
 				InvalidInstructionJsonFailure(it)
 			}.onFailure { return it }
 

@@ -55,5 +55,7 @@ enum class APIMessage(val message: String) {
 	/** Error message if DID is not in correct format*/
 	INCORRECT_FORMAT("The DID requested is not in the correct format."),
 	/** Error message if DID provided as request parameter is different from the one in document body*/
-	MISMATCH_DID("There is a mismatch in the DID provided in request parameter and one in document")
+	MISMATCH_DID("There is a mismatch in the DID provided in request parameter and one in document"),
+	/** Incorrect action being performed*/
+	INCORRECT_ACTION("Incorrect action being performed")
 }
