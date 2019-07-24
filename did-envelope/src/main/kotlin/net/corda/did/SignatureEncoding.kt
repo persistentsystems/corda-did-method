@@ -10,7 +10,7 @@ package net.corda.did
  * @property[SignatureBase58] base58 encoding of signature
  * @property[SignatureMultibase] Multibase encoding of signature
  */
-// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
+
 @Suppress("MemberVisibilityCanBePrivate")
 enum class SignatureEncoding(
 		val encodingId: String
