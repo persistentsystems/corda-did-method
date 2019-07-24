@@ -154,7 +154,20 @@ The instruction data is to be formatted according to the following schema:
 }
 ```
 
-i.e.:
+
+##### Supported Encoding
+
+| Encoding           | Description            |
+|---------------|------------------|
+| `signatureHex` | Hex encoded signature. |
+| `signatureBase64`    | Base64 encoded signature.         |
+| `signatureBase58` | Base58 encoded signature. |
+| `signatureMultibase`    | Multibase encoded signature,details [here.](https://github.com/multiformats/multibase)       |
+
+##### Examples:
+<br>
+
+###### Base58
 
 ```json
 {
@@ -168,11 +181,154 @@ i.e.:
   ]
 }
 ```
-
+###### Multibase
+```json
+{
+  "action": "create",
+  "signatures": [
+	{
+	  "id": "did:corda:tcn:84602311-bd95-4006-968c-01a69d035d64#keys-1",
+	  "type": "Ed25519Signature2018",
+	  "signatureMultibase": "bb3i4jlob2pomlx5yjv5adir7r26tkor6iqroosojkqi4wq2kcjtiju3moxsrkwmobhtlega27uzuxtncks6yib6otqybfykjyzieqe"
+	}
+  ]
+}
+```
+###### Hex
+```json
+{
+  "action": "create",
+  "signatures": [
+	{
+	  "id": "did:corda:tcn:03d7411f-ae67-4c89-94b8-de802f017745#keys-1",
+	  "type": "Ed25519Signature2018",
+	  "signatureHex": "04242D453FA6191B67308B9454E08EC2D59524063F53F85D11E43151283DF672959B9F546CD437FACA914DD15D41F7F6B5FF0AA00ABF5EE91826C70EA83F0E03"
+	}
+  ]
+}
+```
+###### Base64
+```json
+{
+  "action": "create",
+  "signatures": [
+	{
+	  "id": "did:corda:tcn:4b78d87e-1dee-403d-89d6-d2e12926d309#keys-1",
+	  "type": "Ed25519Signature2018",
+	  "signatureBase64": "Kh39kEoMvzfolBimiT/6wGeTys5Leuk/M0im9CligIpRXsJnIx4STphsofZBnbX198H7AfuVp8IJYyzMwKtaAg=="
+	}
+  ]
+}
+```
 ##### Document
 
 The format of the document follows the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec) in JSON-LD.
 
+###### Supported Encoding
+
+| Encoding           | Description            |
+|---------------|------------------|
+| `publicKeyHex` | Hex encoded public key. |
+| `publicKeyBase64`    | Base64 encoded public key.         |
+| `publicKeyBase58` | Base58 encoded public key. |
+| `publicKeyMultibase`    | Multibase encoded public key,details [here.](https://github.com/multiformats/multibase)       |
+| `publicKeyPem` | pem encoded public key. |
+| `publicKeyJwk` | JWK encoded public key,details [here](https://tools.ietf.org/html/rfc7517) |
+##### Examples:
+<br>
+
+###### Base58
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:2ce7cef6-6948-4d71-a6ab-dbd8096050fb",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:2ce7cef6-6948-4d71-a6ab-dbd8096050fb#keys-2",
+	  "type": "EcdsaVerificationKeySecp256k1",
+	  "controller": "did:corda:tcn:2ce7cef6-6948-4d71-a6ab-dbd8096050fb",
+	  "publicKeyBase58": "PZ8Tyr4Nx8MHsRAGMpZmZ6TWY63dXWSCzamP7YTHkZc78MJgqWsAyXmwFufbxxH7JTxJDYFaUzCG9xjsk3gBEYmAFNcr7Y2FckVN65SuiU8YYGBWPgBXc8xs"
+	}
+  ]
+}
+
+```
+
+###### Base64
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:4b96fabe-bb6c-49ee-9da1-cc40cfec3c40",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:4b96fabe-bb6c-49ee-9da1-cc40cfec3c40#keys-1",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:4b96fabe-bb6c-49ee-9da1-cc40cfec3c40",
+	  "publicKeyBase64": "MCowBQYDK2VwAyEAQF9YKxvr6GMdZ6l/1dHCY6fa74WAE5qO87k+fh1Dj6s="
+	}
+  ]
+}
+```
+###### Hex
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:ac157dc3-081f-4b34-997d-a11a533a6776",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:ac157dc3-081f-4b34-997d-a11a533a6776#keys-1",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:ac157dc3-081f-4b34-997d-a11a533a6776",
+	  "publicKeyHex": "302A300506032B657003210017FF237F722D21FA8C7B89EB0FFD415086D7A68A0F6AD9EF221CA9BABEC2A8BA"
+	}
+  ]
+}
+```
+###### Multibase
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:f350302c-de93-4eeb-b32c-c1f0ab7366d0",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:f350302c-de93-4eeb-b32c-c1f0ab7366d0#keys-1",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:f350302c-de93-4eeb-b32c-c1f0ab7366d0",
+	  "publicKeyMultibase": "bycumafaybswzlqamqqb5pjdh4m3cpvoepntwb3hza5zysrfzh4squhig35xp52lkykfyke"
+	}
+  ]
+}
+```
+###### Pem
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:dc059bb7-5e58-4f7e-aecb-14df4097cdc1",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:dc059bb7-5e58-4f7e-aecb-14df4097cdc1#keys-1",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:dc059bb7-5e58-4f7e-aecb-14df4097cdc1",
+	  "publicKeyPem": "-----BEGIN PUBLIC KEY-----MCowBQYDK2VwAyEAYZMwlUIQoaYODRIpKXLTGB30w3gfEW78JU8h93VOXdg=-----END PUBLIC KEY-----"
+	}
+  ]
+}
+```
+###### Jwk
+```json
+{
+  "@context": "https://w3id.org/did/v1",
+  "id": "did:corda:tcn:995591bd-b739-4c39-aeea-c869e2c19af9",
+  "publicKey": [
+	{
+	  "id": "did:corda:tcn:995591bd-b739-4c39-aeea-c869e2c19af9#keys-1",
+	  "type": "Ed25519VerificationKey2018",
+	  "controller": "did:corda:tcn:995591bd-b739-4c39-aeea-c869e2c19af9",
+	  "publicKeyJwk": "{\"kty\":\"oct\",\"k\":\"MCowBQYDK2VwAyEABfHj54MBtp6gsWYes8wcYCrOyhZZNBzlGPju-G9ImgI\"}"
+	}
+  ]
+}
+```
 #### Methods
 
 Envelopes are implemented as `multipart/form-data` HTTP requests with two parts:
