@@ -23,6 +23,7 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 	class DummyCommand : TypeOnlyCommandData()
 
 	private var ledgerServices = MockServices(listOf("com.persistent.did.contract"))
+	private val networkType = "tcn"
 
 	@Test
 	fun `transaction must include Create command`() {
@@ -34,7 +35,7 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
@@ -45,12 +46,12 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 		ledgerServices.ledger {
 			transaction {
 				input(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
@@ -62,12 +63,12 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
@@ -78,12 +79,12 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 		ledgerServices.ledger {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(W1.publicKey), DidContract.Commands.Create())
+				command(listOf(W1.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
@@ -94,12 +95,12 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 		ledgerServices.ledger {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid.copy(participants = listOf()))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
@@ -152,7 +153,7 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 		ledgerServices.ledger {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid.copy(envelope = DidEnvelope(instruction, document)))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 		}
@@ -163,12 +164,12 @@ class CreateDidTests : AbstractContractsStatesTestUtils() {
 		ledgerServices.ledger {
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid.copy(linearId = UniqueIdentifier()))
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.fails()
 			}
 			transaction {
 				output(DidContract.DID_CONTRACT_ID, CordaDid)
-				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create())
+				command(listOf(ORIGINATOR.publicKey), DidContract.Commands.Create(networkType))
 				this.verifies()
 			}
 		}
