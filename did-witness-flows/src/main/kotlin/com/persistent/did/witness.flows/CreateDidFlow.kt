@@ -7,10 +7,10 @@ import com.persistent.did.contract.DidContract
 import com.persistent.did.state.DidState
 import com.persistent.did.state.DidStatus
 import com.persistent.did.utils.DIDAlreadyExistException
+import com.persistent.did.utils.InvalidDIDException
+import com.persistent.did.utils.checkIfDidExist
 import com.persistent.did.utils.getNotaryFromConfig
-import com.persistent.did.utils.loadState
 import net.corda.core.contracts.Command
-import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.FlowLogic
@@ -65,16 +65,12 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 	override fun call(): SignedTransaction {
 
 		// query the ledger if did exist or not
+		val did = envelope.document.id().onFailure { throw InvalidDIDException("Invalid DID passed") }
 
-		var didStates: List<StateAndRef<DidState>> = listOf()
 		envelope.document.id().map {
-			didStates = serviceHub.loadState(UniqueIdentifier(null, it.uuid), DidState::class.java)
-		}
-
-		val did = envelope.document.id().onFailure { throw Exception("") }
-
-		if (didStates.isNotEmpty()) {
-			throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
+			if (serviceHub.checkIfDidExist(UniqueIdentifier(null, it.uuid))) {
+				throw DIDAlreadyExistException("DID with id ${did.toExternalForm()} already exist")
+			}
 		}
 
 		val notary = serviceHub.getNotaryFromConfig()
@@ -83,6 +79,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		progressTracker.currentStep = GENERATING_TRANSACTION
 
 		val config = serviceHub.getAppContext().config
+		val networkType = config.get("network") as String
 		val nodes = config.get("nodes") as ArrayList<*>
 
 		val witnessNodesList = arrayListOf<Party>()
@@ -92,7 +89,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
 
 		// Generate an unsigned transaction.
-		val txCommand = Command(DidContract.Commands.Create(), listOf(ourIdentity.owningKey))
+		val txCommand = Command(DidContract.Commands.Create(networkType), listOf(ourIdentity.owningKey))
 		val txBuilder = TransactionBuilder(notary)
 				.addOutputState(didState, DidContract.DID_CONTRACT_ID)
 				.addCommand(txCommand)
@@ -118,9 +115,10 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 }
 
 /**
- * Receiver finality flow
+ * Receiver finality flow for [CreateDidFlow]
  * @property[otherPartySession] FlowSession
- * */
+ *
+ */
 @InitiatedBy(CreateDidFlow::class)
 class CreateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
 	@Suspendable

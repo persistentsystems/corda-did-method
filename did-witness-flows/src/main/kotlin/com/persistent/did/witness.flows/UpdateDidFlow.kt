@@ -4,7 +4,6 @@ import co.paralleluniverse.fibers.Suspendable
 import com.natpryce.onFailure
 import com.persistent.did.contract.DidContract
 import com.persistent.did.state.DidState
-import com.persistent.did.state.DidStatus
 import com.persistent.did.utils.DIDNotFoundException
 import com.persistent.did.utils.InvalidDIDException
 import com.persistent.did.utils.getNotaryFromConfig
@@ -67,7 +66,7 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		val didStates: List<StateAndRef<DidState>> = serviceHub.loadState(UniqueIdentifier(null, did.uuid), DidState::class.java)
 
 		val inputDidState = didStates.let {
-			if(it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
+			if (it.size != 1) throw DIDNotFoundException("DID with id $did does not exist")
 			else it.single()
 		}
 
@@ -105,11 +104,12 @@ class UpdateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 	}
 }
 
-@InitiatedBy(UpdateDidFlow::class)
 /**
- * Receiver finality flow
+ * Receiver finality flow for [UpdateDidFlow]
  * @property[otherPartySession] FlowSession
- * */
+ *
+ */
+@InitiatedBy(UpdateDidFlow::class)
 class UpdateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
 	@Suspendable
 	override fun call() {

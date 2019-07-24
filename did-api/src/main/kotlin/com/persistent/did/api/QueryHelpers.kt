@@ -30,7 +30,6 @@ class QueryUtil(private val proxy: CordaRPCOps) {
 				result.state
 			}
 		}
-
 		return responseState.data.envelope.rawDocument
 
 	}

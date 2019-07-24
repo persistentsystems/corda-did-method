@@ -25,7 +25,7 @@ import java.util.UUID
  */
 class CordaDid(
 		val did: URI,
-		val network: Network,
+		val network: String,
 		val uuid: UUID
 ) {
 
@@ -50,11 +50,9 @@ class CordaDid(
 				return Failure(InvalidDidSchemeFailure(did.scheme))
 
 			// TODO moritzplatt 2019-07-16 -- this should take the current network running on into consideration
-			val regex = """did:corda:(tcn|tcn-uat|testnet):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
+			val regex = """did:corda:(.+):([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})""".toRegex()
 
 			val (n, u) = regex.find(externalForm)?.destructured ?: return Failure(MalformedCordaDidFailure())
-
-			val network = n.toNetwork().onFailure { return it }
 
 			val uuid = try {
 				UUID.fromString(u)
@@ -62,21 +60,7 @@ class CordaDid(
 				return Failure(InvalidCordaDidUUIDFailure())
 			}
 
-			return Success(CordaDid(did, network, uuid))
-		}
-
-		/**
-		 * Returns an enum representing target Corda network for did
-		 *
-		 * @receiver [String]
-		 * @return [Network]
-		 *
-		 */
-		private fun String.toNetwork(): Result<Network, CordaDidFailure> = when (this) {
-			"tcn"     -> Success(CordaNetwork)
-			"tcn-uat" -> Success(CordaNetworkUAT)
-			"testnet" -> Success(Testnet)
-			else      -> Failure(InvalidCordaNetworkFailure())
+			return Success(CordaDid(did, n, uuid))
 		}
 	}
 }

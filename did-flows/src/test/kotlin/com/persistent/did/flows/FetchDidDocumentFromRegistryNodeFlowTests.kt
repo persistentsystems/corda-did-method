@@ -68,13 +68,13 @@ class FetchDidDocumentFromRegistryNodeFlowTests {
 	@Before
 	fun setup() {
 		mockNetwork = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(TestCordapp.findCordapp("com.persistent.did.state"), TestCordapp.findCordapp("com.persistent.did.contract"), TestCordapp.findCordapp("com.persistent.did.witness.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
-				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US"))), threadPerNode = true, notarySpecs = listOf(MockNetworkNotarySpec(notarySpec, false))))
+				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US", "network" to "tcn"))), threadPerNode = true, notarySpecs = listOf(MockNetworkNotarySpec(notarySpec, false))))
 		originator = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Alice", locality = "TestLand", country = "US"), additionalCordapps = listOf(TestCordapp.findCordapp("com.persistent.did.state"), TestCordapp.findCordapp("com.persistent.did.contract"), TestCordapp.findCordapp("com.persistent.did.witness.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
-				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US")))))
+				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US", "network" to "tcn")))))
 		w1 = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Charlie", locality = "TestVillage", country = "US"), additionalCordapps = listOf(TestCordapp.findCordapp("com.persistent.did.state"), TestCordapp.findCordapp("com.persistent.did.contract"), TestCordapp.findCordapp("com.persistent.did.witness.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
-				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US")))))
+				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US", "network" to "tcn")))))
 		w2 = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Binh", locality = "TestVillage", country = "US"), additionalCordapps = listOf(TestCordapp.findCordapp("com.persistent.did.state"), TestCordapp.findCordapp("com.persistent.did.contract"), TestCordapp.findCordapp("com.persistent.did.witness.flows").withConfig(mapOf("nodes" to listOf("O=Charlie,L=TestVillage,C=US",
-				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US")))))
+				"O=Binh,L=TestVillage,C=US"), "notary" to "O=Notary,L=TestVillage,C=US", "network" to "tcn")))))
 		NonMemberNode = mockNetwork.createNode(MockNodeParameters(legalName = CordaX500Name(organisation = "Alex", locality = "TestLand", country = "US"), additionalCordapps = listOf(TestCordapp.findCordapp("com.persistent.did.flows"))))
 		mockNetwork.startNodes()
 	}
