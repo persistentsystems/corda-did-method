@@ -8,6 +8,8 @@ import net.corda.core.utilities.toBase64
 import net.corda.core.utilities.toHex
 import net.corda.did.CryptoSuite
 import net.i2p.crypto.eddsa.KeyPairGenerator
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.json.simple.JSONObject
 import org.junit.Before
 import org.junit.Test
@@ -18,6 +20,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.io.FileInputStream
 import java.net.URI
+import java.security.SecureRandom
+import java.security.Security
 import java.util.Base64
 import java.util.Properties
 import java.util.UUID
@@ -145,6 +149,217 @@ class UpdateDIDAPITest {
 		|	{
 		|	  "id": "$uriNew",
 		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$encodedSignature2New"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).param("instruction", instructionNew).param("document", documentNew)
+		val resultUpdate = mockMvc.perform(updateBuilder).andReturn()
+		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isOk())
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(documentNew)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID and update the document with new RSA public key`() {
+		val kp = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
+
+		val pub = kp.public.encoded.toBase58()
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.RSA.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+
+		/* update test*/
+		val kpNew = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
+
+		val pubNew = kpNew.public.encoded.toBase58()
+
+		val uriNew = URI("${documentId}#keys-2")
+
+		val documentNew = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+        |  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.RSA.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	},
+        | {
+		|	  "id": "$uriNew",
+		|	  "type": "${CryptoSuite.RSA.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pubNew"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1New = kp.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+		val signature2New = kpNew.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+		val encodedSignature1New = signature1New.bytes.toBase58()
+		val encodedSignature2New = signature2New.bytes.toBase58()
+		val instructionNew = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$encodedSignature1New"
+		|	},
+		|	{
+		|	  "id": "$uriNew",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$encodedSignature2New"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val updateBuilder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).param("instruction", instructionNew).param("document", documentNew)
+		val resultUpdate = mockMvc.perform(updateBuilder).andReturn()
+		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(resultUpdate)).andExpect(MockMvcResultMatchers.status().isOk())
+		mockMvc.perform(MockMvcRequestBuilders.get(apiUrl + "did:corda:tcn:" + uuid.toString())).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(documentNew)).andReturn()
+
+	}
+
+	@Test
+	fun `Create a DID and update the document with new ECDSA public key`() {
+		Security.addProvider(BouncyCastleProvider())
+		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
+		g.initialize(ecSpec, SecureRandom())
+		val kp = g.generateKeyPair()
+
+		val pub = kp.public.encoded.toBase58()
+
+		val uuid = UUID.randomUUID()
+
+		val documentId = "did:corda:tcn:" + uuid
+
+		val uri = URI("${documentId}#keys-1")
+
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+		|  "created": "1970-01-01T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1 = kp.private.sign(document.toByteArray(Charsets.UTF_8))
+
+		val encodedSignature1 = signature1.bytes.toBase58()
+
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$encodedSignature1"
+		|	}
+		|  ]
+		|}""".trimMargin()
+		val instructionjsonFile = MockMultipartFile("instruction", "", "application/json", instruction.toByteArray())
+		val documentjsonFile = MockMultipartFile("document", "", "application/json", document.toByteArray())
+		val builder = MockMvcRequestBuilders.fileUpload(apiUrl + "did:corda:tcn:" + uuid.toString()).file(instructionjsonFile).file(documentjsonFile).with { request ->
+			request.method = "PUT"
+			request
+		}
+		val result = mockMvc.perform(builder).andReturn()
+		mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(result)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+
+		/* update test*/
+		g.initialize(ecSpec, SecureRandom())
+		val kpNew = g.generateKeyPair()
+
+		val pubNew = kpNew.public.encoded.toBase58()
+
+		val uriNew = URI("${documentId}#keys-2")
+
+		val documentNew = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId}",
+        |  "created": "1970-01-01T00:00:00Z",
+		|  "updated": "1970-01-02T00:00:00Z",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "${CryptoSuite.EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pub"
+		|	},
+        | {
+		|	  "id": "$uriNew",
+		|	  "type": "${CryptoSuite.EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId}",
+		|	  "publicKeyBase58": "$pubNew"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val signature1New = kp.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+		val signature2New = kpNew.private.sign(documentNew.toByteArray(Charsets.UTF_8))
+		val encodedSignature1New = signature1New.bytes.toBase58()
+		val encodedSignature2New = signature2New.bytes.toBase58()
+		val instructionNew = """{
+		|  "action": "update",
+		|  "signatures": [
+		|	{
+		|	  "id": "$uri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$encodedSignature1New"
+		|	},
+		|	{
+		|	  "id": "$uriNew",
+		|	  "type": "EcdsaSignatureSecp256k1",
 		|	  "signatureBase58": "$encodedSignature2New"
 		|	}
 		|  ]

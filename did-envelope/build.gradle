@@ -19,8 +19,8 @@ dependencies {
     compile "com.natpryce:result4k:2.0.0"
     compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
     compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.2.1'
-    compile group: 'io.ipfs.multiformats', name: 'kotlin-multibase', version: '1.0.0'
-
+    // compile group: 'io.ipfs.multiformats', name: 'kotlin-multibase', version: '1.0.0'
+    compile files("lib/kotlin-multibase-1.0.jar")
     testCompile "junit:junit:$junit_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
 

@@ -3,15 +3,11 @@ package net.corda.did
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
-import com.natpryce.onFailure
 import net.corda.FailureCode
 import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidCordaDidUUIDFailure
 import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidCordaNetworkFailure
 import net.corda.did.CordaDidFailure.CordaDidValidationFailure.InvalidDidSchemeFailure
 import net.corda.did.CordaDidFailure.CordaDidValidationFailure.MalformedCordaDidFailure
-import net.corda.did.Network.CordaNetwork
-import net.corda.did.Network.CordaNetworkUAT
-import net.corda.did.Network.Testnet
 import java.net.URI
 import java.util.UUID
 

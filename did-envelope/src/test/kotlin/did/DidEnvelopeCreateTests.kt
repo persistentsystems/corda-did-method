@@ -1030,7 +1030,7 @@ class DidEnvelopeCreateTests {
 	}
 
 	@Test
-	fun `Validation succeeds for a valid envelope with multibase encoding`() {
+	fun `Validation succeeds for a valid envelope with multibase encoding with Base32,64,16`() {
 		/*
 		 * 1. Generate a valid ID
 		 */
@@ -1053,6 +1053,422 @@ class DidEnvelopeCreateTests {
 		val pubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE32, keyPair.public.encoded)
 		val rsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE64, rsaKeyPair.public.encoded)
 		val ecdsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE16, ecdsaKeyPair.public.encoded)
+
+		/*
+		 * 4. Build a valid URI for the key in (3)
+		 */
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val ecdsaKeyUri = URI("${documentId.toExternalForm()}#keys-3")
+
+		/*
+		 * 5. Build a valid DID document using the parameters generated
+		 */
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$pubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "${RSA.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$rsaPubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "${EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$ecdsaPubKeyMultiBase"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		/*
+		 * 6. Sign the DID generated in (5) with the key generated in (1)
+		 */
+		val signature = keyPair.private.sign(document.toByteArray(UTF_8))
+		val base58Signature = signature.bytes.toBase58()
+
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val rsaSignatureBase58 = rsaSignature.bytes.toBase58()
+
+		val ecdsaSignature = ecdsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val ecdsaSignatureBase58 = ecdsaSignature.bytes.toBase58()
+
+		/*
+		 * 7. Build a valid instruction set for the DID generated
+		 */
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$base58Signature"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$rsaSignatureBase58"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$ecdsaSignatureBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreation()
+
+		/*
+		 * 8. Test Instruction
+		 */
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `Validation succeeds for a valid envelope with multibase encoding with BASE32_PAD_UPPER,BASE32_PAD,BASE32_HEX_PAD_UPPER`() {
+		/*
+		 * 1. Generate a valid ID
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
+
+		/*
+		 * 2. Generate ed25519, rsa and ecdsa key pair
+		 */
+		val keyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
+		Security.addProvider(BouncyCastleProvider())
+		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
+		g.initialize(ecSpec, SecureRandom())
+		val ecdsaKeyPair = g.generateKeyPair()
+
+		/*
+		 * 3. encode the key pair using the supported encoding
+		 */
+		val pubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE32_PAD_UPPER, keyPair.public.encoded)
+		val rsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE32_HEX, rsaKeyPair.public.encoded)
+		val ecdsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE32_HEX_PAD_UPPER, ecdsaKeyPair.public.encoded)
+
+		/*
+		 * 4. Build a valid URI for the key in (3)
+		 */
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val ecdsaKeyUri = URI("${documentId.toExternalForm()}#keys-3")
+
+		/*
+		 * 5. Build a valid DID document using the parameters generated
+		 */
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$pubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "${RSA.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$rsaPubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "${EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$ecdsaPubKeyMultiBase"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		/*
+		 * 6. Sign the DID generated in (5) with the key generated in (1)
+		 */
+		val signature = keyPair.private.sign(document.toByteArray(UTF_8))
+		val base58Signature = signature.bytes.toBase58()
+
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val rsaSignatureBase58 = rsaSignature.bytes.toBase58()
+
+		val ecdsaSignature = ecdsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val ecdsaSignatureBase58 = ecdsaSignature.bytes.toBase58()
+
+		/*
+		 * 7. Build a valid instruction set for the DID generated
+		 */
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$base58Signature"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$rsaSignatureBase58"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$ecdsaSignatureBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreation()
+
+		/*
+		 * 8. Test Instruction
+		 */
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `Validation succeeds for a valid envelope with multibase encoding with BASE16_UPPER,BASE58_FLICKR,BASE58_BTC`() {
+		/*
+		 * 1. Generate a valid ID
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
+
+		/*
+		 * 2. Generate ed25519, rsa and ecdsa key pair
+		 */
+		val keyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
+		Security.addProvider(BouncyCastleProvider())
+		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
+		g.initialize(ecSpec, SecureRandom())
+		val ecdsaKeyPair = g.generateKeyPair()
+
+		/*
+		 * 3. encode the key pair using the supported encoding
+		 */
+		val pubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE16_UPPER, keyPair.public.encoded)
+		val rsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE58_FLICKR, rsaKeyPair.public.encoded)
+		val ecdsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE58_BTC, ecdsaKeyPair.public.encoded)
+
+		/*
+		 * 4. Build a valid URI for the key in (3)
+		 */
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val ecdsaKeyUri = URI("${documentId.toExternalForm()}#keys-3")
+
+		/*
+		 * 5. Build a valid DID document using the parameters generated
+		 */
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$pubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "${RSA.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$rsaPubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "${EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$ecdsaPubKeyMultiBase"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		/*
+		 * 6. Sign the DID generated in (5) with the key generated in (1)
+		 */
+		val signature = keyPair.private.sign(document.toByteArray(UTF_8))
+		val base58Signature = signature.bytes.toBase58()
+
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val rsaSignatureBase58 = rsaSignature.bytes.toBase58()
+
+		val ecdsaSignature = ecdsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val ecdsaSignatureBase58 = ecdsaSignature.bytes.toBase58()
+
+		/*
+		 * 7. Build a valid instruction set for the DID generated
+		 */
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$base58Signature"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$rsaSignatureBase58"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$ecdsaSignatureBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreation()
+
+		/*
+		 * 8. Test Instruction
+		 */
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `Validation succeeds for a valid envelope with multibase encoding with BASE32_PAD_UPPER,BASE64_URL,BASE64_PAD`() {
+		/*
+		 * 1. Generate a valid ID
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
+
+		/*
+		 * 2. Generate ed25519, rsa and ecdsa key pair
+		 */
+		val keyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
+		Security.addProvider(BouncyCastleProvider())
+		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
+		g.initialize(ecSpec, SecureRandom())
+		val ecdsaKeyPair = g.generateKeyPair()
+
+		/*
+		 * 3. encode the key pair using the supported encoding
+		 */
+		val pubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE32_PAD_UPPER, keyPair.public.encoded)
+		val rsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE64_URL, rsaKeyPair.public.encoded)
+		val ecdsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE64_PAD, ecdsaKeyPair.public.encoded)
+
+		/*
+		 * 4. Build a valid URI for the key in (3)
+		 */
+		val keyUri = URI("${documentId.toExternalForm()}#keys-1")
+		val rasKeyUri = URI("${documentId.toExternalForm()}#keys-2")
+		val ecdsaKeyUri = URI("${documentId.toExternalForm()}#keys-3")
+
+		/*
+		 * 5. Build a valid DID document using the parameters generated
+		 */
+		val document = """{
+		|  "@context": "https://w3id.org/did/v1",
+		|  "id": "${documentId.toExternalForm()}",
+		|  "publicKey": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "${Ed25519.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$pubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "${RSA.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$rsaPubKeyMultiBase"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "${EcdsaSecp256k1.keyID}",
+		|	  "controller": "${documentId.toExternalForm()}",
+		|	  "publicKeyMultibase": "$ecdsaPubKeyMultiBase"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		/*
+		 * 6. Sign the DID generated in (5) with the key generated in (1)
+		 */
+		val signature = keyPair.private.sign(document.toByteArray(UTF_8))
+		val base58Signature = signature.bytes.toBase58()
+
+		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val rsaSignatureBase58 = rsaSignature.bytes.toBase58()
+
+		val ecdsaSignature = ecdsaKeyPair.private.sign(document.toByteArray(UTF_8))
+		val ecdsaSignatureBase58 = ecdsaSignature.bytes.toBase58()
+
+		/*
+		 * 7. Build a valid instruction set for the DID generated
+		 */
+		val instruction = """{
+		|  "action": "create",
+		|  "signatures": [
+		|	{
+		|	  "id": "$keyUri",
+		|	  "type": "Ed25519Signature2018",
+		|	  "signatureBase58": "$base58Signature"
+		|	},
+		|	{
+		|	  "id": "$rasKeyUri",
+		|	  "type": "RsaSignature2018",
+		|	  "signatureBase58": "$rsaSignatureBase58"
+		|	},
+		|	{
+		|	  "id": "$ecdsaKeyUri",
+		|	  "type": "EcdsaSignatureSecp256k1",
+		|	  "signatureBase58": "$ecdsaSignatureBase58"
+		|	}
+		|  ]
+		|}""".trimMargin()
+
+		val actual = DidEnvelope(instruction, document).validateCreation()
+
+		/*
+		 * 8. Test Instruction
+		 */
+		assertThat(actual, isA<Success<Unit>>())
+	}
+
+	@Test
+	fun `Validation succeeds for a valid envelope with multibase encoding with BASE2,BASE10,BASE8`() {
+		/*
+		 * 1. Generate a valid ID
+		 */
+		val documentId = CordaDid.parseExternalForm("did:corda:tcn:${UUID.randomUUID()}").assertSuccess()
+
+		/*
+		 * 2. Generate ed25519, rsa and ecdsa key pair
+		 */
+		val keyPair = KeyPairGenerator().generateKeyPair()
+		val rsaKeyPair = JavaKeyPairGenerator.getInstance("RSA").generateKeyPair()
+		Security.addProvider(BouncyCastleProvider())
+		val ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+		val g = java.security.KeyPairGenerator.getInstance("ECDSA", "BC")
+		g.initialize(ecSpec, SecureRandom())
+		val ecdsaKeyPair = g.generateKeyPair()
+
+		/*
+		 * 3. encode the key pair using the supported encoding
+		 */
+		val pubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE10, keyPair.public.encoded)
+		val rsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE2, rsaKeyPair.public.encoded)
+		val ecdsaPubKeyMultiBase = MultiBase.encode(MultiBase.Base.BASE8, ecdsaKeyPair.public.encoded)
 
 		/*
 		 * 4. Build a valid URI for the key in (3)
@@ -2670,13 +3086,13 @@ class DidEnvelopeCreateTests {
 		 * 6. Sign the DID generated in (5) with the key generated in (1)
 		 */
 		val signature = keyPair.private.sign(document.toByteArray(UTF_8))
-		val multibaseSignature = MultiBase.encode(MultiBase.Base.BASE32, signature.bytes)
+		val multibaseSignature = MultiBase.encode(MultiBase.Base.BASE8, signature.bytes)
 
 		val rsaSignature = rsaKeyPair.private.sign(document.toByteArray(UTF_8))
-		val rsaSignatureMultibase = MultiBase.encode(MultiBase.Base.BASE16, rsaSignature.bytes)
+		val rsaSignatureMultibase = MultiBase.encode(MultiBase.Base.BASE10, rsaSignature.bytes)
 
 		val ecdsaSignature = ecdsaKeyPair.private.sign(document.toByteArray(UTF_8))
-		val ecdsaSignatureMultibase = MultiBase.encode(MultiBase.Base.BASE32_HEX, ecdsaSignature.bytes)
+		val ecdsaSignatureMultibase = MultiBase.encode(MultiBase.Base.BASE2, ecdsaSignature.bytes)
 
 		/*
 		 * 7. Build a valid instruction set for the DID generated
