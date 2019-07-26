@@ -14,11 +14,10 @@ Corda DID Method Proof-of-Concept
 ### Introduction
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
 
-![Corda DID System Architecture](images/architecture.svg)
-
-The system architecture outlined above illustrates the high level components without going into implementation details.
+The system architecture outlined below illustrates the high level components without going into implementation details.
 On a high level, persistence of DID documents will be provided by a _consortium_ of trusted nodes operating within a _network_.
-The Corda DID method allows targeting three networks by specification: [The Corda Network](https://corda.network/) (UAT and Live [environments](https://corda.network/policy/environments.html)) as well as [Testnet](https://docs.corda.net/head/corda-testnet-intro.html).
+
+![Corda DID System Architecture](images/architecture.svg)
 
 End users that aim to _create_, _read_, _update_ or _delete_ DID documents can do so by interacting with a trusted node of their choosing.
 The API provided for interaction is exposing REST endpoints over HTTP, using a JSON based envelope format closely aligned with the JSON-LD examples found in the [draft community report](https://w3c-ccg.github.io/did-spec/#dfn-did-document).
@@ -81,7 +80,7 @@ This envelope must contain signatures by all private keys associated with the pu
 ![Corda DID API](images/did_envelope.svg)
 
 Envelopes that do not contain signatures for all public keys will be rejected.
-Envelopes using unsupported cryptographic suites or unsupported serialisation mechanisms will be rejected.
+Envelopes using unsupported cryptographic suites or unsupported serialization mechanisms will be rejected.
 In the current implementation there are severe restrictions on which suites and serialisation mechanisms can be used (see _Caveats_ below).
 
 #### API Format
@@ -349,7 +348,7 @@ This is used to create a new DID.
 Proof of ownership of the document has to be presented in the envelope.
 
 Payload includes:
-- The document consisting of the encoded public key,type of public key,controller of public key.
+- The document consisting of the encoded public key, type of public key, controller of public key.
 - The instruction consisting of action to perform (create), encoded signature on the document and type of signature.
 
 Instruction:
@@ -465,8 +464,8 @@ This is appropriate since this field is only used to determine a before/after re
 Consumers of the DID document need to take into account that this value is potentially inaccurate.
 
 Payload includes:
-- The document consisting of the new encoded public key,type of public key,controller of public key.
-- The instruction consisting of action to perform (update), encoded signature(s) on this document using all private keys(including the one being added) assosiated with the public keys in the document and type of signature.
+- The document consisting of the new encoded public key, type of public key, controller of public key.
+- The instruction consisting of action to perform (update), encoded signature(s) on this document using all private keys(including the one being added) associated with the public keys in the document and type of signature.
 
 HTTP request:
 
@@ -541,7 +540,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
  - The API will respond with status `200` if delete is successful.
  - The API will respond with status `404` for a request with an unknown ID.
- - The API will respond with status `400` for other cases of incorrect payload (mismatched signatures,malformed instruction etc.).
+ - The API will respond with status `400` for other cases of incorrect payload (mismatched signatures, malformed instruction etc.).
 
 ### Corda DID Flows ([`did-witness-flows`](did-witness-flows))
 The DID Flows is the CorDapp component to be deployed by consortium member nodes. It provides Method specific flows to create, read, update or delete DID documents.
@@ -560,7 +559,7 @@ Proof of ownership of the document has to be presented in the envelope as outlin
 where envelope is an instance of type `DidEnvelope`
 
 ##### Read (`FetchDidDocumentFlow`)
-This is used to fetch a did document from node's local vault. It returns an instance of type `DidDocument`
+This is used to fetch a `did` document from node's local vault. It returns an instance of type `DidDocument`
 
 * invoke FetchDidDocumentFlow via RPC:
 ```rpc.startFlowDynamic(FetchDidDocumentFlow::class.java, linearId)```
@@ -568,7 +567,7 @@ This is used to fetch a did document from node's local vault. It returns an inst
 * invoke FetchDidDocumentFlow from another flow:  
 ```subFlow(FetchDidDocumentFlow(linearId))```
 
-where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the did.
+where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the `did`.
 
 There might be a case where a node which is not part of the DID Business Network may request DID document from one of the DID consortium nodes.
 In such situations, nodes can invoke `FetchDidDocumentFromRegistryNodeFlow` defined in ([`did-flows`](did-flows)) module.
@@ -579,7 +578,7 @@ In such situations, nodes can invoke `FetchDidDocumentFromRegistryNodeFlow` defi
 * invoke FetchDidDocumentFromRegistryNodeFlow from another flow:  
 ```subFlow(FetchDidDocumentFromRegistryNodeFlow(didRegistryNode, linearId))```
 
-where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the did && didRegistryNode is an instance of type `Party` representing the did consortium node. 
+where linearId is an instance of type `UniqueIdentifier` and it is the UUID part of the `did` && didRegistryNode is an instance of type `Party` representing the `did` consortium node. 
 
 ##### Update (`UpdateDidFlow`)
 This is used to update an existing DID.
@@ -594,7 +593,7 @@ where envelope is an instance of type `DidEnvelope`
 
 ##### Delete (`DeleteDidFlow`)
 This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It expires the DidState and is marked as `Consumed` on the ledger. 
-To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest did document present in the ledger signed with corresponding private keys for all the public keys present in the document.
+To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on the latest `did` document present in the ledger signed with corresponding private keys for all the public keys present in the document.
 * invoke DeleteDidFlow via RPC:    
 ```rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)```
 
@@ -602,7 +601,7 @@ To validate a delete request, the user must provide signature(s) in the instruct
 ```subFlow(DeleteDidFlow(instruction, did))```
 
 where instruction is the instruction JSON object (in string form) containing signatures of did-owner on the did-document to be deactivated
-&& did is the did to be deleted.
+&& `did` is the `did` to be deleted.
 
 
 <a name="cmn"></a>
@@ -614,8 +613,7 @@ The steps for setting up the project are [here.](/installation_setup.md)
 <a name="caveats"></a>
 #### Caveats
 
- - Not all cryptographic suites to be supported as per the [Linked Data Cryptographic Suite Registry Draft Community Group Report](https://w3c-ccg.github.io/ld-cryptosuite-registry) (09 December 2018) are supported.
- - Not all encodings to be supported as per the [Decentralized Identifiers Draft Community Group](https://w3c-ccg.github.io/did-spec/#public-keys) (06 February 2019) are supported.
+ - Below digital signatures and public key encoding schemes are supported.  
 
 |                             	| `publicKeyPem` 	| `publicKeyJwk` 	| `publicKeyHex` 	| `publicKeyBase64` 	| `publicKeyBase58` 	| `publicKeyMultibase` 	|
 |-----------------------------	|----------------	|----------------	|----------------	|-------------------	|-------------------	|----------------------	|
