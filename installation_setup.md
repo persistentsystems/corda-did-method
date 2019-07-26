@@ -1,4 +1,3 @@
-
 ## Directory Structure
 | Directory | Description                                                     |
 |-----------|-----------------------------------------------------------------|
@@ -38,3 +37,8 @@ network = "tcn"
 where nodes is a pre-defined list of witness nodes. Replace the nodes, notary and network with appropriate values
 * Place the jars generated in the above build step into the cordapp directory of node file system.
 * Run the corda node using `java -jar corda.jar`
+
+
+### Running the Spring boot api using gradle task
+* Run the command `./gradelw runPartyAServer` to start the Spring boot server on port `50005`
+* Update the gradle task as required with appropriate rpc host, rpc port, rpc username, rpc password and server port.
