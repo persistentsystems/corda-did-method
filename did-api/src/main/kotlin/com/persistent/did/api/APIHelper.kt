@@ -72,7 +72,6 @@ class APIUtils {
 	}
 
 	private fun badRequest(message: APIMessage): ResponseEntity<Any?> {
-		logger.info(message.toString())
 		return badRequest(ApiResponse(message).toResponseObj())
 	}
 
@@ -90,17 +89,14 @@ class APIUtils {
 	fun generateEnvelope(instruction: String, document: String, did: String, action: String): DidEnvelope {
 
 		if (instruction.isEmpty()) {
-			logger.info("instruction is empty")
 			throw IllegalArgumentException(INSTRUCTION_EMPTY.message)
 		}
 
 		if (document.isEmpty()) {
-			logger.info("document is empty")
 			throw IllegalArgumentException(DOCUMENT_EMPTY.message)
 		}
 
 		if (did.isEmpty()) {
-			logger.info("did is empty")
 			throw IllegalArgumentException(DID_EMPTY.message)
 		}
 
@@ -112,7 +108,6 @@ class APIUtils {
 		val envelopeDid = envelope.document.id().onFailure { throw IllegalArgumentException(DID_EMPTY.message) }
 
 		if (envelopeDid.toExternalForm() != did) {
-			logger.info("Mismatch occurred in DID in parameter and DID in document ")
 			throw IllegalArgumentException(ApiResponse(MISMATCH_DID).message)
 		}
 		return envelope

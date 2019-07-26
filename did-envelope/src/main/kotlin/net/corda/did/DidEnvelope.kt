@@ -247,7 +247,6 @@ class DidEnvelope(
 	/**
 	 * @param precursor The precursor document
 	 */
-	// TODO moritzplatt 2019-07-16 -- unused method. which logic do we use for validating deleting documents. make sure this is documented!
 	// validate that _at least one_ key in the precursor document has a signature in the current one
 	@Suppress("unused")
 	private fun validateKeysForDelete(precursor: DidDocument): Result<Unit, ValidationFailure> {

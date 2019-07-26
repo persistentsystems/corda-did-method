@@ -59,3 +59,8 @@ enum class APIMessage(val message: String) {
 	/** Incorrect action being performed*/
 	INCORRECT_ACTION("Incorrect action being performed")
 }
+enum class Action(val action: String){
+	CREATE("create"),
+	DELETE("delete"),
+	UPDATE("update")
+}

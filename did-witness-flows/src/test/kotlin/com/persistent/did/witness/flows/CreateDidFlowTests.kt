@@ -331,7 +331,6 @@ class CreateDidFlowTests : AbstractFlowTestUtils() {
 
 		val ed25519KeyPair = KeyPairGenerator().generateKeyPair()
 
-		// TODO moritzplatt 2019-02-18 -- this will become valid once the crypto suite limitation is removed
 		val rsaKeyPair = java.security.KeyPairGenerator.getInstance("RSA").generateKeyPair()
 
 		val ed25519PubKey = ed25519KeyPair.public.encoded.toBase58()

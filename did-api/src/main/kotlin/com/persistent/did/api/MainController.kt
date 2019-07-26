@@ -81,7 +81,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Takes instruction,document and did as input, validates them and returns an envelope Object.
 			 *
 			 * */
-			val envelope = apiUtils.generateEnvelope(instruction, document, did, "create")
+			val envelope = apiUtils.generateEnvelope(instruction, document, did, Action.CREATE.action)
 			/**
 			 *  Checks if the provided 'did' is in the correct format.
 			 *
@@ -198,7 +198,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Takes instruction,document and did as input, validates them and returns an envelope Object.
 			 *
 			 * */
-			val envelope = apiUtils.generateEnvelope(instruction, document, did, "update")
+			val envelope = apiUtils.generateEnvelope(instruction, document, did, Action.UPDATE.action)
 			/**
 			 * Converts the "did" from external form to uuid form else returns an error
 			 *
@@ -260,7 +260,7 @@ class MainController(rpc: NodeRPCConnection) {
 				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()));return apiResult
 			}
 			val didInstruction = DidInstruction(instruction)
-			if (didInstruction.json["action"] != "delete") {
+			if (didInstruction.json["action"] != Action.DELETE.action) {
 				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_ACTION).toResponseObj()))
 				return apiResult
 			}

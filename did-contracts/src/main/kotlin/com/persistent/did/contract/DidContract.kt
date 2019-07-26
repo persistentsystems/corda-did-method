@@ -92,7 +92,7 @@ open class DidContract : Contract {
 		// validate the network type
 		val networkType = tx.commandsOfType<Create>().single().value.networkType
 		val network = didState.envelope.document.id().onFailure { throw IllegalArgumentException("Invalid did") }
-		"Invalid network type found in did" using(networkType == network.network)
+		"Invalid network type found in did" using (networkType == network.network)
 
 		// validate did envelope
 		"the envelope presented is must be valid to create" using (didState.envelope.validateCreation() is Success)
@@ -115,7 +115,7 @@ open class DidContract : Contract {
 		val oldDIDState = tx.inputsOfType<DidState>().single()
 		val newDIDState = tx.outputsOfType<DidState>().single()
 
-		// validate deletion
+		// validate update
 		"Failed to update DID document" using (newDIDState.envelope.validateModification(oldDIDState.envelope.document) is Success)
 		"Status of the precursor DID must be 'VALID'" using (oldDIDState.isActive())
 		"Status of the updated DID must be 'VALID'" using (newDIDState.isActive())

@@ -20,8 +20,7 @@ configurations {
 }
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
-    // TODO does this need to be `cordapp` instead?
+    
     compile "com.grack:nanojson:1.1"
     compile "com.natpryce:result4k:2.0.0"
 

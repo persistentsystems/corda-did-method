@@ -33,7 +33,6 @@ import javax.xml.bind.DatatypeConverter
  * @property didDocument String representation of did document json as specified in the w3-spec.
  * Ref: https://w3c-ccg.github.io/did-spec/#did-documents
  */
-// TODO moritzplatt 2019-07-16 -- use descriptive variable names. what does `document1` hold?
 @CordaSerializable
 data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 
@@ -86,8 +85,6 @@ data class DidDocument(val didDocument: String) : JsonBacked(didDocument) {
 				InvalidDocumentJsonFailure(it)
 			}.onFailure { return it }
 
-			// TODO moritzplatt 2019-02-13 -- Support other encodings
-			// TODO moritzplatt 2019-07-16 -- will support for other encodings be added?
 			val listOfEncodings = arrayOf(PublicKeyEncoding.PublicKeyBase58, PublicKeyEncoding.PublicKeyBase64, PublicKeyEncoding.PublicKeyHex, PublicKeyEncoding.PublicKeyMultibase, PublicKeyEncoding.PublicKeyPem, PublicKeyEncoding.PublicKeyJwk)
 			val encodingUsed = listOfEncodings.filter { key.has(it.encodingId) }.singleOrNull()
 			var value = key.getMandatoryEncoding(encodingUsed?.encodingId).mapFailure {

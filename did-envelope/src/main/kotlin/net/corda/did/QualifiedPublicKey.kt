@@ -11,11 +11,9 @@ import java.net.URI
  *@property[controller] Id of the controller of the public key .
  *@property[value] value of the public key in bytes.
  */
-// TODO moritzplatt 2019-07-16 -- this defines `equals` but not `hasChode`. ensure this is safe where used
 class QualifiedPublicKey(
 		val id: URI,
 		val type: CryptoSuite,
-		// TODO moritzplatt 2019-02-13 -- what validation to apply here?
 		val controller: URI,
 		val value: ByteArray
 ) {
