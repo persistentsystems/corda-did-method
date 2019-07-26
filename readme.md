@@ -8,7 +8,8 @@ Corda DID Method Proof-of-Concept
 4. [Setup](#setup)
 5. [Caveats](#caveats)
 6. [Risks/Known Attack Surface](#risks)
-7. [Partnership](#partner)
+7. [Contribution guidelines](#contribution)
+8. [Partnership](#partner)
 
 <a name="introduction"></a>
 ### Introduction
@@ -631,6 +632,13 @@ The steps for setting up the project are [here.](/installation_setup.md)
 ##### Denial-of-Service Attack on Edge-Nodes
 
 ##### Replication Issues During Unavailability of Witness Nodes
+<a name="contribution"></a>
+### Contribution guidelines
+Contribution guidelines can be found [here.](CONTRIBUTING.MD)
+
+To raise an issue, please follow the format [here](bug_report.md)
+
+To raise a feature request, follow the format [here](feature_request.md)
 <a name="partner"></a>
 ### Partnership
 The product was built by Persistent in partnership with [r3](https://www.r3.com/).
