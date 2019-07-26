@@ -1,4 +1,3 @@
-
 Corda DID Method Proof-of-Concept
 =================================
 ## Table of Contents
@@ -624,6 +623,14 @@ The steps for setting up the project are [here.](/installation_setup.md)
 | `RsaSignature2018`          	|        ✔       	|        ✔        	|        ✔        	|         ✔         	|         ✔          	|           ✔           |
 | `EdDsaSASignatureSecp256k1` 	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔          	|           ✔           |
 
+
+
+The following multibase encoding schemes are not supported as defined in the [Multibase data format](https://tools.ietf.org/id/draft-multiformats-multibase-01.html)
+* BASE1 
+* Z-Base32
+* BASE32_PAD
+* BASE32_HEX_PAD
+* BASE64_URL_PAD
 
 
 <a name="risks"></a>
