@@ -612,8 +612,7 @@ Detailed design of the CorDapp can be viewed [here.](/cmn_diagram.md)
 The steps for setting up the project are [here.](/installation_setup.md)
 <a name="caveats"></a>
 #### Caveats
-
- - Below digital signatures and public key encoding schemes are supported.  
+Digital signatures and public key encoding schemes supported are shown in the table below.
 
 |                             	| `publicKeyPem` 	| `publicKeyJwk` 	| `publicKeyHex` 	| `publicKeyBase64` 	| `publicKeyBase58` 	| `publicKeyMultibase` 	|
 |-----------------------------	|----------------	|----------------	|----------------	|-------------------	|-------------------	|----------------------	|
