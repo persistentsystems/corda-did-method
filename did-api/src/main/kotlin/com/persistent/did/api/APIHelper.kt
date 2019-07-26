@@ -22,7 +22,6 @@ import com.persistent.did.api.APIMessage.NO_PUBLIC_KEYS
 import com.persistent.did.api.APIMessage.NO_SIGNATURE
 import com.persistent.did.api.APIMessage.PRECURSOR_DID
 import com.persistent.did.api.APIMessage.UNSUPPORTED_CRYPTO_SUITE
-import com.persistent.did.api.MainController.Companion.logger
 import net.corda.did.DidEnvelope
 import net.corda.did.DidEnvelopeFailure.ValidationFailure
 import net.corda.did.DidEnvelopeFailure.ValidationFailure.CryptoSuiteMismatchFailure

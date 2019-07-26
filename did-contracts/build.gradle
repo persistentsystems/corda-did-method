@@ -20,7 +20,7 @@ configurations {
 }
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    
+
     compile "com.grack:nanojson:1.1"
     compile "com.natpryce:result4k:2.0.0"
 
