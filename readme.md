@@ -647,7 +647,10 @@ To raise a feature request, follow the format [here](feature_request.md)
 ### Partnership
 The product was built by Persistent in partnership with [r3](https://www.r3.com/).
 <p align="center">
-   <a href="https://www.r3.com/">
+  <a href="https://www.persistent.com/">
+       <img src="persistent.png" alt="Persistent" width="200">
+    </a>
+    <a href="https://www.r3.com/">
      <img src="16-11-02_R3_Master Logo-01.jpg" alt="R3" width="200">
   </a>
 </p>
