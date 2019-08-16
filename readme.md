@@ -618,7 +618,7 @@ Digital signatures and public key encoding schemes supported are shown in the ta
 |-----------------------------	|----------------	|----------------	|----------------	|-------------------	|-------------------	|----------------------	|
 | `Ed25519Signature2018`      	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔         	|           ✔           |
 | `RsaSignature2018`          	|        ✔       	|        ✔        	|        ✔        	|         ✔         	|         ✔          	|           ✔           |
-| `EdDsaSASignatureSecp256k1` 	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔          	|           ✔           |
+| `EcDsaSASignatureSecp256k1` 	|        ✔        	|        ✔        	|        ✔        	|         ✔          	|         ✔          	|           ✔           |
 
 
 
