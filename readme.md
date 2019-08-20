@@ -645,7 +645,7 @@ To raise an issue, please follow the format [here](bug_report.md)
 To raise a feature request, follow the format [here](feature_request.md)
 <a name="partner"></a>
 ### Partnership
-The product was built by Persistent in partnership with [r3](https://www.r3.com/).
+The Corda DID method is the result of a collaboration between R3 and Persistent Systems.
 <p align="center">
   <a href="https://www.persistent.com/">
        <img src="persistent.png" alt="Persistent" width="200">
