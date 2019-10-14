@@ -15,12 +15,12 @@ State evolution view depicts the life cycle of the DidState.
 * Upon did update, the state is evolved with the modified did document.
 * Upon did deletion, the state is evolved with status as `Deleted`.
    
-![State evolution View](/cmn_diagrams/State evolution view.png)
+![State evolution View](/cmn_diagrams/State%20evolution%20view.png)
 
 ### State machine view 
 State machine view depicts how the DidState will get involved based on the constraints present in the state and contract which governs it.
 
-![State machine view](/cmn_diagrams/State machine view.png)
+![State machine view](/cmn_diagrams/State%20machine%20view.png)
 
 ### BPMN (create did process)
 BPMN describes the create did process and identifies all the business events that result in an update to the ledger.
