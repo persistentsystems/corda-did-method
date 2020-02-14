@@ -24,7 +24,7 @@ To build jar use command `./gradelw jar` .This will generate the following files
 
 ### Running the node as witness
 * Complete the [pre-requisite](https://docs.corda.net/getting-set-up.html) and [network bootstrapper](https://docs.corda.net/network-bootstrapper.html) setup.
-* Create a file with name `did-witness-flows-1.0-SNAPSHOT.jar.conf` with below content and place it under the config directory of node file system.
+* Create a file with name `did-witness-flows-1.0-SNAPSHOT.conf` with below content and place it under the config directory of node file system.
 ```bash
 nodes = [
 "O=PartyB,L=New York,C=US"
