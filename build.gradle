@@ -16,7 +16,6 @@ buildscript {
         http4k_version = "3.112.2"
     }
 
-
     repositories {
         mavenCentral()
         jcenter()
