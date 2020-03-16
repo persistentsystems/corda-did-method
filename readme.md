@@ -1,6 +1,10 @@
 Corda DID Method Proof-of-Concept
 =================================
+<<<<<<< HEAD
 ## Table of Contents
+=======
+### Table of Contents
+>>>>>>> ea3858a19df31ef101f1938679b60d51986f44bc
 1. [Introduction](#introduction)
 2. [Specifications](#specifications) 
 3. [CorDapp design -CMN views](#cmn)
@@ -15,7 +19,7 @@ Corda DID Method Proof-of-Concept
 This repository contains all components necessary to provide a Corda ‘Decentralized Identifier Method’ within the meaning of the [Data Model and Syntaxes for Decentralized Identifiers Draft Community Group Report 06 February 2019](https://w3c-ccg.github.io/did-spec).
 
 The system architecture outlined below illustrates the high level components without going into implementation details.
-On a high level, persistence of DID documents will be provided by a _consortium_ of trusted nodes operating within a _network_.
+On a high level, persistence of DID documents will be provided by a _consortium_ of trusted nodes operating within a _network_..
 
 ![Corda DID System Architecture](images/architecture.svg)
 
