@@ -74,13 +74,19 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		}
 
 		val notary = serviceHub.getNotaryFromConfig()
+		println("Notary found:")
+		println(notary?.name.toString())
 
 		// Stage 1.
 		progressTracker.currentStep = GENERATING_TRANSACTION
 
 		val config = serviceHub.getAppContext().config
+		println("Fetched Config")
+		println(config.toString())
 		val networkType = config.get("network") as String
 		val nodes = config.get("nodes") as ArrayList<*>
+		println("Nodes from config:")
+		println(nodes)
 
 		val witnessNodesList = arrayListOf<Party>()
 		nodes.map {
@@ -88,6 +94,7 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 		}
 		val didState = DidState(envelope, serviceHub.myInfo.legalIdentities.first(), witnessNodesList.toSet(), DidStatus.ACTIVE, UniqueIdentifier(null, did.uuid))
 
+		println("Generate the unsigned transaction")
 		// Generate an unsigned transaction.
 		val txCommand = Command(DidContract.Commands.Create(networkType), listOf(ourIdentity.owningKey))
 		val txBuilder = TransactionBuilder(notary)
@@ -95,21 +102,29 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 				.addCommand(txCommand)
 
 		// Stage 2.
+		println("Stage 2 Verify")
 		progressTracker.currentStep = VERIFYING_TRANSACTION
 		// Verify that the transaction is valid.
 		txBuilder.verify(serviceHub)
+		println("Transaction Verified")
 
 		// Stage 3.
+		println("Stage 3 Sign")
 		progressTracker.currentStep = SIGNING_TRANSACTION
 		// Sign the transaction.
 		val signedTx = serviceHub.signInitialTransaction(txBuilder)
+		println("Transaction Signed")
 
 		// Stage 4.
+		println("Stage 4 Notarise and finish transaction")
 		progressTracker.currentStep = FINALISING_TRANSACTION
 
 		val otherPartySession = didState.witnesses.minus(ourIdentity).map { initiateFlow(it) }.toSet()
+		println("Other Parties Sessions")
+		println(otherPartySession)
 
 		// Notarise and record the transaction in witness parties' vaults.
+		println("Invoke FinalityFlow")
 		return subFlow(FinalityFlow(signedTx, otherPartySession, FINALISING_TRANSACTION.childProgressTracker()))
 	}
 }
@@ -123,6 +138,8 @@ class CreateDidFlow(val envelope: DidEnvelope) : FlowLogic<SignedTransaction>() 
 class CreateDidFinalityFlowResponder(private val otherPartySession: FlowSession) : FlowLogic<Unit>() {
 	@Suspendable
 	override fun call() {
+		println("Finality Flow Responder")
+		println(otherPartySession)
 		subFlow(ReceiveFinalityFlow(otherPartySession))
 	}
 }
