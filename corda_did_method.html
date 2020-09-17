@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" dir="ltr" class=" idcae idcac"><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><meta name="generator" content="ReSpec 25.3.1"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><style>/* dfn popup panel that list all local references to a dfn */
+<!DOCTYPE html><html lang="en-GB-oxendict" class=" idcae idcac"><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><meta name="generator" content="ReSpec 25.4.0"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><style>/* dfn popup panel that list all local references to a dfn */
 dfn {
   cursor: pointer;
 }
@@ -465,6 +465,11 @@ hue-6-2: #c18401
       "companyURL": "https://www.r3.com/"
     },
     {
+      "name": "Arati Baliga",
+      "company": "Persistent Systems",
+      "companyURL": "https://www.persistent.com/"
+    },
+    {
       "name": "Pandurang Kamat",
       "company": "Persistent Systems",
       "companyURL": "https://www.persistent.com/"
@@ -474,15 +479,9 @@ hue-6-2: #c18401
       "mailto": "moritz.platt@r3.com",
       "company": "R3",
       "companyURL": "https://www.r3.com/"
-    },
-	{
-      "name": "Arati Baliga",
-      "company": "Persistent Systems",
-      "companyURL": "https://www.persistent.com/"
     }
   ],
   "authors": [
-    
     {
       "name": "Pranav Kirtani",
       "company": "Persistent Systems",
@@ -532,16 +531,16 @@ hue-6-2: #c18401
       "id": "multibase"
     }
   },
-  "_ijt": "59oq71sb5brqa2js61njrbfdiv",
-  "publishISODate": "2020-03-02T00:00:00.000Z",
-  "generatedSubtitle": "Unofficial Draft 02 March 2020"
+  "_ijt": "5l4hkraffl78kc5uj2qdk8hgsf",
+  "publishISODate": "2020-03-09T00:00:00.000Z",
+  "generatedSubtitle": "Unofficial Draft 09 March 2020"
 }</script><link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2016/W3C-UD"></head>
 <body class="h-entry informative"><div class="head">
        <h1 id="title" class="title">Corda DID Method</h1>
       
       <h2>
         Unofficial Draft
-        <time class="dt-published" datetime="2020-03-02">02 March 2020</time>
+        <time class="dt-published" datetime="2020-03-09">09 March 2020</time>
       </h2>
       <dl>
         
@@ -554,18 +553,17 @@ hue-6-2: #c18401
         <dt>Editors:</dt>
         <dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:abbas.ali@r3.com">Abbas Ali</a>
             (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
+          </dd><dd class="p-author h-card vcard"><span class="p-name fn">Arati Baliga</span>
+            (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
           </dd><dd class="p-author h-card vcard"><span class="p-name fn">Pandurang Kamat</span>
             (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
           </dd><dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:moritz.platt@r3.com">Moritz Platt</a>
             (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
           </dd>
-		  <dd class="p-author h-card vcard"><span class="p-name fn">Arati Baliga</span>(<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
-          </dd>
         
         <dt>
                 Authors:
-              </dt>
-            <dd class="p-author h-card vcard"><span class="p-name fn">Pranav Kirtani</span>
+              </dt><dd class="p-author h-card vcard"><span class="p-name fn">Pranav Kirtani</span>
             (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
           </dd><dd class="p-author h-card vcard"><span class="p-name fn">Nitesh Solanki</span>
             (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
@@ -582,67 +580,65 @@ hue-6-2: #c18401
       <hr title="Separator for header">
     </div>
 <section id="abstract" class="introductory"><h2>Abstract</h2>
-    The Corda DID method aims to implement the Decentralized Identifiers requirements [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] on Corda networks.
-    The Corda DID method is a hybrid, exposing both Corda specific means of communication (Corda's peer-to-peer
-    messaging protocol [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-messaging" title="Corda Networking and Messaging">corda-messaging</a></cite>]), as well as a more widely recognised protocol for end-users (JSON over
-    HTTPS).
-</section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>Introduction</a></li><li class="tocline"><a class="tocxref" href="#overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#networks"><bdi class="secno">2.1 </bdi>Networks</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#member-node-end-points"><bdi class="secno">2.1.1 </bdi>Member Node End Points</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-end-points"><bdi class="secno">2.1.1.1.1 </bdi>HTTP End Points</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-end-points"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer End Points</a></li></ol></li><li class="tocline"><a class="tocxref" href="#corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-end-points-0"><bdi class="secno">2.1.1.2.1 </bdi>HTTP End Points</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-end-points-0"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer End Points</a></li></ol></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#methods"><bdi class="secno">3. </bdi>Methods</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</a></li><li class="tocline"><a class="tocxref" href="#json-over-https-api"><bdi class="secno">3.2 </bdi>JSON over HTTPS API</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#message-format"><bdi class="secno">3.2.1 </bdi>Message Format</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#instruction"><bdi class="secno">3.2.1.1 </bdi>Instruction</a></li><li class="tocline"><a class="tocxref" href="#supported-encodings"><bdi class="secno">3.2.1.2 </bdi>Supported Encodings</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#examples"><bdi class="secno">3.2.1.2.1 </bdi>Examples</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#base58"><bdi class="secno">3.2.1.2.1.1 </bdi>Base58</a></li><li class="tocline"><a class="tocxref" href="#multibase"><bdi class="secno">3.2.1.2.1.2 </bdi>Multibase</a></li><li class="tocline"><a class="tocxref" href="#hex"><bdi class="secno">3.2.1.2.1.3 </bdi>Hex</a></li><li class="tocline"><a class="tocxref" href="#base64"><bdi class="secno">3.2.1.2.1.4 </bdi>Base64</a></li></ol></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did"><bdi class="secno">3.3.1 </bdi>Create DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request"><bdi class="secno">3.3.1.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response"><bdi class="secno">3.3.1.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#read-did"><bdi class="secno">3.3.2 </bdi>Read DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-0"><bdi class="secno">3.3.2.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-0"><bdi class="secno">3.3.2.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#update-did"><bdi class="secno">3.3.3 </bdi>Update DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-1"><bdi class="secno">3.3.3.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-1"><bdi class="secno">3.3.3.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-2"><bdi class="secno">3.3.4.1 </bdi>Request</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did-createdidflow"><bdi class="secno">4.1 </bdi>Create DID (<em>CreateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#read-did-fetchdiddocumentflow"><bdi class="secno">4.2 </bdi>Read DID (<em>FetchDidDocumentFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#update-did-updatedidflow"><bdi class="secno">4.3 </bdi>Update DID (<em>UpdateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#delete-did-deletedidflow"><bdi class="secno">4.4 </bdi>Delete DID (<em>DeleteDidFlow</em>)</a></li></ol></li><li class="tocline"><a class="tocxref" href="#tof"><bdi class="secno">A. </bdi>List of Figures</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">B. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#informative-references"><bdi class="secno">B.1 </bdi>Informative references</a></li></ol></li></ol></nav>
+    The Corda DID method aims to implement Decentralized Identifier [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] architecture in Corda networks.<br>
+    The Corda DID method is a hybrid method, exposing a widely recognized protocol for end users (JSON over HTTPS),
+    while utilizing a Corda-specific means of communication (Corda’s peer-to-peer messaging protocol
+    [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-messaging" title="Corda Networking and Messaging">corda-messaging</a></cite>]) for data replication.
+</section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>Introduction</a></li><li class="tocline"><a class="tocxref" href="#overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#networks"><bdi class="secno">2.1 </bdi>Networks</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li><li class="tocline"><a class="tocxref" href="#corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints-0"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints-0"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#methods"><bdi class="secno">3. </bdi>Methods</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</a></li><li class="tocline"><a class="tocxref" href="#json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#message-format"><bdi class="secno">3.2.1 </bdi>Message Format</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#instruction"><bdi class="secno">3.2.1.1 </bdi>Instruction data</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings</a></li></ol></li><li class="tocline"><a class="tocxref" href="#examples"><bdi class="secno">3.2.1.2 </bdi>Examples</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58</a></li><li class="tocline"><a class="tocxref" href="#multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase</a></li><li class="tocline"><a class="tocxref" href="#hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex</a></li><li class="tocline"><a class="tocxref" href="#base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did"><bdi class="secno">3.3.1 </bdi>Create DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request"><bdi class="secno">3.3.1.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response"><bdi class="secno">3.3.1.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#read-did"><bdi class="secno">3.3.2 </bdi>Read DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-0"><bdi class="secno">3.3.2.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-0"><bdi class="secno">3.3.2.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#update-did"><bdi class="secno">3.3.3 </bdi>Update DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-1"><bdi class="secno">3.3.3.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-1"><bdi class="secno">3.3.3.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-2"><bdi class="secno">3.3.4.1 </bdi>Request</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did-createdidflow"><bdi class="secno">4.1 </bdi>Create DID (<em>CreateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#read-did-fetchdiddocumentflow"><bdi class="secno">4.2 </bdi>Read DID (<em>FetchDidDocumentFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#update-did-updatedidflow"><bdi class="secno">4.3 </bdi>Update DID (<em>UpdateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#delete-did-deletedidflow"><bdi class="secno">4.4 </bdi>Delete DID (<em>DeleteDidFlow</em>)</a></li></ol></li><li class="tocline"><a class="tocxref" href="#tof"><bdi class="secno">A. </bdi>List of Figures</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">B. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#informative-references"><bdi class="secno">B.1 </bdi>Informative references</a></li></ol></li></ol></nav>
 
 <section id="introduction">
     <h2 id="x1-introduction"><bdi class="secno">1. </bdi>Introduction</h2>
     <p>
         To understand the environment in which the Corda DID method operates, the permissioned nature of a Corda network
         and the point-to-point approach to data replication must be taken into account.
-        While parties on permissionless blockchains remain are anonymous, and can join and leave at will, any Corda
-        network utilises a standard PKIX infrastructure for linking public keys to identities [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-whitepaper" title="Corda Technical White Paper">corda-whitepaper</a></cite>].
-        As such, individually deployed entities on the network—nodes—have a strong notion of identity. This concept
-        is instrumental to network communication.
-        Similarly, the data replication model implemented in Corda is different from that of a conventional public
-        blockchain that makes all on-ledger data visible to all network participants.
-        In Corda, data is distributed to a configurable subset of network members only.
+        While parties in permissionless blockchains remain anonymous and can join and leave at will, any Corda network
+        utilizes a standard PKIX infrastructure for linking public keys to identities [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-whitepaper" title="Corda Technical White Paper">corda-whitepaper</a></cite>].
+        As such, individually deployed entities in the network – nodes – have a strong notion of identity.
+        This concept is instrumental in network communication. Similarly, the data-replication model implemented in
+        Corda is different to that of a conventional public blockchain, which makes all in-ledger data visible to all
+        network participants. In Corda, data are distributed to a configurable subset of network members only.
     </p>
 </section>
 <section id="overall-architecture">
     <h2 id="x2-overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</h2>
     <p>
-        The Corda DID method operates in an environment in which multiple nodes form a consortium to replicate
-        decentralised identity data (cf. <a href="#high-level-architecture">figure 1</a>).
-        These consortium nodes replicate decentralised identifier documents to form a network-wide eventually consistent
-        view of the unity of decentralised identifiers using the Corda DID method.
+        The Corda DID method operates in an environment where multiple nodes form a consortium in order to replicate
+        decentralized identity data (cf. <a href="#high-level-architecture">figure 1</a>).
+        These consortium nodes replicate decentralized identifier documents to form a network-wide and, ultimately,
+        consistent view of the unity of decentralized identifiers, using the Corda DID method.
     </p>
     <figure id="high-level-architecture">
         <img src="high_level_architecture.svg" height="339" width="1050">
-        <figcaption>Figure <bdi class="figno">1</bdi> <span class="fig-title">The high level network architecture of a Corda network with three consortium nodes.</span></figcaption>
+        <figcaption>Figure <bdi class="figno">1</bdi> <span class="fig-title">The high-level network architecture of a Corda network with three consortium nodes.</span></figcaption>
     </figure>
     <p>
-        Replication is implemented via the Corda peer-to-peer protocol and invoked via the Corda Flow Framework.
-        Since replication between consortium members is not a public aspect of the DID method, it will not be discussed
-        in detail in this specification.
+        Replication is implemented via the Corda peer-to-peer protocol and invoked via the Corda Flow Framework. Since
+        replication between consortium members is not a public aspect of the DID method, it will not be discussed in
+        detail in this specification. It is, however, briefly outlined in the <a href="#implementation-considerations">information
+        section</a>.
     </p>
 
     <p>
-        External parties, i.e. those not part of the consortium, can utilise the Corda DID method to create, read,
-        update and delete DID documents via two API:
+        External parties, i.e., those not part of the consortium, can utilize the Corda DID method to create, read,
+        update and delete DID documents via two APIs:
     </p>
     <ol>
-        <li>The JSON over HTTPS protocol</li>
+        <li>The JSON-over-HTTPS protocol</li>
         <li>The Corda peer-to-peer protocol</li>
     </ol>
     <p id="expert-users">
-        Only the former (JSON over HTTPS) is a documented aspect of the DID method at the time of writing.
-        The latter is intended for expert users who wish to make use of DID within the context of Corda's flow
-        framework.
-        A formal specification of this API is the subject of future work.
+        At the time of writing, only the first of these (JSON over HTTPS) is a documented aspect of the DID method. The
+        second protocol is intended for expert users who wish to make use of DID within the context of the Corda Flow
+        Framework. A formal specification for this API will be the subject of future work.
     </p>
 
     <section id="networks">
         <h3 id="x2-1-networks"><bdi class="secno">2.1 </bdi>Networks</h3>
 
         <p>
-            DID are to be replicated between nodes on the same Corda network.
-            Ultimately, the target network for the method is the Corda Network [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-network" title="Corda Network Foundation">corda-network</a></cite>].
-            While the method specification is evolving, an ephemeral environment for experimentation with the concept
-            will be provided.
+            DID documents are to be replicated between nodes in the same Corda network. Ultimately, the target network
+            for the method is the Corda Network [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-network" title="Corda Network Foundation">corda-network</a></cite>]. While the method specification is evolving, an
+            ephemeral environment for experimentation with the concept will be provided.
         </p>
 
         <table>
@@ -655,55 +651,55 @@ hue-6-2: #c18401
             <tr>
                 <td>Testnet [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-testnet" title="Corda Testnet">corda-testnet</a></cite>]</td>
                 <td>Test</td>
-                <td>Enabling experimentation with the method in an ephemeral environment.<br>
-                    DID are not expected to be persisted permanently.
+                <td>To enable experimentation with the method in an ephemeral environment. DIDs are not expected to be
+                    continued permanently.
                 </td>
-                <td>to be defined</td>
+                <td>To be defined</td>
             </tr>
             <tr>
                 <td>Corda Network [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-network" title="Corda Network Foundation">corda-network</a></cite>]</td>
                 <td>Live</td>
-                <td>Production ready environment replicating DID on a permanent basis.</td>
-                <td>to be defined</td>
+                <td>A production-ready environment replicating DID on a permanent basis.</td>
+                <td>To be defined</td>
             </tr>
         </tbody></table>
 
-        <section id="member-node-end-points">
-            <h4 id="x2-1-1-member-node-end-points"><bdi class="secno">2.1.1 </bdi>Member Node End Points</h4>
+        <section id="member-node-endpoints">
+            <h4 id="x2-1-1-member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints</h4>
 
             <p>
-                Consortium member nodes have to maintain a permanent host name or IP address for both Corda peer-to-peer
-                communication and to expose the HTTP server that operates the API.
-                These host names/IP addresses can be different.
+                Consortium-member nodes have to maintain a permanent hostname or IP address for Corda peer-to-peer
+                communication and to expose the HTTP server that operates the API. These hostnames/IP addresses can be
+                different.
             </p>
 
             <section id="testnet">
                 <h5 id="x2-1-1-1-testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</h5>
 
-                <section id="http-end-points">
-                    <h6 id="x2-1-1-1-1-http-end-points"><bdi class="secno">2.1.1.1.1 </bdi>HTTP End Points</h6>
+                <section id="http-endpoints">
+                    <h6 id="x2-1-1-1-1-http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints</h6>
                     <table>
                         <tbody><tr>
-                            <th>Consortium Member</th>
+                            <th>Consortium-Member</th>
                             <th>Host Name</th>
                             <th>Port</th>
                         </tr>
                         <tr>
-                            <td colspan="3">to be defined</td>
+                            <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
                     </tbody></table>
                 </section>
 
-                <section id="corda-peer-to-peer-end-points">
-                    <h6 id="x2-1-1-1-2-corda-peer-to-peer-end-points"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer End Points</h6>
+                <section id="corda-peer-to-peer-endpoints">
+                    <h6 id="x2-1-1-1-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints</h6>
                     <table>
                         <tbody><tr>
-                            <th>Consortium Member</th>
+                            <th>Consortium-Member</th>
                             <th>Host Name</th>
                             <th>Port</th>
                         </tr>
                         <tr>
-                            <td colspan="3">to be defined</td>
+                            <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
                     </tbody></table>
                 </section>
@@ -711,30 +707,30 @@ hue-6-2: #c18401
             <section id="corda-network">
                 <h5 id="x2-1-1-2-corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</h5>
 
-                <section id="http-end-points-0">
-                    <h6 id="x2-1-1-2-1-http-end-points"><bdi class="secno">2.1.1.2.1 </bdi>HTTP End Points</h6>
+                <section id="http-endpoints-0">
+                    <h6 id="x2-1-1-2-1-http-endpoints"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints</h6>
                     <table>
                         <tbody><tr>
-                            <th>Consortium Member</th>
+                            <th>Consortium-Member</th>
                             <th>Host Name</th>
                             <th>Port</th>
                         </tr>
                         <tr>
-                            <td colspan="3">to be defined</td>
+                            <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
                     </tbody></table>
                 </section>
 
-                <section id="corda-peer-to-peer-end-points-0">
-                    <h6 id="x2-1-1-2-2-corda-peer-to-peer-end-points"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer End Points</h6>
+                <section id="corda-peer-to-peer-endpoints-0">
+                    <h6 id="x2-1-1-2-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints</h6>
                     <table>
                         <tbody><tr>
-                            <th>Consortium Member</th>
+                            <th>Consortium-Member</th>
                             <th>Host Name</th>
                             <th>Port</th>
                         </tr>
                         <tr>
-                            <td colspan="3">to be defined</td>
+                            <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
                     </tbody></table>
                 </section>
@@ -746,30 +742,29 @@ hue-6-2: #c18401
 
 <section id="methods">
     <h2 id="x3-methods"><bdi class="secno">3. </bdi>Methods</h2>
-    <p>End users that aim to <em>create</em>, <em>read</em>, <em>update</em> or <em>delete</em> DID documents can do so
-        by interacting with a trusted node of their choosing.
-        The API provided for interaction is exposing REST endpoints over HTTP, using a JSON based envelope format
-        closely aligned with the JSON-LD examples found in the DID draft community report [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>].
+    <p>
+        End users who aim to <em>create</em>, <em>read</em>, <em>update</em> or <em>delete</em> DID documents can do so
+        by interacting with a trusted node of their choosing. The API provided for interaction exposes REST endpoints
+        over HTTP using a JSON-based envelope format closely aligned with the JSON-LD examples found in the DID draft
+        community report [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>].
     </p>
-    <p>When users interact with consortium member nodes, their requests will be handled by a <em>web server</em> that
+    <p>
+        When users interact with consortium-member nodes, their requests will be handled by a <em>web server</em> that
         transforms the requests into a <a href="https://docs.corda.net/clientrpc.html">format suitable for Corda</a>.
-        The web server component is running in a process independent of Corda.
-        User calls ‘proxied’ through this way will invoke a <a href="https://docs.corda.net/key-concepts-flows.html">Flow</a>
-        on one of the consortium nodes.
-        As part of this flow, consortium nodes will validate that the id provided by the user is valid and that the
-        message has cryptographic integrity (i.e. that the DID document is signed properly).
-        Once this validation was successful, DID documents will be replicated from the <em>trusted node</em> (i.e. the
-        node the user chose to interact with via REST) to all <em>witness nodes</em> (i.e. all other nodes in the
-        consortium).
-        Witness nodes will perform a cryptographic integrity check as part of the <a href="https://docs.corda.net/key-concepts-contracts.html">contract</a> underpinning this
-        transaction.</p>
-
+        The web-server component runs in a process independent of Corda. User calls ‘proxied’ in this way will invoke a
+        <a href="https://docs.corda.net/key-concepts-flows.html">Flow</a> on one of the consortium nodes. As part of
+        this flow, consortium nodes will check that the ID provided by the user is valid and that the message has
+        cryptographic integrity (i.e., that the DID document is signed properly). Once this validation has been
+        successfully completed, DID documents will be replicated from the <em>trusted node</em> (i.e., the node the user
+        has chosen to interact with via REST) to all <em>witness nodes</em> (i.e., all other nodes in the consortium).
+        Witness nodes will perform a cryptographic integrity check as part of the <a href="https://docs.corda.net/key-concepts-contracts.html">contract</a> underpinning this transaction.
+    </p>
     <section id="corda-did-format">
         <h3 id="x3-1-corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</h3>
 
         <p>
-            A Corda DID specifies the <code>corda</code> method, a target network (e.g. <code>testnet</code>,
-            <code>tcn</code>) and a UUID formatted in the canonical string representation [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>]:
+            A Corda DID specifies the <code>corda</code> method, a target network (e.g. <code>testnet</code> or <code>tcn</code>)
+            and a UUID formatted in the canonical string representation [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>]:
         </p>
 
         <code>
@@ -802,28 +797,25 @@ hue-6-2: #c18401
             </tr>
         </tbody></table>
 
-        I.e.
+        I.e.,
 
         <ul>
             <li><code>did:corda:testnet:559d1c8f-75dd-477f-b28a-ef9d96c4e802</code></li>
             <li><code>did:corda:tcn:ffe0f4ff-8740-470d-bb4c-0b642f58e0f5</code></li>
             <li><code>did:corda:private-persistent:d3b91530-67f5-48b8-bf1c-e883b1fea766</code></li>
         </ul>
-        <p></p>
     </section>
 
     <section id="json-over-https-api">
-        <h3 id="x3-2-json-over-https-api"><bdi class="secno">3.2 </bdi>JSON over HTTPS API</h3>
+        <h3 id="x3-2-json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API</h3>
 
-        <p>The DID API is the server component to be deployed by consortium member nodes in conjunction with the
-            CorDapp.
-            It provides Method specific APIs to <em>create</em>, <em>read</em>, <em>update</em> or <em>delete</em> DID
-            documents.
-            The Corda DID method achieves proof-of-ownership of a <em>document</em> by requiring proof-of-ownership of
-            the <em>keys</em> contained in the document.
-            To implement that, any DID document must be wrapped in an envelope.
-            This envelope must contain signatures by all private keys associated with the public keys contained in the
-            documents (cf. <a href="#did-envelope">figure 2</a>).
+        <p>
+            The DID API is the server component to be deployed by consortium-member nodes in conjunction with the
+            CorDapp. It provides method-specific APIs to <em>create</em>, <em>read</em>, <em>update</em> or
+            <em>delete</em> DID documents. The Corda DID method achieves proof of ownership of a <em>document</em> by
+            requiring proof of ownership of the <em>keys</em> contained in the document. To implement this, any DID
+            document must be wrapped in an envelope. This envelope must contain signatures for all private keys
+            associated with public keys contained in the documents (cf. <a href="#did-envelope">figure 2</a>).
         </p>
         <figure id="did-envelope">
             <img src="did_envelope.svg" height="352" width="518">
@@ -831,20 +823,18 @@ hue-6-2: #c18401
             </span></figcaption>
         </figure>
         <p>
-            Envelopes that do not contain signatures for all public keys will be rejected.
-            Envelopes using unsupported cryptographic suites or unsupported serialization mechanisms will be rejected.
-            There are restrictions on which suites and serialisation mechanisms can be used (see <em>Caveats</em>
-            below).
+            Envelopes that do not contain signatures for all public keys will be rejected. Envelopes using unsupported
+            cryptographic suites or unsupported serialization mechanisms will be rejected. There are <a href="#supported-encodings">restrictions</a> on which suites and serialization mechanisms can be used.
         </p>
         <section id="message-format">
             <h4 id="x3-2-1-message-format"><bdi class="secno">3.2.1 </bdi>Message Format</h4>
 
             <section id="instruction">
-                <h5 id="x3-2-1-1-instruction"><bdi class="secno">3.2.1.1 </bdi>Instruction</h5>
+                <h5 id="x3-2-1-1-instruction-data"><bdi class="secno">3.2.1.1 </bdi>Instruction data</h5>
 
                 <p>
-                    Instruction data tells the API what to do with the document received. It also contains proof of
-                    ownership of keys. The instruction data is to be formatted according to the following schema:
+                    Instruction data tell the API what to do with the document received. They also contain proof of
+                    ownership of keys. Instruction data are formatted according to the following schema:
                 </p>
 
                 <pre aria-busy="false"><code class="hljs json">{
@@ -909,47 +899,49 @@ hue-6-2: #c18401
     }
   }
 }</code></pre>
+
+                <section id="supported-encodings">
+                    <h6 id="x3-2-1-1-1-supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings</h6>
+
+                    <p>
+                    </p><table>
+                        <thead>
+                        <tr>
+                            <th>Encoding</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><code>signatureHex</code></td>
+                            <td>Hex-encoded signature</td>
+                        </tr>
+                        <tr>
+                            <td><code>signatureBase64</code></td>
+                            <td>Base64-encoded signature as per [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4648" title="The Base16, Base32, and Base64 Data Encodings">rfc4648</a></cite>]</td>
+                        </tr>
+                        <tr>
+                            <td><code>signatureBase58</code></td>
+                            <td>Base58-encoded signature</td>
+                        </tr>
+                        <tr>
+                            <td><code>signatureMultibase</code></td>
+                            <td>Multibase-encoded signature [<cite><a class="bibref" data-link-type="biblio" href="#bib-multibase" title="The Multibase Data Format">multibase</a></cite>]
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p></p>
+                </section>
             </section>
-            <section id="supported-encodings">
-                <h5 id="x3-2-1-2-supported-encodings"><bdi class="secno">3.2.1.2 </bdi>Supported Encodings</h5>
 
-                <p>
-                </p><table>
-                    <thead>
-                    <tr>
-                        <th>Encoding</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><code>signatureHex</code></td>
-                        <td>Hex encoded signature.</td>
-                    </tr>
-                    <tr>
-                        <td><code>signatureBase64</code></td>
-                        <td>Base64 encoded signature as per [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4648" title="The Base16, Base32, and Base64 Data Encodings">rfc4648</a></cite>]</td>
-                    </tr>
-                    <tr>
-                        <td><code>signatureBase58</code></td>
-                        <td>Base58 encoded signature.</td>
-                    </tr>
-                    <tr>
-                        <td><code>signatureMultibase</code></td>
-                        <td>Multibase encoded signature [<cite><a class="bibref" data-link-type="biblio" href="#bib-multibase" title="The Multibase Data Format">multibase</a></cite>]
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p></p>
+            <section id="examples">
+                <h5 id="x3-2-1-2-examples"><bdi class="secno">3.2.1.2 </bdi>Examples</h5>
 
-                <section id="examples">
-                    <h6 id="x3-2-1-2-1-examples"><bdi class="secno">3.2.1.2.1 </bdi>Examples</h6>
+                <section id="base58">
+                    <h6 id="x3-2-1-2-1-base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58</h6>
 
-                    <section id="base58">
-                        <h6 id="x3-2-1-2-1-1-base58"><bdi class="secno">3.2.1.2.1.1 </bdi>Base58</h6>
-
-                        <pre aria-busy="false"><code class="hljs json">{
+                    <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
     {
@@ -959,12 +951,12 @@ hue-6-2: #c18401
     }
   ]
 }</code></pre>
-                    </section>
+                </section>
 
-                    <section id="multibase">
-                        <h6 id="x3-2-1-2-1-2-multibase"><bdi class="secno">3.2.1.2.1.2 </bdi>Multibase</h6>
+                <section id="multibase">
+                    <h6 id="x3-2-1-2-2-multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase</h6>
 
-                        <pre aria-busy="false"><code class="hljs json">{
+                    <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
 	{
@@ -974,12 +966,12 @@ hue-6-2: #c18401
 	}
   ]
 }</code></pre>
-                    </section>
+                </section>
 
-                    <section id="hex">
-                        <h6 id="x3-2-1-2-1-3-hex"><bdi class="secno">3.2.1.2.1.3 </bdi>Hex</h6>
+                <section id="hex">
+                    <h6 id="x3-2-1-2-3-hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex</h6>
 
-                        <pre aria-busy="false"><code class="hljs json">{
+                    <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
 	{
@@ -989,12 +981,12 @@ hue-6-2: #c18401
 	}
   ]
 }</code></pre>
-                    </section>
+                </section>
 
-                    <section id="base64">
-                        <h6 id="x3-2-1-2-1-4-base64"><bdi class="secno">3.2.1.2.1.4 </bdi>Base64</h6>
+                <section id="base64">
+                    <h6 id="x3-2-1-2-4-base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64</h6>
 
-                        <pre aria-busy="false"><code class="hljs json">{
+                    <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
 	{
@@ -1004,7 +996,6 @@ hue-6-2: #c18401
 	}
   ]
 }</code></pre>
-                    </section>
                 </section>
             </section>
         </section>
@@ -1029,7 +1020,7 @@ hue-6-2: #c18401
             </tr>
             <tr>
                 <td><code>document</code></td>
-                <td>JSON Representation of the DID document [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>]</td>
+                <td>JSON representation of the DID document [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>]</td>
             </tr>
             </tbody>
         </table>
@@ -1046,15 +1037,11 @@ hue-6-2: #c18401
                     Proof of ownership of the document has to be presented in the envelope.</p>
                 <p>The payload includes:</p>
                 <ul>
-                    <li>The document consisting of the encoded public key, the type of public key and the controller of
-                        the
-                        public key.
+                    <li>The document, consisting of the encoded public key, the type of public key and the controller of
+                        the public key;
                     </li>
-                    <li>The instruction consisting of the action to perform (create), the encoded signature on the
-                        document
-                        and
-                        the type of
-                        signature.
+                    <li>The instruction, consisting of action to be taken (create), the encoded signature(s) in the
+                        document and the type of signature.
                     </li>
                 </ul>
 
@@ -1122,10 +1109,11 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
                     <li>The API will respond with status <code>204</code> for a request with a well-formed instruction
                         <em>and</em> a well-formed document <em>and</em> valid signature(s) <em>and</em> an unused ID.
                     </li>
-                    <li>The API will respond with status <code>400</code> for a request with a deformed instruction <em>or</em>
+                    <li>The API will respond with status <code>400</code> for a request with a deformed instruction
+                        <em>or</em>
                         a deformed document <em>or</em> at least one invalid signature.
                     </li>
-                    <li>The API will respond with status <code>409</code> for a request with an ID that is already
+                    <li>The API will respond with status <code>409</code> for a request with an ID that has already been
                         taken.
                     </li>
                 </ul>
@@ -1137,9 +1125,9 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             <section id="request-0">
                 <h5 id="x3-3-2-1-request"><bdi class="secno">3.3.2.1 </bdi>Request</h5>
 
-                <p>A simple <code>GET</code> request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>] specifying the id as fragment is used to retrieve a DID
-                    document.The DID document contains a list of public keys, the type of the public key, information
-                    about encodings used on those public keys and the controller of each public key.</p>
+                <p>A simple <code>GET</code> request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>] (specifying the ID as a fragment) is used to retrieve a
+                    DID document. The DID document contains a list of public keys, the type of public key, information
+                    about encodings used in these public keys and the controller of each public key.</p>
 
                 <h6 id="request-example-curl-0">Request Example (cURL)</h6>
 
@@ -1160,11 +1148,11 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             <span class="hljs-attr">"publicKeyBase58"</span>:<span class="hljs-string">"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"</span>
         }
     ]
-}</code></pre>
+    }</code></pre>
                 <ul>
                     <li>The API will respond with status <code>200</code> for a request with a known ID.</li>
                     <li>The API will respond with status <code>404</code> for a request with an unknown ID.</li>
-                    <li>The API will respond with status <code>400</code> for a request with an ID with incorrect
+                    <li>The API will respond with status <code>400</code> for a request with an ID in the incorrect
                         format.
                     </li>
                 </ul>
@@ -1179,26 +1167,30 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
                 <p>The instruction to create a new DID is issued via a <code>POST</code> HTTP request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>].</p>
 
-                <p>Updates use the optional created [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] and updated [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] concepts to mitigate replay
+                <p>
+                    Updates use the optional created [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] and updated [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] concepts to mitigate replay
                     attacks. This means an update will only be successful if the <code>updated</code> field <em>in the
-                        DID document</em> is set to an instant that is later than the instant previously saved with that
-                    field. Should no previous update be recorded, the update will only be successful if
-                    the <code>created</code> field <em>in the document</em> is set to an instant that is later than the
-                    instant provided with the update.
+                    DID document</em> is set to an instant that is later than the instant previously saved in that
+                    field. Should no previous update be recorded, the update will only be successful if the <code>created</code>
+                    field <em>in the document</em> is set to an instant that is later than the instant provided with the
+                    update.
                 </p>
-                <p>The calculation of the current time is done by the DID owner without verification of its accuracy by
-                    the consortium. This is appropriate since this field is only used to determine a before/after
+                <p>
+                    The current time is calculated by the DID owner, without verification of its accuracy by the
+                    consortium. This is appropriate, however, since this field is only used to determine a before/after
                     relationship. Consumers of the DID document need to take into account that this value is potentially
                     inaccurate.
                 </p>
-                <p>The Payload includes:</p>
+                <p>The payload includes:</p>
                 <ul>
-                    <li>The document consisting of the new encoded public key, type of public key, controller of public
-                        key.
+                    <li>
+                        The document, consisting of the new encoded public key, the type of public key and controller of
+                        the public key;
                     </li>
-                    <li>The instruction consisting of action to perform (update), encoded signature(s) on this document
-                        using all private keys (including the one being added) associated with the public keys in the
-                        document and type of signature.
+                    <li>
+                        The instruction, consisting of action to be taken (update), encoded signature(s) in the document
+                        using all private keys (including the one being added) associated with public keys in the
+                        document and the type of signature.
                     </li>
                 </ul>
 
@@ -1241,10 +1233,10 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             <section id="response-1">
                 <h5 id="x3-3-3-2-response"><bdi class="secno">3.3.3.2 </bdi>Response</h5>
                 <ul>
-                    <li>The API will respond with status <code>204</code> if update is successful.</li>
+                    <li>The API will respond with status <code>204</code> if the update is successful.</li>
                     <li>The API will respond with status <code>404</code> for a request with an unknown ID.</li>
                     <li>The API will respond with status <code>400</code> for other cases of incorrect payload
-                        (mismatched signatures, malformed document, malformed instruction etc.).
+                        (mismatched signatures, a malformed document, malformed instructions, etc.).
                     </li>
                 </ul>
             </section>
@@ -1256,21 +1248,22 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
                 <p>The instruction to create a new DID is issued via a <code>DELETE</code> HTTP request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>].</p>
 
-                <p>This method is used to disable the identity on the ledger. Once deleted the identity cannot be used
-                    again. Delete accepts only the instruction as payload, the instruction contains signature(s) for the
-                    public key(s) of the latest DID document on the ledger.</p>
+                <p>
+                    This method is used to disable the identity in the ledger. Once deleted, the identity cannot be used
+                    again. The delete function only accepts an instruction as a payload. The instruction contains
+                    signature(s) for public key(s) for the latest DID document in the ledger.
+                </p>
                 <p>The payload includes:</p>
                 <ul>
-                    <li>The instruction consisting of action to perform (delete), encoded signature on the latest DID
-                        document on the ledger using all private keys associated with public keys present in the
-                        document
-                        and type of the signature.
+                    <li>The instruction, consisting of action to be taken (delete), encoded signature(s) in the latest
+                        DID document in the ledger using all private keys associated with public keys present in the
+                        document and the type of signature.
                     </li>
                 </ul>
-                <p>To validate a delete request, the user must provide signature(s) in the instruction. The signature(s)
-                    must be over the latest did document present in the ledger signed with corresponding private keys
-                    for
-                    all the public keys present in the document.</p>
+                <p>
+                    To validate a delete request, the user must provide signature(s) in the instruction. The
+                    signature(s) must be over the latest DID document present in the ledger, signed with corresponding
+                    private keys for all public keys present in the document.</p>
 
                 <h6 id="request-example-curl-2">Request Example (cURL)</h6>
 
@@ -1298,69 +1291,70 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 </section>
 
 
-<section class="informative" id="implementation-considerations">
+<section id="implementation-considerations" class="informative">
     <h2 id="x4-implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</h2><p><em>This section is non-normative.</em></p>
 
-    <p><em>This outlines the "on-ledger" implementation of the protocol which has only marginal use. As this is likely
-        not widely adopted this section is strictly informative.</em></p>
+    <p><em>This section outlines ‘on-ledger’ implementation of the protocol, which has only
+        marginal use.</em></p>
 
-    <p>The DID Flows is the CorDapp component to be deployed by consortium member nodes. It provides method specific
-        flows to create, read, update or delete DID documents.
-        The DID flows can be invoked from RPC clients or from other flows.</p>
+    <p>A reference implementation of this method is <a href="https://github.com/persistentsystems/corda-did-method">available
+        publicly</a>.</p>
+
+    <p>DID Flows is the CorDapp component to be deployed by consortium-member nodes. It provides method-specific flows
+        to create, read, update or delete DID documents. The DID flows can be invoked from RPC clients or from other
+        flows.</p>
 
     <section id="create-did-createdidflow">
         <h3 id="x4-1-create-did-createdidflow"><bdi class="secno">4.1 </bdi>Create DID (<em>CreateDidFlow</em>)</h3>
 
-        <p>This is used to create a new DID.
-            Proof of ownership of the document has to be presented in the envelope as outlined in the API format.</p>
+        <p>This is used to create a new DID. Proof of ownership of the document has to be presented in the envelope, as
+            outlined in the API format.</p>
         <ul>
             <li>
-                <p>invoke CreateDidFlow via RPC:
-                    <code>rpc.startFlowDynamic(CreateDidFlow::class.java, envelope)</code></p>
+                <p>Invoke CreateDidFlow via RPC: <code>rpc.startFlowDynamic(CreateDidFlow::class.java, envelope)</code>.
+                </p>
             </li>
             <li>
-                <p>invoke CreateDidFlow from another flow:<br>
-                    <code>subFlow(CreateDidFlow(envelope))</code></p>
+                <p>Invoke CreateDidFlow from another flow: <code>subFlow(CreateDidFlow(envelope))</code>,</p>
             </li>
         </ul>
-        <p>where envelope is an instance of type <code>DidEnvelope</code></p>
+        <p>where ‘envelope’ is an instance of the <code>DidEnvelope</code> type.</p>
     </section>
 
     <section id="read-did-fetchdiddocumentflow">
         <h3 id="x4-2-read-did-fetchdiddocumentflow"><bdi class="secno">4.2 </bdi>Read DID (<em>FetchDidDocumentFlow</em>)</h3>
 
-        <p>This is used to fetch a <code>did</code> document from node's local vault. It returns an instance of type
-            <code>DidDocument</code></p>
+        <p>This is used to fetch a DID document from a node’s local vault. It returns an instance of the
+            <code>DidDocument</code> type.</p>
         <ul>
             <li>
-                <p>invoke FetchDidDocumentFlow via RPC:
-                    <code>rpc.startFlowDynamic(FetchDidDocumentFlow::class.java, linearId)</code></p>
+                <p>Invoke FetchDidDocumentFlow via RPC:
+                    <code>rpc.startFlowDynamic(FetchDidDocumentFlow::class.java, linearId)</code>.</p>
             </li>
             <li>
-                <p>invoke FetchDidDocumentFlow from another flow:<br>
-                    <code>subFlow(FetchDidDocumentFlow(linearId))</code></p>
+                <p>Invoke FetchDidDocumentFlow from another flow:<br>
+                    <code>subFlow(FetchDidDocumentFlow(linearId))</code>,</p>
             </li>
         </ul>
-        <p>where linearId is an instance of type <code>UniqueIdentifier</code> and it is the UUID part of the
-            <code>did</code>.</p>
-        <p>There might be a case where a node which is not part of the DID Business Network may request DID document
+        <p>where ‘linearId’ is an instance of the <code>UniqueIdentifier</code> type and is the UUID part of the DID.
+        </p>
+        <p>There might be a case where a node which is not part of the DID Business Network may request a DID document
             from one of the DID consortium nodes.
             In such situations, nodes can invoke <code>FetchDidDocumentFromRegistryNodeFlow</code>.
         </p>
         <ul>
             <li>
-                <p>invoke FetchDidFetchDidDocumentFromRegistryNodeFlowDocumentFlow via RPC:
+                <p>Invoke FetchDidFetchDidDocumentFromRegistryNodeFlowDocumentFlow via RPC:
                     <code>rpc.startFlowDynamic(FetchDidDocumentFromRegistryNodeFlow::class.java, didRegistryNode,
-                        linearId)</code></p>
+                        linearId)</code>.</p>
             </li>
             <li>
-                <p>invoke FetchDidDocumentFromRegistryNodeFlow from another flow:<br>
-                    <code>subFlow(FetchDidDocumentFromRegistryNodeFlow(didRegistryNode, linearId))</code></p>
+                <p>Invoke FetchDidDocumentFromRegistryNodeFlow from another flow:<br>
+                    <code>subFlow(FetchDidDocumentFromRegistryNodeFlow(didRegistryNode, linearId))</code>,</p>
             </li>
         </ul>
-        <p>where linearId is an instance of type <code>UniqueIdentifier</code> and it is the UUID part of the
-            <code>did</code> and didRegistryNode is an instance of type <code>Party</code> representing the
-            <code>did</code> consortium node.</p>
+        <p>where ‘linearId’ is an instance of the <code>UniqueIdentifier</code> type and is the UUID part of the DID,
+            and ‘didRegistryNode’ is an instance of the Party type representing the DID consortium node.</p>
     </section>
 
     <section id="update-did-updatedidflow">
@@ -1369,43 +1363,42 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
         <p>This is used to update an existing DID.</p>
         <ul>
             <li>
-                <p>invoke UpdateDidFlow via RPC:
-                    <code>rpc.startFlowDynamic(UpdateDidFlow::class.java, envelope)</code></p>
+                <p>Invoke UpdateDidFlow via RPC:
+                    <code>rpc.startFlowDynamic(UpdateDidFlow::class.java, envelope)</code>.</p>
             </li>
             <li>
-                <p>invoke UpdateDidFlow from another flow:<br>
-                    <code>subFlow(UpdateDidFlow(envelope))</code></p>
+                <p>Invoke UpdateDidFlow from another flow:<br>
+                    <code>subFlow(UpdateDidFlow(envelope))</code>,</p>
             </li>
         </ul>
-        <p>where envelope is an instance of type <code>DidEnvelope</code></p>
+        <p>where ‘envelope’ is an instance of the <code>DidEnvelope</code> type.</p>
     </section>
 
     <section id="delete-did-deletedidflow">
         <h3 id="x4-4-delete-did-deletedidflow"><bdi class="secno">4.4 </bdi>Delete DID (<em>DeleteDidFlow</em>)</h3>
 
-        <p>This is used to disable an existing DID. Delete operation introduces no changes to the DidDocument. It
-            expires the DidState and is marked as <code>Consumed</code> on the ledger.
-            To validate a delete request, the user must provide signature(s) in the instruction, the signature(s) are on
-            the latest <code>did</code> document present in the ledger signed with corresponding private keys for all
-            the public keys present in the document.</p>
+        <p>This is used to disable an existing DID. The delete operation introduces no changes to the
+            <code>DidDocument</code>. It expires the <code>DidState</code> and is marked as <code>Consumed</code> in the
+            ledger. To validate a delete request, the user must provide signature(s) in the instruction. The
+            signature(s) are to be created using the key pair referenced in the latest DID document present in the
+            ledger, signed with corresponding private keys for all public keys present in the document.</p>
         <ul>
             <li>
-                <p>invoke DeleteDidFlow via RPC:<br>
-                    <code>rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)</code></p>
+                <p>Invoke DeleteDidFlow via RPC:<br>
+                    <code>rpc.startFlowDynamic(DeleteDidFlow::class.java, instruction, did)</code>.</p>
             </li>
             <li>
-                <p>invoke DeleteDidFlow from another flow:<br>
-                    <code>subFlow(DeleteDidFlow(instruction, did))</code></p>
+                <p>Invoke DeleteDidFlow from another flow:<br>
+                    <code>subFlow(DeleteDidFlow(instruction, did))</code>,</p>
             </li>
         </ul>
-        <p>where instruction is the instruction JSON object (in string form) containing signatures of did-owner on the
-            did-document to be deactivated
-            and <code>did</code> is the <code>did</code> to be deleted.</p>
+        <p>where ‘instruction’ is the instruction JSON object (in string form), containing DID-owner signatures in the
+            DID-document to be deactivated; <code>did</code> is the DID to be deleted.</p>
     </section>
 </section>
 
 <section id="tof" class="appendix"><h2 id="a-list-of-figures"><bdi class="secno">A. </bdi>List of Figures</h2><ul class="tof"><li class="tofline">
-    <a class="tocxref" href="#high-level-architecture">Figure <bdi class="figno">1</bdi> <span class="fig-title">The high level network architecture of a Corda network with three consortium nodes.</span></a>
+    <a class="tocxref" href="#high-level-architecture">Figure <bdi class="figno">1</bdi> <span class="fig-title">The high-level network architecture of a Corda network with three consortium nodes.</span></a>
   </li><li class="tofline">
     <a class="tocxref" href="#did-envelope">Figure <bdi class="figno">2</bdi> <span class="fig-title">A DID envelope holds the document payload and signatures over the payload by relevant keys.
             </span></a>
