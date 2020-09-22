@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+     width="518px" height="352px" viewBox="6.5 35 518 352" enable-background="new 6.5 35 518 352" xml:space="preserve">
+<polygon fill="#DEEBF7" stroke="#4472C4" stroke-width="2" stroke-miterlimit="10" points="284.678,361.171 67.883,361.171
+	67.883,63 501.363,63 501.363,361.171 "/>
+    <text transform="matrix(1 0 0 1 81.1042 85.6609)" enable-background="new    "><tspan x="0" y="0" fill="#666666" font-family="'Helvetica-Bold'" font-size="14.6875">Envelope</tspan></text>
+    <path fill="none" stroke="#4472C4" stroke-width="2.0031" stroke-linejoin="round" stroke-miterlimit="10"
+          d="M340.172,291.522"/>
+    <g>
+	<polygon fill="#FFFFFF" stroke="#666666" stroke-width="2" stroke-miterlimit="10" points="282.354,213 81.104,213 81.104,103
+		483.5,103 483.5,213 	"/>
+        <text transform="matrix(1 0 0 1 95.4998 122.9998)" fill="#666666" font-family="'Helvetica-Bold'"
+              font-size="14.6875">Signatures</text>
+        <text transform="matrix(1 0 0 1 95.4998 158.2498)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">Sig</text>
+        <text transform="matrix(0.583 0 0 0.583 116.7278 163.1409)" fill="#666666" font-family="'Helvetica'"
+              font-size="14.6875">1</text>
+        <text transform="matrix(1 0 0 1 95.4998 175.8748)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">Sig</text>
+        <text transform="matrix(0.583 0 0 0.583 116.7278 180.7659)" fill="#666666" font-family="'Helvetica'"
+              font-size="14.6875">2</text>
+        <text transform="matrix(1 0 0 1 95.4998 193.4998)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">Sig</text>
+        <text transform="matrix(0.583 0 0 0.583 116.7278 198.3909)" fill="#666666" font-family="'Helvetica'"
+              font-size="14.6875">3</text>
+</g>
+    <polygon fill="#FFFFFF" stroke="#666666" stroke-width="2" stroke-miterlimit="10" points="282.354,341 81.104,341 81.104,225
+	483.5,225 483.5,341 "/>
+    <text transform="matrix(1 0 0 1 95.4998 244.9998)" fill="#666666" font-family="'Helvetica-Bold'"
+          font-size="14.6875">Payload/DID</text>
+    <polygon fill="#F2F2F2" stroke="#C4446A" stroke-width="2" stroke-miterlimit="10" points="279.547,324 95.5,324 95.5,256
+	463.5,256 463.5,324 "/>
+    <text transform="matrix(1 0 0 1 105.4998 276.9998)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">PubKey</text>
+    <text transform="matrix(0.583 0 0 0.583 156.9417 281.8904)" fill="#666666" font-family="'Helvetica'"
+          font-size="14.6875">1</text>
+    <text transform="matrix(1 0 0 1 105.4998 294.6248)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">PubKey</text>
+    <text transform="matrix(0.583 0 0 0.583 156.9417 299.5154)" fill="#666666" font-family="'Helvetica'"
+          font-size="14.6875">2</text>
+    <text transform="matrix(1 0 0 1 105.4998 312.2498)" fill="#666666" font-family="'Helvetica'" font-size="14.6875">PubKey</text>
+    <text transform="matrix(0.583 0 0 0.583 156.9417 317.1404)" fill="#666666" font-family="'Helvetica'"
+          font-size="14.6875">3</text>
+    <g>
+	<g opacity="0.7">
+		<g>
+			<path fill="none" stroke="#C4446A" stroke-width="2" stroke-miterlimit="10" d="M88.672,272.503
+				C58.476,269.478,34.9,243.992,34.9,213c0-33.028,26.774-59.802,59.802-59.802"/>
+            <g>
+				<path fill="#C4446A" d="M94.702,272.802c-2.777-1.21-6.195-3.201-8.27-5.225l1.453,4.845l-1.982,4.651
+					C88.19,275.295,91.808,273.695,94.702,272.802z"/>
+			</g>
+		</g>
+	</g>
+        <g opacity="0.7">
+		<g>
+			<path fill="none" stroke="#A73A5B" stroke-width="2" stroke-miterlimit="10" d="M87.649,290.391
+				C57.946,286.901,34.9,261.642,34.9,231c0-33.028,26.774-59.802,59.802-59.802"/>
+            <g>
+				<polygon fill="#A73A5B"
+                         points="94.702,290.802 85.05,286.075 87.131,290.291 84.502,294.186 				"/>
+			</g>
+		</g>
+	</g>
+        <g opacity="0.7">
+		<g>
+			<path fill="none" stroke="#7C2B43" stroke-width="2" stroke-miterlimit="10" d="M87.649,308.391
+				C57.946,304.901,34.9,279.641,34.9,249c0-33.028,26.774-59.802,59.802-59.802"/>
+            <g>
+				<polygon fill="#7C2B43"
+                         points="94.702,308.802 85.05,304.075 87.131,308.291 84.502,312.186 				"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

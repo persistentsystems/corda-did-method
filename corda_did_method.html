@@ -1,593 +1,268 @@
-<!DOCTYPE html><html lang="en-GB-oxendict" class=" idcae idcac"><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><meta name="generator" content="ReSpec 25.4.0"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><style>/* dfn popup panel that list all local references to a dfn */
-dfn {
-  cursor: pointer;
-}
+<!DOCTYPE html><html lang="en-GB-oxendict" class=" kvfzrrzhh idc0_321"><head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="generator" content="ReSpec 25.16.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+dfn{cursor:pointer}
+.dfn-panel{position:absolute;z-index:35;min-width:300px;max-width:500px;padding:.5em .75em;margin-top:.6em;font:small Helvetica Neue,sans-serif,Droid Sans Fallback;background:#fff;color:#000;box-shadow:0 1em 3em -.4em rgba(0,0,0,.3),0 0 1px 1px rgba(0,0,0,.05);border-radius:2px}
+.dfn-panel:not(.docked)>.caret{position:absolute;top:-9px}
+.dfn-panel:not(.docked)>.caret::after,.dfn-panel:not(.docked)>.caret::before{content:"";position:absolute;border:10px solid transparent;border-top:0;border-bottom:10px solid #fff;top:0}
+.dfn-panel:not(.docked)>.caret::before{border-bottom:9px solid #a2a9b1}
+.dfn-panel *{margin:0}
+.dfn-panel b{display:block;color:#000;margin-top:.25em}
+.dfn-panel ul a[href]{color:#333}
+.dfn-panel a.self-link{font-weight:700}
+.dfn-panel .dfn-exported{float:right;padding:.1em;border-radius:.2em;text-align:center;white-space:nowrap;font-size:90%;background:#d1edfd;color:#040b1c;box-shadow:0 0 0 .125em #1ca5f940}
+.dfn-panel a:not(:hover){text-decoration:none!important;border-bottom:none!important}
+.dfn-panel a[href]:hover{border-bottom-width:1px}
+.dfn-panel ul{padding:0}
+.dfn-panel li{margin-left:1em}
+.dfn-panel.docked{position:fixed;left:.5em;top:unset;bottom:2em;margin:0 auto;max-width:calc(100vw - .75em * 2 - .5em - .2em * 2);max-height:30vh;overflow:auto}
+</style>
 
-.dfn-panel {
-  position: absolute;
-  left: var(--left); /* set via JS */
-  top: var(--top); /* set via JS */
-  z-index: 35;
-  height: auto;
-  width: max-content;
-  max-width: 300px;
-  max-height: 500px;
-  overflow: auto;
-  padding: 0.5em 0.75em;
-  font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
-  background: #dddddd;
-  color: black;
-  border: outset 0.2em;
-}
+    <title>Corda DID Method</title>
 
-.dfn-panel * {
-  margin: 0;
-}
 
-.dfn-panel > b {
-  display: block;
-}
 
-.dfn-panel ul a[href] {
-  color: black;
-}
 
-.dfn-panel a:not(:hover) {
-  text-decoration: none !important;
-  border-bottom: none !important;
-}
 
-.dfn-panel a[href]:hover {
-  border-bottom-width: 1px;
+    <style id="respec-mainstyle">
+@keyframes pop{
+0%{transform:scale(1,1)}
+25%{transform:scale(1.25,1.25);opacity:.75}
+100%{transform:scale(1,1)}
 }
-
-.dfn-panel > b + b {
-  margin-top: 0.25em;
+.hljs{background:0 0!important}
+a abbr,h1 abbr,h2 abbr,h3 abbr,h4 abbr,h5 abbr,h6 abbr{border:none}
+dfn{font-weight:700}
+a.internalDFN{color:inherit;border-bottom:1px solid #99c;text-decoration:none}
+a.externalDFN{color:inherit;border-bottom:1px dotted #ccc;text-decoration:none}
+a.bibref{text-decoration:none}
+.respec-offending-element:target{animation:pop .25s ease-in-out 0s 1}
+.respec-offending-element,a[href].respec-offending-element{text-decoration:red wavy underline}
+@supports not (text-decoration:red wavy underline){
+.respec-offending-element:not(pre){display:inline-block}
+.respec-offending-element{background:url(data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=) bottom repeat-x}
 }
-
-.dfn-panel ul {
-  padding: 0;
+#references :target{background:#eaf3ff;animation:pop .4s ease-in-out 0s 1}
+cite .bibref{font-style:normal}
+code{color:#c63501}
+th code{color:inherit}
+a[href].orcid{padding-left:4px;padding-right:4px}
+a[href].orcid>svg{margin-bottom:-2px}
+.toc a,.tof a{text-decoration:none}
+a .figno,a .secno{color:#000}
+ol.tof,ul.tof{list-style:none outside none}
+.caption{margin-top:.5em;font-style:italic}
+table.simple{border-spacing:0;border-collapse:collapse;border-bottom:3px solid #005a9c}
+.simple th{background:#005a9c;color:#fff;padding:3px 5px;text-align:left}
+.simple th a{color:#fff;padding:3px 5px;text-align:left}
+.simple th[scope=row]{background:inherit;color:inherit;border-top:1px solid #ddd}
+.simple td{padding:3px 10px;border-top:1px solid #ddd}
+.simple tr:nth-child(even){background:#f0f6ff}
+.section dd>p:first-child{margin-top:0}
+.section dd>p:last-child{margin-bottom:0}
+.section dd{margin-bottom:1em}
+.section dl.attrs dd,.section dl.eldef dd{margin-bottom:0}
+#issue-summary>ul,.respec-dfn-list{column-count:2}
+#issue-summary li,.respec-dfn-list li{list-style:none}
+details.respec-tests-details{margin-left:1em;display:inline-block;vertical-align:top}
+details.respec-tests-details>*{padding-right:2em}
+details.respec-tests-details[open]{z-index:999999;position:absolute;border:thin solid #cad3e2;border-radius:.3em;background-color:#fff;padding-bottom:.5em}
+details.respec-tests-details[open]>summary{border-bottom:thin solid #cad3e2;padding-left:1em;margin-bottom:1em;line-height:2em}
+details.respec-tests-details>ul{width:100%;margin-top:-.3em}
+details.respec-tests-details>li{padding-left:1em}
+a[href].self-link:hover{opacity:1;text-decoration:none;background-color:transparent}
+h2,h3,h4,h5,h6{position:relative}
+aside.example .marker>a.self-link{color:inherit}
+h2>a.self-link,h3>a.self-link,h4>a.self-link,h5>a.self-link,h6>a.self-link{border:none;color:inherit;font-size:83%;height:2em;left:-1.6em;opacity:.5;position:absolute;text-align:center;text-decoration:none;top:0;transition:opacity .2s;width:2em}
+h2>a.self-link::before,h3>a.self-link::before,h4>a.self-link::before,h5>a.self-link::before,h6>a.self-link::before{content:"§";display:block}
+@media (max-width:767px){
+dd{margin-left:0}
+h2>a.self-link,h3>a.self-link,h4>a.self-link,h5>a.self-link,h6>a.self-link{left:auto;top:auto}
 }
-
-.dfn-panel li {
-  list-style: inside;
-}
-
-.dfn-panel.docked {
-  display: inline-block;
-  position: fixed;
-  left: 0.5em;
-  top: unset;
-  bottom: 2em;
-  margin: 0 auto;
-  /* 0.75em from padding (x2), 0.5em from left position, 0.2em border (x2) */
-  max-width: calc(100vw - 0.75em * 2 - 0.5em - 0.2em * 2);
-  max-height: 30vh;
+@media print{
+.removeOnSave{display:none}
 }
 </style>
-    <title>Corda DID Method</title>
-    
-    
-    
-    
-<style id="respec-mainstyle">/*****************************************************************
- * ReSpec specific CSS
- *****************************************************************/
-@keyframes pop {
-  0% {
-    transform: scale(1, 1);
-  }
-  25% {
-    transform: scale(1.25, 1.25);
-    opacity: 0.75;
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-/* Override code highlighter background */
-.hljs {
-  background: transparent !important;
-}
-
-/* --- INLINES --- */
-h1 abbr,
-h2 abbr,
-h3 abbr,
-h4 abbr,
-h5 abbr,
-h6 abbr,
-a abbr {
-  border: none;
-}
-
-dfn {
-  font-weight: bold;
-}
-
-a.internalDFN {
-  color: inherit;
-  border-bottom: 1px solid #99c;
-  text-decoration: none;
-}
-
-a.externalDFN {
-  color: inherit;
-  border-bottom: 1px dotted #ccc;
-  text-decoration: none;
-}
-
-a.bibref {
-  text-decoration: none;
-}
-
-.respec-offending-element:target {
-  animation: pop 0.25s ease-in-out 0s 1;
-}
-
-.respec-offending-element,
-a[href].respec-offending-element {
-  text-decoration: red wavy underline;
-}
-@supports not (text-decoration: red wavy underline) {
-  .respec-offending-element:not(pre) {
-    display: inline-block;
-  }
-  .respec-offending-element {
-    /* Red squiggly line */
-    background: url(data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=)
-      bottom repeat-x;
-  }
-}
-
-#references :target {
-  background: #eaf3ff;
-  animation: pop 0.4s ease-in-out 0s 1;
-}
-
-cite .bibref {
-  font-style: normal;
-}
-
-code {
-  color: #c83500;
-}
-
-th code {
-  color: inherit;
-}
-
-a[href].orcid {
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
-a[href].orcid > svg {
-    margin-bottom: -2px;
-}
-
-/* --- TOC --- */
-
-.toc a,
-.tof a {
-  text-decoration: none;
-}
-
-a .secno,
-a .figno {
-  color: #000;
-}
-
-ul.tof,
-ol.tof {
-  list-style: none outside none;
-}
-
-.caption {
-  margin-top: 0.5em;
-  font-style: italic;
-}
-
-/* --- TABLE --- */
-
-table.simple {
-  border-spacing: 0;
-  border-collapse: collapse;
-  border-bottom: 3px solid #005a9c;
-}
-
-.simple th {
-  background: #005a9c;
-  color: #fff;
-  padding: 3px 5px;
-  text-align: left;
-}
-
-.simple th a {
-  color: #fff;
-  padding: 3px 5px;
-  text-align: left;
-}
-
-.simple th[scope="row"] {
-  background: inherit;
-  color: inherit;
-  border-top: 1px solid #ddd;
-}
-
-.simple td {
-  padding: 3px 10px;
-  border-top: 1px solid #ddd;
-}
-
-.simple tr:nth-child(even) {
-  background: #f0f6ff;
-}
-
-/* --- DL --- */
-
-.section dd > p:first-child {
-  margin-top: 0;
-}
-
-.section dd > p:last-child {
-  margin-bottom: 0;
-}
-
-.section dd {
-  margin-bottom: 1em;
-}
-
-.section dl.attrs dd,
-.section dl.eldef dd {
-  margin-bottom: 0;
-}
-
-#issue-summary > ul,
-.respec-dfn-list {
-  column-count: 2;
-}
-
-#issue-summary li,
-.respec-dfn-list li {
-  list-style: none;
-}
-
-details.respec-tests-details {
-  margin-left: 1em;
-  display: inline-block;
-  vertical-align: top;
-}
-
-details.respec-tests-details > * {
-  padding-right: 2em;
-}
-
-details.respec-tests-details[open] {
-  z-index: 999999;
-  position: absolute;
-  border: thin solid #cad3e2;
-  border-radius: 0.3em;
-  background-color: white;
-  padding-bottom: 0.5em;
-}
-
-details.respec-tests-details[open] > summary {
-  border-bottom: thin solid #cad3e2;
-  padding-left: 1em;
-  margin-bottom: 1em;
-  line-height: 2em;
-}
-
-details.respec-tests-details > ul {
-  width: 100%;
-  margin-top: -0.3em;
-}
-
-details.respec-tests-details > li {
-  padding-left: 1em;
-}
-
-a[href].self-link:hover {
-  opacity: 1;
-  text-decoration: none;
-  background-color: transparent;
-}
-
-h2,
-h3,
-h4,
-h5,
-h6 {
-  position: relative;
-}
-
-aside.example .marker > a.self-link {
-  color: inherit;
-}
-
-h2 > a.self-link,
-h3 > a.self-link,
-h4 > a.self-link,
-h5 > a.self-link,
-h6 > a.self-link {
-  border: none;
-  color: inherit;
-  font-size: 83%;
-  height: 2em;
-  left: -1.6em;
-  opacity: 0.5;
-  position: absolute;
-  text-align: center;
-  text-decoration: none;
-  top: 0;
-  transition: opacity 0.2s;
-  width: 2em;
-}
-
-h2 > a.self-link::before,
-h3 > a.self-link::before,
-h4 > a.self-link::before,
-h5 > a.self-link::before,
-h6 > a.self-link::before {
-  content: "§";
-  display: block;
-}
-
-@media (max-width: 767px) {
-  dd {
-    margin-left: 0;
-  }
-
-  /* Don't position self-link in headings off-screen */
-  h2 > a.self-link,
-  h3 > a.self-link,
-  h4 > a.self-link,
-  h5 > a.self-link,
-  h6 > a.self-link {
-    left: auto;
-    top: auto;
-  }
-}
-
-@media print {
-  .removeOnSave {
-    display: none;
-  }
-}
-</style><style>/*
-Atom One Light by Daniel Gamage
-Original One Light Syntax theme from https://github.com/atom/one-light-syntax
-base:    #fafafa
-mono-1:  #383a42
-mono-2:  #686b77
-mono-3:  #a0a1a7
-hue-1:   #0184bb
-hue-2:   #4078f2
-hue-3:   #a626a4
-hue-4:   #50a14f
-hue-5:   #e45649
-hue-5-2: #c91243
-hue-6:   #986801
-hue-6-2: #c18401
-*/
-
-.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 0.5em;
-  color: #383a42;
-  background: #fafafa;
-}
-
-.hljs-comment,
-.hljs-quote {
-  color: #717277;
-  font-style: italic;
-}
-
-.hljs-doctag,
-.hljs-keyword,
-.hljs-formula {
-  color: #a626a4;
-}
-
-.hljs-section,
-.hljs-name,
-.hljs-selector-tag,
-.hljs-deletion,
-.hljs-subst {
-  color: #e45649;
-}
-
-.hljs-literal {
-  color: #0184bb;
-}
-
-.hljs-string,
-.hljs-regexp,
-.hljs-addition,
-.hljs-attribute,
-.hljs-meta-string {
-  color: #42803C;
-}
-
-.hljs-built_in,
-.hljs-class .hljs-title {
-  color: #c18401;
-}
-
-.hljs-attr,
-.hljs-variable,
-.hljs-template-variable,
-.hljs-type,
-.hljs-selector-class,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
-.hljs-number {
-  color: #986801;
-}
-
-.hljs-symbol,
-.hljs-bullet,
-.hljs-link,
-.hljs-meta,
-.hljs-selector-id,
-.hljs-title {
-  color: #4078f2;
-}
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-.hljs-strong {
-  font-weight: bold;
-}
-
-.hljs-link {
-  text-decoration: underline;
-}
-</style><script id="initialUserConfig" type="application/json">{
-  "xref": true,
-  "specStatus": "unofficial",
-  "shortName": "xxx-xxx",
-  "copyrightStart": "2019",
-  "extraCSS": [
-    "http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css"
-  ],
-  "editors": [
-    {
-      "name": "Abbas Ali",
-      "mailto": "abbas.ali@r3.com",
-      "company": "R3",
-      "companyURL": "https://www.r3.com/"
-    },
-    {
-      "name": "Arati Baliga",
-      "company": "Persistent Systems",
-      "companyURL": "https://www.persistent.com/"
-    },
-    {
-      "name": "Pandurang Kamat",
-      "company": "Persistent Systems",
-      "companyURL": "https://www.persistent.com/"
-    },
-    {
-      "name": "Moritz Platt",
-      "mailto": "moritz.platt@r3.com",
-      "company": "R3",
-      "companyURL": "https://www.r3.com/"
-    }
-  ],
-  "authors": [
-    {
-      "name": "Pranav Kirtani",
-      "company": "Persistent Systems",
-      "companyURL": "https://www.persistent.com/"
-    },
-    {
-      "name": "Nitesh Solanki",
-      "company": "Persistent Systems",
-      "companyURL": "https://www.persistent.com/"
-    }
-  ],
-  "wg": "In Charge Of This Document Working Group",
-  "wgURI": "http://example.org/really-cool-wg",
-  "wgPublicList": "spec-writers-anonymous",
-  "localBiblio": {
-    "corda-whitepaper": {
-      "title": "Corda Technical White Paper",
-      "href": "https://www.r3.com/reports/corda-technical-whitepaper/",
-      "authors": [
-        "Mike Hearn",
-        "Richard Gendal Brown"
-      ],
-      "id": "corda-whitepaper"
-    },
-    "corda-messaging": {
-      "title": "Corda Networking and Messaging",
-      "href": "https://docs.corda.net/messaging.html",
-      "id": "corda-messaging"
-    },
-    "corda-network": {
-      "title": "Corda Network Foundation",
-      "href": "https://corda.network/",
-      "id": "corda-network"
-    },
-    "corda-testnet": {
-      "title": "Corda Testnet",
-      "href": "https://docs.corda.net/head/corda-testnet-intro.html",
-      "id": "corda-testnet"
-    },
-    "multibase": {
-      "title": "The Multibase Data Format",
-      "href": "https://tools.ietf.org/id/draft-multiformats-multibase-00.html",
-      "authors": [
-        "J. Benet",
-        "M. Sporny"
-      ],
-      "id": "multibase"
-    }
-  },
-  "_ijt": "5l4hkraffl78kc5uj2qdk8hgsf",
-  "publishISODate": "2020-03-09T00:00:00.000Z",
-  "generatedSubtitle": "Unofficial Draft 09 March 2020"
-}</script><link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2016/W3C-UD"></head>
+    <style>
+.hljs{display:block;overflow-x:auto;padding:.5em;color:#383a42;background:#fafafa}
+.hljs-comment,.hljs-quote{color:#717277;font-style:italic}
+.hljs-doctag,.hljs-formula,.hljs-keyword{color:#a626a4}
+.hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#ca4706;font-weight:700}
+.hljs-literal{color:#0b76c5}
+.hljs-addition,.hljs-attribute,.hljs-meta-string,.hljs-regexp,.hljs-string{color:#42803c}
+.hljs-built_in,.hljs-class .hljs-title{color:#9a6a01}
+.hljs-attr,.hljs-number,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-pseudo,.hljs-template-variable,.hljs-type,.hljs-variable{color:#986801}
+.hljs-bullet,.hljs-link,.hljs-meta,.hljs-selector-id,.hljs-symbol,.hljs-title{color:#336ae3}
+.hljs-emphasis{font-style:italic}
+.hljs-strong{font-weight:700}
+.hljs-link{text-decoration:underline}
+</style>
+    <style>
+var{position:relative;cursor:pointer}
+var[data-type]::after,var[data-type]::before{position:absolute;left:50%;top:-6px;opacity:0;transition:opacity .4s;pointer-events:none}
+var[data-type]::before{content:"";transform:translateX(-50%);border-width:4px 6px 0 6px;border-style:solid;border-color:transparent;border-top-color:#000}
+var[data-type]::after{content:attr(data-type);transform:translateX(-50%) translateY(-100%);background:#000;text-align:center;font-family:"Dank Mono","Fira Code",monospace;font-style:normal;padding:6px;border-radius:3px;color:#daca88;text-indent:0;font-weight:400}
+var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
+</style>
+    <script id="initialUserConfig" type="application/json">{
+        "xref": true,
+        "specStatus": "unofficial",
+        "shortName": "did-core",
+        "copyrightStart": "2019",
+        "extraCSS": [
+            "http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css"
+        ],
+        "editors": [
+            {
+                "name": "Abbas Ali",
+                "mailto": "abbas.ali@r3.com",
+                "company": "R3",
+                "companyURL": "https://www.r3.com/"
+            },
+            {
+                "name": "Arati Baliga",
+                "company": "Persistent Systems",
+                "companyURL": "https://www.persistent.com/"
+            },
+            {
+                "name": "Pandurang Kamat",
+                "company": "Persistent Systems",
+                "companyURL": "https://www.persistent.com/"
+            },
+            {
+                "name": "Moritz Platt",
+                "mailto": "moritz.platt@r3.com",
+                "company": "R3",
+                "companyURL": "https://www.r3.com/"
+            }
+        ],
+        "authors": [
+            {
+                "name": "Pranav Kirtani",
+                "company": "Persistent Systems",
+                "companyURL": "https://www.persistent.com/"
+            },
+            {
+                "name": "Moritz Platt",
+                "mailto": "moritz.platt@r3.com",
+                "company": "R3",
+                "companyURL": "https://www.r3.com/"
+            },
+            {
+                "name": "Nitesh Solanki",
+                "company": "Persistent Systems",
+                "companyURL": "https://www.persistent.com/"
+            }
+        ],
+        "wg": "DID Working Group",
+        "wgURI": "https://www.w3.org/2019/did-wg/",
+        "wgPublicList": "public-did-wg@w3.org",
+        "localBiblio": {
+            "corda-whitepaper": {
+                "title": "Corda Technical White Paper",
+                "href": "https://www.r3.com/reports/corda-technical-whitepaper/",
+                "authors": [
+                    "Mike Hearn",
+                    "Richard Gendal Brown"
+                ],
+                "id": "corda-whitepaper"
+            },
+            "corda-messaging": {
+                "title": "Corda Networking and Messaging",
+                "href": "https://docs.corda.net/messaging.html",
+                "id": "corda-messaging"
+            },
+            "corda-network": {
+                "title": "Corda Network Foundation",
+                "href": "https://corda.network/",
+                "id": "corda-network"
+            },
+            "corda-testnet": {
+                "title": "Corda Testnet",
+                "href": "https://docs.corda.net/head/corda-testnet-intro.html",
+                "id": "corda-testnet"
+            },
+            "multibase": {
+                "title": "The Multibase Data Format",
+                "href": "https://tools.ietf.org/id/draft-multiformats-multibase-00.html",
+                "authors": [
+                    "J. Benet",
+                    "M. Sporny"
+                ],
+                "id": "multibase"
+            },
+            "ddos-mitigation": {
+                "title": "Distributed denial of service (DDoS) resilience in cloud: Review and conceptual cloud DDoS mitigation framework",
+                "href": "https://doi.org/10.1016/j.jnca.2016.01.001",
+                "authors": [
+                    "Opeyemi Osanaiye",
+                    "Kim-Kwang Raymond Choo",
+                    "Mqhele Dlodloa"
+                ],
+                "id": "ddos-mitigation"
+            }
+        },
+        "_ijt": "8csjqmb82ebgfb5noopsu8kubr",
+        "publishISODate": "2020-09-21T00:00:00.000Z",
+        "generatedSubtitle": "Unofficial Draft 21 September 2020"
+    }</script>
+    <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2016/W3C-UD"></head>
 <body class="h-entry informative"><div class="head">
-       <h1 id="title" class="title">Corda DID Method</h1>
-      
-      <h2>
+    <h1 id="title" class="title">Corda DID Method</h1>
+
+    <h2>
         Unofficial Draft
-        <time class="dt-published" datetime="2020-03-09">09 March 2020</time>
-      </h2>
-      <dl>
-        
-        
-        
-        
-        
-        
-        
+        <time class="dt-published" datetime="2020-09-21">21 September 2020</time>
+    </h2>
+
+    <dl>
+
+
+
+
+
+
+
         <dt>Editors:</dt>
         <dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:abbas.ali@r3.com">Abbas Ali</a>
             (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
-          </dd><dd class="p-author h-card vcard"><span class="p-name fn">Arati Baliga</span>
-            (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
-          </dd><dd class="p-author h-card vcard"><span class="p-name fn">Pandurang Kamat</span>
-            (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
-          </dd><dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:moritz.platt@r3.com">Moritz Platt</a>
-            (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
-          </dd>
-        
-        <dt>
-                Authors:
-              </dt><dd class="p-author h-card vcard"><span class="p-name fn">Pranav Kirtani</span>
-            (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
-          </dd><dd class="p-author h-card vcard"><span class="p-name fn">Nitesh Solanki</span>
-            (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
-          </dd>
-        
-      </dl>
-      
-      
-      
-      <p class="copyright">
-            This document is licensed under a
-            <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" class="subfoot">Creative Commons Attribution 4.0 License</a>.
-          </p>
-      <hr title="Separator for header">
-    </div>
+        </dd><dd class="p-author h-card vcard"><span class="p-name fn">Arati Baliga</span>
+        (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
+    </dd><dd class="p-author h-card vcard"><span class="p-name fn">Pandurang Kamat</span>
+        (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
+    </dd><dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:moritz.platt@r3.com">Moritz Platt</a>
+        (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
+    </dd>
+
+        <dt>Authors:</dt><dd class="p-author h-card vcard"><span class="p-name fn">Pranav Kirtani</span>
+        (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
+    </dd><dd class="p-author h-card vcard"><a class="ed_mailto u-email email p-name" href="mailto:moritz.platt@r3.com">Moritz Platt</a>
+        (<a class="p-org org h-org h-card" href="https://www.r3.com/">R3</a>)
+    </dd><dd class="p-author h-card vcard"><span class="p-name fn">Nitesh Solanki</span>
+        (<a class="p-org org h-org h-card" href="https://www.persistent.com/">Persistent Systems</a>)
+    </dd>
+
+    </dl>
+
+
+
+    <p class="copyright">
+        This document is licensed under a
+        <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" class="subfoot">Creative Commons Attribution 4.0 License</a>.
+    </p>
+    <hr title="Separator for header">
+</div>
 <section id="abstract" class="introductory"><h2>Abstract</h2>
     The Corda DID method aims to implement Decentralized Identifier [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>] architecture in Corda networks.<br>
     The Corda DID method is a hybrid method, exposing a widely recognized protocol for end users (JSON over HTTPS),
     while utilizing a Corda-specific means of communication (Corda’s peer-to-peer messaging protocol
     [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-messaging" title="Corda Networking and Messaging">corda-messaging</a></cite>]) for data replication.
-</section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>Introduction</a></li><li class="tocline"><a class="tocxref" href="#overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#networks"><bdi class="secno">2.1 </bdi>Networks</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li><li class="tocline"><a class="tocxref" href="#corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints-0"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints-0"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#methods"><bdi class="secno">3. </bdi>Methods</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</a></li><li class="tocline"><a class="tocxref" href="#json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#message-format"><bdi class="secno">3.2.1 </bdi>Message Format</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#instruction"><bdi class="secno">3.2.1.1 </bdi>Instruction data</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings</a></li></ol></li><li class="tocline"><a class="tocxref" href="#examples"><bdi class="secno">3.2.1.2 </bdi>Examples</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58</a></li><li class="tocline"><a class="tocxref" href="#multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase</a></li><li class="tocline"><a class="tocxref" href="#hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex</a></li><li class="tocline"><a class="tocxref" href="#base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did"><bdi class="secno">3.3.1 </bdi>Create DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request"><bdi class="secno">3.3.1.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response"><bdi class="secno">3.3.1.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#read-did"><bdi class="secno">3.3.2 </bdi>Read DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-0"><bdi class="secno">3.3.2.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-0"><bdi class="secno">3.3.2.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#update-did"><bdi class="secno">3.3.3 </bdi>Update DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-1"><bdi class="secno">3.3.3.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-1"><bdi class="secno">3.3.3.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-2"><bdi class="secno">3.3.4.1 </bdi>Request</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did-createdidflow"><bdi class="secno">4.1 </bdi>Create DID (<em>CreateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#read-did-fetchdiddocumentflow"><bdi class="secno">4.2 </bdi>Read DID (<em>FetchDidDocumentFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#update-did-updatedidflow"><bdi class="secno">4.3 </bdi>Update DID (<em>UpdateDidFlow</em>)</a></li><li class="tocline"><a class="tocxref" href="#delete-did-deletedidflow"><bdi class="secno">4.4 </bdi>Delete DID (<em>DeleteDidFlow</em>)</a></li></ol></li><li class="tocline"><a class="tocxref" href="#tof"><bdi class="secno">A. </bdi>List of Figures</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">B. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#informative-references"><bdi class="secno">B.1 </bdi>Informative references</a></li></ol></li></ol></nav>
+</section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>Introduction</a></li><li class="tocline"><a class="tocxref" href="#overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#networks"><bdi class="secno">2.1 </bdi>Networks</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li><li class="tocline"><a class="tocxref" href="#corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#http-endpoints-0"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints</a></li><li class="tocline"><a class="tocxref" href="#corda-peer-to-peer-endpoints-0"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#security-considerations"><bdi class="secno">2.2 </bdi>Security Considerations</a></li><li class="tocline"><a class="tocxref" href="#privacy-considerations"><bdi class="secno">2.3 </bdi>Privacy Considerations</a></li></ol></li><li class="tocline"><a class="tocxref" href="#methods"><bdi class="secno">3. </bdi>Methods</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</a></li><li class="tocline"><a class="tocxref" href="#json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#message-format"><bdi class="secno">3.2.1 </bdi>Message Format</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#instruction"><bdi class="secno">3.2.1.1 </bdi>Instruction data</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings</a></li></ol></li><li class="tocline"><a class="tocxref" href="#examples"><bdi class="secno">3.2.1.2 </bdi>Examples</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58</a></li><li class="tocline"><a class="tocxref" href="#multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase</a></li><li class="tocline"><a class="tocxref" href="#hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex</a></li><li class="tocline"><a class="tocxref" href="#base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did"><bdi class="secno">3.3.1 </bdi>Create DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request"><bdi class="secno">3.3.1.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response"><bdi class="secno">3.3.1.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#read-did"><bdi class="secno">3.3.2 </bdi>Read DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-0"><bdi class="secno">3.3.2.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-0"><bdi class="secno">3.3.2.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#update-did"><bdi class="secno">3.3.3 </bdi>Update DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-1"><bdi class="secno">3.3.3.1 </bdi>Request</a></li><li class="tocline"><a class="tocxref" href="#response-1"><bdi class="secno">3.3.3.2 </bdi>Response</a></li></ol></li><li class="tocline"><a class="tocxref" href="#delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#request-2"><bdi class="secno">3.3.4.1 </bdi>Request</a></li></ol></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#create-did-0"><bdi class="secno">4.1 </bdi>Create DID</a></li><li class="tocline"><a class="tocxref" href="#read-did-0"><bdi class="secno">4.2 </bdi>Read DID</a></li><li class="tocline"><a class="tocxref" href="#update-did-0"><bdi class="secno">4.3 </bdi>Update DID</a></li><li class="tocline"><a class="tocxref" href="#delete-did-0"><bdi class="secno">4.4 </bdi>Delete DID</a></li></ol></li><li class="tocline"><a class="tocxref" href="#tof"><bdi class="secno">A. </bdi>List of Figures</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">B. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#informative-references"><bdi class="secno">B.1 </bdi>Informative references</a></li></ol></li></ol></nav>
 
 <section id="introduction">
-    <h2 id="x1-introduction"><bdi class="secno">1. </bdi>Introduction</h2>
+    <h2 id="x1-introduction"><bdi class="secno">1. </bdi>Introduction<a class="self-link" aria-label="§" href="#introduction"></a></h2>
     <p>
         To understand the environment in which the Corda DID method operates, the permissioned nature of a Corda network
         and the point-to-point approach to data replication must be taken into account.
@@ -600,7 +275,7 @@ hue-6-2: #c18401
     </p>
 </section>
 <section id="overall-architecture">
-    <h2 id="x2-overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture</h2>
+    <h2 id="x2-overall-architecture"><bdi class="secno">2. </bdi>Overall Architecture<a class="self-link" aria-label="§" href="#overall-architecture"></a></h2>
     <p>
         The Corda DID method operates in an environment where multiple nodes form a consortium in order to replicate
         decentralized identity data (cf. <a href="#high-level-architecture">figure 1</a>).
@@ -633,7 +308,7 @@ hue-6-2: #c18401
     </p>
 
     <section id="networks">
-        <h3 id="x2-1-networks"><bdi class="secno">2.1 </bdi>Networks</h3>
+        <h3 id="x2-1-networks"><bdi class="secno">2.1 </bdi>Networks<a class="self-link" aria-label="§" href="#networks"></a></h3>
 
         <p>
             DID documents are to be replicated between nodes in the same Corda network. Ultimately, the target network
@@ -662,10 +337,10 @@ hue-6-2: #c18401
                 <td>A production-ready environment replicating DID on a permanent basis.</td>
                 <td>To be defined</td>
             </tr>
-        </tbody></table>
+            </tbody></table>
 
         <section id="member-node-endpoints">
-            <h4 id="x2-1-1-member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints</h4>
+            <h4 id="x2-1-1-member-node-endpoints"><bdi class="secno">2.1.1 </bdi>Member Node Endpoints<a class="self-link" aria-label="§" href="#member-node-endpoints"></a></h4>
 
             <p>
                 Consortium-member nodes have to maintain a permanent hostname or IP address for Corda peer-to-peer
@@ -674,10 +349,10 @@ hue-6-2: #c18401
             </p>
 
             <section id="testnet">
-                <h5 id="x2-1-1-1-testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet</h5>
+                <h5 id="x2-1-1-1-testnet"><bdi class="secno">2.1.1.1 </bdi>Testnet<a class="self-link" aria-label="§" href="#testnet"></a></h5>
 
                 <section id="http-endpoints">
-                    <h6 id="x2-1-1-1-1-http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints</h6>
+                    <h6 id="x2-1-1-1-1-http-endpoints"><bdi class="secno">2.1.1.1.1 </bdi>HTTP Endpoints<a class="self-link" aria-label="§" href="#http-endpoints"></a></h6>
                     <table>
                         <tbody><tr>
                             <th>Consortium-Member</th>
@@ -687,11 +362,11 @@ hue-6-2: #c18401
                         <tr>
                             <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
-                    </tbody></table>
+                        </tbody></table>
                 </section>
 
                 <section id="corda-peer-to-peer-endpoints">
-                    <h6 id="x2-1-1-1-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints</h6>
+                    <h6 id="x2-1-1-1-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.1.2 </bdi>Corda Peer-to-Peer Endpoints<a class="self-link" aria-label="§" href="#corda-peer-to-peer-endpoints"></a></h6>
                     <table>
                         <tbody><tr>
                             <th>Consortium-Member</th>
@@ -701,14 +376,14 @@ hue-6-2: #c18401
                         <tr>
                             <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
-                    </tbody></table>
+                        </tbody></table>
                 </section>
             </section>
             <section id="corda-network">
-                <h5 id="x2-1-1-2-corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network</h5>
+                <h5 id="x2-1-1-2-corda-network"><bdi class="secno">2.1.1.2 </bdi>Corda Network<a class="self-link" aria-label="§" href="#corda-network"></a></h5>
 
                 <section id="http-endpoints-0">
-                    <h6 id="x2-1-1-2-1-http-endpoints"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints</h6>
+                    <h6 id="x2-1-1-2-1-http-endpoints"><bdi class="secno">2.1.1.2.1 </bdi>HTTP Endpoints<a class="self-link" aria-label="§" href="#http-endpoints-0"></a></h6>
                     <table>
                         <tbody><tr>
                             <th>Consortium-Member</th>
@@ -718,11 +393,11 @@ hue-6-2: #c18401
                         <tr>
                             <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
-                    </tbody></table>
+                        </tbody></table>
                 </section>
 
                 <section id="corda-peer-to-peer-endpoints-0">
-                    <h6 id="x2-1-1-2-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints</h6>
+                    <h6 id="x2-1-1-2-2-corda-peer-to-peer-endpoints"><bdi class="secno">2.1.1.2.2 </bdi>Corda Peer-to-Peer Endpoints<a class="self-link" aria-label="§" href="#corda-peer-to-peer-endpoints-0"></a></h6>
                     <table>
                         <tbody><tr>
                             <th>Consortium-Member</th>
@@ -732,16 +407,67 @@ hue-6-2: #c18401
                         <tr>
                             <td colspan="3" style="text-align: center">To be defined</td>
                         </tr>
-                    </tbody></table>
+                        </tbody></table>
                 </section>
             </section>
         </section>
     </section>
+    <section id="security-considerations">
+        <h3 id="x2-2-security-considerations"><bdi class="secno">2.2 </bdi>Security Considerations<a class="self-link" aria-label="§" href="#security-considerations"></a></h3>
+        <h3 id="attacks-in-scope">Attacks In Scope<a class="self-link" aria-label="§" href="#security-considerations"></a></h3>
+
+        <h4 id="denial-of-service-dos-attack">Denial-of-Service (DoS) Attack<a class="self-link" aria-label="§" href="#security-considerations"></a></h4>
+
+        <p>
+            As replicating nodes are required to distribute data to others, they are susceptible to DoS attacks. An
+            attacker who chooses to conduct a DoS attack can relatively easily flood the network with DID creation
+            requests. If unmitigated, this attack can have high impact as the messages necessary to instruct the
+            creation of a DID are trivial to create in bulk. Due to the need for broadcasting, replicating these
+            messages leads to significant computational expense.<br>
+            This attack can be mitigated by employing conventional mitigation techniques [<cite><a class="bibref" data-link-type="biblio" href="#bib-ddos-mitigation" title="Distributed denial of service (DDoS) resilience in cloud: Review and conceptual cloud DDoS mitigation framework">ddos-mitigation</a></cite>].
+        </p>
+
+        <h3 id="attacks-out-of-scope">Attacks Out of Scope<a class="self-link" aria-label="§" href="#security-considerations"></a></h3>
+        <h4 id="withholding-replication-attack">Withholding Replication Attack<a class="self-link" aria-label="§" href="#security-considerations"></a></h4>
+
+        <p>
+            It is the responsibility of consortium members to propagate any instructions to create, update or delete DID
+            to
+            other members. Failure to do so will allow them to effectively censor the DID network. This attack is out of
+            scope for the following reasons:
+        </p>
+
+        <ol>
+            <li>Consortium members are trusted entities that are unlikely to have an incentive to negatively impact the
+                system's trustworthiness by censoring it.
+            </li>
+            <li>
+                DID holders are free to select any of the consortium members for any DID interaction and can therefore
+                pick a different member should they suspect an attack.
+            </li>
+        </ol>
+
+        <h4 id="cessation-of-service">Cessation of Service<a class="self-link" aria-label="§" href="#security-considerations"></a></h4>
+
+        <p>
+            As DID documents are not stored on a public ledger, should all consortium members cease operation at the
+            same time, DID data will not be recoverable from the system.<br>
+            This attack is out of scope as DID holders will be able to re-establish data based on their personal copies.
+        </p>
+    </section>
+
+    <section id="privacy-considerations">
+        <h3 id="x2-3-privacy-considerations"><bdi class="secno">2.3 </bdi>Privacy Considerations<a class="self-link" aria-label="§" href="#privacy-considerations"></a></h3>
+
+        <p>
+            The Corda DID Method adheres to the <em>Privacy Considerations</em> section of the Decentralized Identifiers
+            Core architecture [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>].
+        </p>
+    </section>
 </section>
 
-
 <section id="methods">
-    <h2 id="x3-methods"><bdi class="secno">3. </bdi>Methods</h2>
+    <h2 id="x3-methods"><bdi class="secno">3. </bdi>Methods<a class="self-link" aria-label="§" href="#methods"></a></h2>
     <p>
         End users who aim to <em>create</em>, <em>read</em>, <em>update</em> or <em>delete</em> DID documents can do so
         by interacting with a trusted node of their choosing. The API provided for interaction exposes REST endpoints
@@ -760,7 +486,7 @@ hue-6-2: #c18401
         Witness nodes will perform a cryptographic integrity check as part of the <a href="https://docs.corda.net/key-concepts-contracts.html">contract</a> underpinning this transaction.
     </p>
     <section id="corda-did-format">
-        <h3 id="x3-1-corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format</h3>
+        <h3 id="x3-1-corda-did-format"><bdi class="secno">3.1 </bdi>Corda DID Format<a class="self-link" aria-label="§" href="#corda-did-format"></a></h3>
 
         <p>
             A Corda DID specifies the <code>corda</code> method, a target network (e.g. <code>testnet</code> or <code>tcn</code>)
@@ -773,28 +499,28 @@ hue-6-2: #c18401
 
         <p>
         </p><table>
-            <tbody><tr>
-                <th>Target Network</th>
-                <th>Network Tag</th>
-                <th>Purpose</th>
-            </tr>
-            <tr>
-                <td>Testnet [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-testnet" title="Corda Testnet">corda-testnet</a></cite>]</td>
-                <td><code>testnet</code></td>
-                <td>Signifies that the document can be resolved via Testnet.</td>
-            </tr>
-            <tr>
-                <td>Corda Network [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-network" title="Corda Network Foundation">corda-network</a></cite>]</td>
-                <td><code>tcn</code></td>
-                <td>Signifies that the document can be resolved via the Corda Network.</td>
-            </tr>
-            <tr>
-                <td>Private</td>
-                <td><code>private-*</code></td>
-                <td>Signifies that the document cannot be resolved via a standard mechanism. This tag is intended for
-                    use in private networks and in testing.
-                </td>
-            </tr>
+        <tbody><tr>
+            <th>Target Network</th>
+            <th>Network Tag</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>Testnet [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-testnet" title="Corda Testnet">corda-testnet</a></cite>]</td>
+            <td><code>testnet</code></td>
+            <td>Signifies that the document can be resolved via Testnet.</td>
+        </tr>
+        <tr>
+            <td>Corda Network [<cite><a class="bibref" data-link-type="biblio" href="#bib-corda-network" title="Corda Network Foundation">corda-network</a></cite>]</td>
+            <td><code>tcn</code></td>
+            <td>Signifies that the document can be resolved via the Corda Network.</td>
+        </tr>
+        <tr>
+            <td>Private</td>
+            <td><code>private-*</code></td>
+            <td>Signifies that the document cannot be resolved via a standard mechanism. This tag is intended for
+                use in private networks and in testing.
+            </td>
+        </tr>
         </tbody></table>
 
         I.e.,
@@ -807,7 +533,7 @@ hue-6-2: #c18401
     </section>
 
     <section id="json-over-https-api">
-        <h3 id="x3-2-json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API</h3>
+        <h3 id="x3-2-json-over-https-api"><bdi class="secno">3.2 </bdi>JSON-over-HTTPS API<a class="self-link" aria-label="§" href="#json-over-https-api"></a></h3>
 
         <p>
             The DID API is the server component to be deployed by consortium-member nodes in conjunction with the
@@ -827,10 +553,10 @@ hue-6-2: #c18401
             cryptographic suites or unsupported serialization mechanisms will be rejected. There are <a href="#supported-encodings">restrictions</a> on which suites and serialization mechanisms can be used.
         </p>
         <section id="message-format">
-            <h4 id="x3-2-1-message-format"><bdi class="secno">3.2.1 </bdi>Message Format</h4>
+            <h4 id="x3-2-1-message-format"><bdi class="secno">3.2.1 </bdi>Message Format<a class="self-link" aria-label="§" href="#message-format"></a></h4>
 
             <section id="instruction">
-                <h5 id="x3-2-1-1-instruction-data"><bdi class="secno">3.2.1.1 </bdi>Instruction data</h5>
+                <h5 id="x3-2-1-1-instruction-data"><bdi class="secno">3.2.1.1 </bdi>Instruction data<a class="self-link" aria-label="§" href="#instruction"></a></h5>
 
                 <p>
                     Instruction data tell the API what to do with the document received. They also contain proof of
@@ -901,45 +627,45 @@ hue-6-2: #c18401
 }</code></pre>
 
                 <section id="supported-encodings">
-                    <h6 id="x3-2-1-1-1-supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings</h6>
+                    <h6 id="x3-2-1-1-1-supported-encodings"><bdi class="secno">3.2.1.1.1 </bdi>Supported Encodings<a class="self-link" aria-label="§" href="#supported-encodings"></a></h6>
 
                     <p>
                     </p><table>
-                        <thead>
-                        <tr>
-                            <th>Encoding</th>
-                            <th>Description</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td><code>signatureHex</code></td>
-                            <td>Hex-encoded signature</td>
-                        </tr>
-                        <tr>
-                            <td><code>signatureBase64</code></td>
-                            <td>Base64-encoded signature as per [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4648" title="The Base16, Base32, and Base64 Data Encodings">rfc4648</a></cite>]</td>
-                        </tr>
-                        <tr>
-                            <td><code>signatureBase58</code></td>
-                            <td>Base58-encoded signature</td>
-                        </tr>
-                        <tr>
-                            <td><code>signatureMultibase</code></td>
-                            <td>Multibase-encoded signature [<cite><a class="bibref" data-link-type="biblio" href="#bib-multibase" title="The Multibase Data Format">multibase</a></cite>]
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <thead>
+                    <tr>
+                        <th>Encoding</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><code>signatureHex</code></td>
+                        <td>Hex-encoded signature</td>
+                    </tr>
+                    <tr>
+                        <td><code>signatureBase64</code></td>
+                        <td>Base64-encoded signature as per [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4648" title="The Base16, Base32, and Base64 Data Encodings">rfc4648</a></cite>]</td>
+                    </tr>
+                    <tr>
+                        <td><code>signatureBase58</code></td>
+                        <td>Base58-encoded signature</td>
+                    </tr>
+                    <tr>
+                        <td><code>signatureMultibase</code></td>
+                        <td>Multibase-encoded signature [<cite><a class="bibref" data-link-type="biblio" href="#bib-multibase" title="The Multibase Data Format">multibase</a></cite>]
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                     <p></p>
                 </section>
             </section>
 
             <section id="examples">
-                <h5 id="x3-2-1-2-examples"><bdi class="secno">3.2.1.2 </bdi>Examples</h5>
+                <h5 id="x3-2-1-2-examples"><bdi class="secno">3.2.1.2 </bdi>Examples<a class="self-link" aria-label="§" href="#examples"></a></h5>
 
                 <section id="base58">
-                    <h6 id="x3-2-1-2-1-base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58</h6>
+                    <h6 id="x3-2-1-2-1-base58"><bdi class="secno">3.2.1.2.1 </bdi>Base58<a class="self-link" aria-label="§" href="#base58"></a></h6>
 
                     <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
@@ -954,46 +680,46 @@ hue-6-2: #c18401
                 </section>
 
                 <section id="multibase">
-                    <h6 id="x3-2-1-2-2-multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase</h6>
+                    <h6 id="x3-2-1-2-2-multibase"><bdi class="secno">3.2.1.2.2 </bdi>Multibase<a class="self-link" aria-label="§" href="#multibase"></a></h6>
 
                     <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
-	{
-	  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:84602311-bd95-4006-968c-01a69d035d64#keys-1"</span>,
-	  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
-	  <span class="hljs-attr">"signatureMultibase"</span>: <span class="hljs-string">"bb3i4jlob2pomlx5yjv5adir7r26tkor6iqroosojkqi4wq2kcjtiju3moxsrkwmobhtlega27uzuxtncks6yib6otqybfykjyzieqe"</span>
-	}
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:84602311-bd95-4006-968c-01a69d035d64#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
+      <span class="hljs-attr">"signatureMultibase"</span>: <span class="hljs-string">"bb3i4jlob2pomlx5yjv5adir7r26tkor6iqroosojkqi4wq2kcjtiju3moxsrkwmobhtlega27uzuxtncks6yib6otqybfykjyzieqe"</span>
+    }
   ]
 }</code></pre>
                 </section>
 
                 <section id="hex">
-                    <h6 id="x3-2-1-2-3-hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex</h6>
+                    <h6 id="x3-2-1-2-3-hex"><bdi class="secno">3.2.1.2.3 </bdi>Hex<a class="self-link" aria-label="§" href="#hex"></a></h6>
 
                     <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
-	{
-	  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:03d7411f-ae67-4c89-94b8-de802f017745#keys-1"</span>,
-	  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
-	  <span class="hljs-attr">"signatureHex"</span>: <span class="hljs-string">"04242D453FA6191B67308B9454E08EC2D59524063F53F85D11E43151283DF672959B9F546CD437FACA914DD15D41F7F6B5FF0AA00ABF5EE91826C70EA83F0E03"</span>
-	}
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:03d7411f-ae67-4c89-94b8-de802f017745#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
+      <span class="hljs-attr">"signatureHex"</span>: <span class="hljs-string">"04242D453FA6191B67308B9454E08EC2D59524063F53F85D11E43151283DF672959B9F546CD437FACA914DD15D41F7F6B5FF0AA00ABF5EE91826C70EA83F0E03"</span>
+    }
   ]
 }</code></pre>
                 </section>
 
                 <section id="base64">
-                    <h6 id="x3-2-1-2-4-base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64</h6>
+                    <h6 id="x3-2-1-2-4-base64"><bdi class="secno">3.2.1.2.4 </bdi>Base64<a class="self-link" aria-label="§" href="#base64"></a></h6>
 
                     <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
-	{
-	  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:4b78d87e-1dee-403d-89d6-d2e12926d309#keys-1"</span>,
-	  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
-	  <span class="hljs-attr">"signatureBase64"</span>: <span class="hljs-string">"Kh39kEoMvzfolBimiT/6wGeTys5Leuk/M0im9CligIpRXsJnIx4STphsofZBnbX198H7AfuVp8IJYyzMwKtaAg=="</span>
-	}
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:4b78d87e-1dee-403d-89d6-d2e12926d309#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
+      <span class="hljs-attr">"signatureBase64"</span>: <span class="hljs-string">"Kh39kEoMvzfolBimiT/6wGeTys5Leuk/M0im9CligIpRXsJnIx4STphsofZBnbX198H7AfuVp8IJYyzMwKtaAg=="</span>
+    }
   ]
 }</code></pre>
                 </section>
@@ -1002,36 +728,36 @@ hue-6-2: #c18401
     </section>
 
     <section id="http-communication">
-        <h3 id="x3-3-http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication</h3>
+        <h3 id="x3-3-http-communication"><bdi class="secno">3.3 </bdi>HTTP Communication<a class="self-link" aria-label="§" href="#http-communication"></a></h3>
 
         <p>Envelopes are implemented as <code>multipart/form-data</code> [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7578" title="Returning Values from Forms: multipart/form-data">rfc7578</a></cite>] HTTP requests with two parts:</p>
         <p>
         </p><table>
-            <thead>
-            <tr>
-                <th>Part</th>
-                <th>Purpose</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td><code>instruction</code></td>
-                <td>JSON representation of the <a href="#instruction">instruction</a></td>
-            </tr>
-            <tr>
-                <td><code>document</code></td>
-                <td>JSON representation of the DID document [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>]</td>
-            </tr>
-            </tbody>
-        </table>
+        <thead>
+        <tr>
+            <th>Part</th>
+            <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>instruction</code></td>
+            <td>JSON representation of the <a href="#instruction">instruction</a></td>
+        </tr>
+        <tr>
+            <td><code>document</code></td>
+            <td>JSON representation of the DID document [<cite><a class="bibref" data-link-type="biblio" href="#bib-did-core" title="Decentralized Identifiers (DIDs) v1.0">did-core</a></cite>]</td>
+        </tr>
+        </tbody>
+    </table>
         <p></p>
         <p>This format is chosen to circumvent issues with canonical document representation for hashing.</p>
 
         <section id="create-did">
-            <h4 id="x3-3-1-create-did"><bdi class="secno">3.3.1 </bdi>Create DID</h4>
+            <h4 id="x3-3-1-create-did"><bdi class="secno">3.3.1 </bdi>Create DID<a class="self-link" aria-label="§" href="#create-did"></a></h4>
 
             <section id="request">
-                <h5 id="x3-3-1-1-request"><bdi class="secno">3.3.1.1 </bdi>Request</h5>
+                <h5 id="x3-3-1-1-request"><bdi class="secno">3.3.1.1 </bdi>Request<a class="self-link" aria-label="§" href="#request"></a></h5>
 
                 <p>The instruction to create a new DID is issued via a <code>PUT</code> HTTP request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>].
                     Proof of ownership of the document has to be presented in the envelope.</p>
@@ -1045,35 +771,35 @@ hue-6-2: #c18401
                     </li>
                 </ul>
 
-                <h6 id="instruction-0">Instruction</h6>
+                <h6 id="instruction-0">Instruction<a class="self-link" aria-label="§" href="#request"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"action"</span>: <span class="hljs-string">"create"</span>,
   <span class="hljs-attr">"signatures"</span>: [
-	{
-	  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
-	  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
-	  <span class="hljs-attr">"signatureBase58"</span>: <span class="hljs-string">"2M12aBn5ijmmUyHtTf56NTJsUEUbpbqbAgpsvxsfMa2KrL5MR5rGb4dP37QoyRWp94kqreDMV9P4K3QHfE67ypTD"</span>
-	}
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519Signature2018"</span>,
+      <span class="hljs-attr">"signatureBase58"</span>: <span class="hljs-string">"2M12aBn5ijmmUyHtTf56NTJsUEUbpbqbAgpsvxsfMa2KrL5MR5rGb4dP37QoyRWp94kqreDMV9P4K3QHfE67ypTD"</span>
+    }
   ]
 }</code></pre>
 
-                <h6 id="document">Document</h6>
+                <h6 id="document">Document<a class="self-link" aria-label="§" href="#request"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs json">{
   <span class="hljs-attr">"@context"</span>: <span class="hljs-string">"https://w3id.org/did/v1"</span>,
   <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
   <span class="hljs-attr">"publicKey"</span>: [
-	{
-	  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
-	  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519VerificationKey2018"</span>,
-	  <span class="hljs-attr">"controller"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
-	  <span class="hljs-attr">"publicKeyBase58"</span>: <span class="hljs-string">"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"</span>
-	}
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519VerificationKey2018"</span>,
+      <span class="hljs-attr">"controller"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
+      <span class="hljs-attr">"publicKeyBase58"</span>: <span class="hljs-string">"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"</span>
+    }
   ]
 }</code></pre>
 
-                <h6 id="request-example-curl">Request Example (cURL)</h6>
+                <h6 id="request-example-curl">Request Example (cURL)<a class="self-link" aria-label="§" href="#request"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs">curl -X PUT \
 http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
@@ -1103,7 +829,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 }'</code></pre>
             </section>
             <section id="response">
-                <h5 id="x3-3-1-2-response"><bdi class="secno">3.3.1.2 </bdi>Response</h5>
+                <h5 id="x3-3-1-2-response"><bdi class="secno">3.3.1.2 </bdi>Response<a class="self-link" aria-label="§" href="#response"></a></h5>
 
                 <ul>
                     <li>The API will respond with status <code>204</code> for a request with a well-formed instruction
@@ -1120,35 +846,35 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             </section>
         </section>
         <section id="read-did">
-            <h4 id="x3-3-2-read-did"><bdi class="secno">3.3.2 </bdi>Read DID</h4>
+            <h4 id="x3-3-2-read-did"><bdi class="secno">3.3.2 </bdi>Read DID<a class="self-link" aria-label="§" href="#read-did"></a></h4>
 
             <section id="request-0">
-                <h5 id="x3-3-2-1-request"><bdi class="secno">3.3.2.1 </bdi>Request</h5>
+                <h5 id="x3-3-2-1-request"><bdi class="secno">3.3.2.1 </bdi>Request<a class="self-link" aria-label="§" href="#request-0"></a></h5>
 
                 <p>A simple <code>GET</code> request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>] (specifying the ID as a fragment) is used to retrieve a
                     DID document. The DID document contains a list of public keys, the type of public key, information
                     about encodings used in these public keys and the controller of each public key.</p>
 
-                <h6 id="request-example-curl-0">Request Example (cURL)</h6>
+                <h6 id="request-example-curl-0">Request Example (cURL)<a class="self-link" aria-label="§" href="#request-0"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs javascript">curl -X GET http:<span class="hljs-comment">//example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5</span></code></pre>
             </section>
             <section id="response-0">
-                <h5 id="x3-3-2-2-response"><bdi class="secno">3.3.2.2 </bdi>Response</h5>
+                <h5 id="x3-3-2-2-response"><bdi class="secno">3.3.2.2 </bdi>Response<a class="self-link" aria-label="§" href="#response-0"></a></h5>
 
                 <pre aria-busy="false"><code class="hljs json">{
-<span class="hljs-attr">"@context"</span>:<span class="hljs-string">"https://w3id.org/did/v1"</span>,
-<span class="hljs-attr">"id"</span>:<span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
-<span class="hljs-attr">"created"</span>:<span class="hljs-string">"2019-07-11T10:27:27.326Z"</span>,
-<span class="hljs-attr">"publicKey"</span>:[
-        {
-            <span class="hljs-attr">"id"</span>:<span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
-            <span class="hljs-attr">"type"</span>:<span class="hljs-string">"Ed25519VerificationKey2018"</span>,
-            <span class="hljs-attr">"controller"</span>:<span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
-            <span class="hljs-attr">"publicKeyBase58"</span>:<span class="hljs-string">"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"</span>
-        }
-    ]
-    }</code></pre>
+  <span class="hljs-attr">"@context"</span>: <span class="hljs-string">"https://w3id.org/did/v1"</span>,
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2019-07-11T10:27:27.326Z"</span>,
+  <span class="hljs-attr">"publicKey"</span>: [
+    {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5#keys-1"</span>,
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"Ed25519VerificationKey2018"</span>,
+      <span class="hljs-attr">"controller"</span>: <span class="hljs-string">"did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5"</span>,
+      <span class="hljs-attr">"publicKeyBase58"</span>: <span class="hljs-string">"GfHq2tTVk9z4eXgyNRg7ikjUaaP1fuE4Ted3d6eBaYSTxq9iokAwcd16hu8v"</span>
+    }
+  ]
+}</code></pre>
                 <ul>
                     <li>The API will respond with status <code>200</code> for a request with a known ID.</li>
                     <li>The API will respond with status <code>404</code> for a request with an unknown ID.</li>
@@ -1160,10 +886,10 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
         </section>
 
         <section id="update-did">
-            <h4 id="x3-3-3-update-did"><bdi class="secno">3.3.3 </bdi>Update DID</h4>
+            <h4 id="x3-3-3-update-did"><bdi class="secno">3.3.3 </bdi>Update DID<a class="self-link" aria-label="§" href="#update-did"></a></h4>
 
             <section id="request-1">
-                <h5 id="x3-3-3-1-request"><bdi class="secno">3.3.3.1 </bdi>Request</h5>
+                <h5 id="x3-3-3-1-request"><bdi class="secno">3.3.3.1 </bdi>Request<a class="self-link" aria-label="§" href="#request-1"></a></h5>
 
                 <p>The instruction to create a new DID is issued via a <code>POST</code> HTTP request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>].</p>
 
@@ -1194,7 +920,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
                     </li>
                 </ul>
 
-                <h6 id="request-example-curl-1">Request Example (cURL)</h6>
+                <h6 id="request-example-curl-1">Request Example (cURL)<a class="self-link" aria-label="§" href="#request-1"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs">curl -X POST \
 http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
@@ -1231,7 +957,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             </section>
 
             <section id="response-1">
-                <h5 id="x3-3-3-2-response"><bdi class="secno">3.3.3.2 </bdi>Response</h5>
+                <h5 id="x3-3-3-2-response"><bdi class="secno">3.3.3.2 </bdi>Response<a class="self-link" aria-label="§" href="#response-1"></a></h5>
                 <ul>
                     <li>The API will respond with status <code>204</code> if the update is successful.</li>
                     <li>The API will respond with status <code>404</code> for a request with an unknown ID.</li>
@@ -1242,9 +968,9 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             </section>
         </section>
         <section id="delete-did">
-            <h4 id="x3-3-4-delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID</h4>
+            <h4 id="x3-3-4-delete-did"><bdi class="secno">3.3.4 </bdi>Delete DID<a class="self-link" aria-label="§" href="#delete-did"></a></h4>
             <section id="request-2">
-                <h5 id="x3-3-4-1-request"><bdi class="secno">3.3.4.1 </bdi>Request</h5>
+                <h5 id="x3-3-4-1-request"><bdi class="secno">3.3.4.1 </bdi>Request<a class="self-link" aria-label="§" href="#request-2"></a></h5>
 
                 <p>The instruction to create a new DID is issued via a <code>DELETE</code> HTTP request [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc4122" title="A Universally Unique IDentifier (UUID) URN Namespace">rfc4122</a></cite>].</p>
 
@@ -1265,7 +991,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
                     signature(s) must be over the latest DID document present in the ledger, signed with corresponding
                     private keys for all public keys present in the document.</p>
 
-                <h6 id="request-example-curl-2">Request Example (cURL)</h6>
+                <h6 id="request-example-curl-2">Request Example (cURL)<a class="self-link" aria-label="§" href="#request-2"></a></h6>
 
                 <pre aria-busy="false"><code class="hljs">curl -X DELETE \
 http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
@@ -1292,7 +1018,7 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
 
 
 <section id="implementation-considerations" class="informative">
-    <h2 id="x4-implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations</h2><p><em>This section is non-normative.</em></p>
+    <h2 id="x4-implementation-considerations"><bdi class="secno">4. </bdi>Implementation Considerations<a class="self-link" aria-label="§" href="#implementation-considerations"></a></h2><p><em>This section is non-normative.</em></p>
 
     <p><em>This section outlines ‘on-ledger’ implementation of the protocol, which has only
         marginal use.</em></p>
@@ -1304,8 +1030,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
         to create, read, update or delete DID documents. The DID flows can be invoked from RPC clients or from other
         flows.</p>
 
-    <section id="create-did-createdidflow">
-        <h3 id="x4-1-create-did-createdidflow"><bdi class="secno">4.1 </bdi>Create DID (<em>CreateDidFlow</em>)</h3>
+    <section id="create-did-0">
+        <h3 id="x4-1-create-did"><bdi class="secno">4.1 </bdi>Create DID<a class="self-link" aria-label="§" href="#create-did-0"></a></h3>
 
         <p>This is used to create a new DID. Proof of ownership of the document has to be presented in the envelope, as
             outlined in the API format.</p>
@@ -1321,8 +1047,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
         <p>where ‘envelope’ is an instance of the <code>DidEnvelope</code> type.</p>
     </section>
 
-    <section id="read-did-fetchdiddocumentflow">
-        <h3 id="x4-2-read-did-fetchdiddocumentflow"><bdi class="secno">4.2 </bdi>Read DID (<em>FetchDidDocumentFlow</em>)</h3>
+    <section id="read-did-0">
+        <h3 id="x4-2-read-did"><bdi class="secno">4.2 </bdi>Read DID<a class="self-link" aria-label="§" href="#read-did-0"></a></h3>
 
         <p>This is used to fetch a DID document from a node’s local vault. It returns an instance of the
             <code>DidDocument</code> type.</p>
@@ -1357,8 +1083,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
             and ‘didRegistryNode’ is an instance of the Party type representing the DID consortium node.</p>
     </section>
 
-    <section id="update-did-updatedidflow">
-        <h3 id="x4-3-update-did-updatedidflow"><bdi class="secno">4.3 </bdi>Update DID (<em>UpdateDidFlow</em>)</h3>
+    <section id="update-did-0">
+        <h3 id="x4-3-update-did"><bdi class="secno">4.3 </bdi>Update DID<a class="self-link" aria-label="§" href="#update-did-0"></a></h3>
 
         <p>This is used to update an existing DID.</p>
         <ul>
@@ -1374,8 +1100,8 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
         <p>where ‘envelope’ is an instance of the <code>DidEnvelope</code> type.</p>
     </section>
 
-    <section id="delete-did-deletedidflow">
-        <h3 id="x4-4-delete-did-deletedidflow"><bdi class="secno">4.4 </bdi>Delete DID (<em>DeleteDidFlow</em>)</h3>
+    <section id="delete-did-0">
+        <h3 id="x4-4-delete-did"><bdi class="secno">4.4 </bdi>Delete DID<a class="self-link" aria-label="§" href="#delete-did-0"></a></h3>
 
         <p>This is used to disable an existing DID. The delete operation introduces no changes to the
             <code>DidDocument</code>. It expires the <code>DidState</code> and is marked as <code>Consumed</code> in the
@@ -1397,16 +1123,126 @@ http://example.org/did:corda:tcn:a609bcc0-a3a8-11e9-b949-fb002eb572a5 \
     </section>
 </section>
 
-<section id="tof" class="appendix"><h2 id="a-list-of-figures"><bdi class="secno">A. </bdi>List of Figures</h2><ul class="tof"><li class="tofline">
-    <a class="tocxref" href="#high-level-architecture">Figure <bdi class="figno">1</bdi> <span class="fig-title">The high-level network architecture of a Corda network with three consortium nodes.</span></a>
-  </li><li class="tofline">
+<section id="tof" class="appendix"><h2 id="a-list-of-figures"><bdi class="secno">A. </bdi>List of Figures<a class="self-link" aria-label="§" href="#tof"></a></h2><ul class="tof">
+    <li class="tofline">
+        <a class="tocxref" href="#high-level-architecture">Figure <bdi class="figno">1</bdi> <span class="fig-title">The high-level network architecture of a Corda network with three consortium nodes.</span></a>
+    </li><li class="tofline">
     <a class="tocxref" href="#did-envelope">Figure <bdi class="figno">2</bdi> <span class="fig-title">A DID envelope holds the document payload and signatures over the payload by relevant keys.
             </span></a>
-  </li></ul></section>
+</li>
+</ul></section>
 
 
-<section id="references" class="appendix"><h2 id="b-references"><bdi class="secno">B. </bdi>References</h2><section id="informative-references">
-        <h3 id="b-1-informative-references"><bdi class="secno">B.1 </bdi>Informative references</h3>
-      <dl class="bibliography">
-        <dt id="bib-corda-messaging">[corda-messaging]</dt><dd><a href="https://docs.corda.net/messaging.html"><cite>Corda Networking and Messaging</cite></a>. URL: <a href="https://docs.corda.net/messaging.html">https://docs.corda.net/messaging.html</a></dd><dt id="bib-corda-network">[corda-network]</dt><dd><a href="https://corda.network/"><cite>Corda Network Foundation</cite></a>. URL: <a href="https://corda.network/">https://corda.network/</a></dd><dt id="bib-corda-testnet">[corda-testnet]</dt><dd><a href="https://docs.corda.net/head/corda-testnet-intro.html"><cite>Corda Testnet</cite></a>. URL: <a href="https://docs.corda.net/head/corda-testnet-intro.html">https://docs.corda.net/head/corda-testnet-intro.html</a></dd><dt id="bib-corda-whitepaper">[corda-whitepaper]</dt><dd><a href="https://www.r3.com/reports/corda-technical-whitepaper/"><cite>Corda Technical White Paper</cite></a>. Mike Hearn; Richard Gendal Brown. URL: <a href="https://www.r3.com/reports/corda-technical-whitepaper/">https://www.r3.com/reports/corda-technical-whitepaper/</a></dd><dt id="bib-did-core">[did-core]</dt><dd><a href="https://www.w3.org/TR/did-core/"><cite>Decentralized Identifiers (DIDs) v1.0</cite></a>. Drummond Reed; Manu Sporny; Markus Sabadello; Dave Longley; Christopher Allen.  W3C. 25 February 2020. W3C Working Draft. URL: <a href="https://www.w3.org/TR/did-core/">https://www.w3.org/TR/did-core/</a></dd><dt id="bib-multibase">[multibase]</dt><dd><a href="https://tools.ietf.org/id/draft-multiformats-multibase-00.html"><cite>The Multibase Data Format</cite></a>. J. Benet; M. Sporny. URL: <a href="https://tools.ietf.org/id/draft-multiformats-multibase-00.html">https://tools.ietf.org/id/draft-multiformats-multibase-00.html</a></dd><dt id="bib-rfc4122">[rfc4122]</dt><dd><a href="https://tools.ietf.org/html/rfc4122"><cite>A Universally Unique IDentifier (UUID) URN Namespace</cite></a>. P. Leach; M. Mealling; R. Salz.  IETF. July 2005. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc4122">https://tools.ietf.org/html/rfc4122</a></dd><dt id="bib-rfc4648">[rfc4648]</dt><dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. S. Josefsson.  IETF. October 2006. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc4648">https://tools.ietf.org/html/rfc4648</a></dd><dt id="bib-rfc7578">[rfc7578]</dt><dd><a href="https://tools.ietf.org/html/rfc7578"><cite>Returning Values from Forms: multipart/form-data</cite></a>. L. Masinter.  IETF. July 2015. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc7578">https://tools.ietf.org/html/rfc7578</a></dd>
-      </dl></section></section><p role="navigation" id="back-to-top"><a href="#title"><abbr title="Back to Top">↑</abbr></a></p><script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script></body></html>
+<section id="references" class="appendix"><h2 id="b-references"><bdi class="secno">B. </bdi>References<a class="self-link" aria-label="§" href="#references"></a></h2><section id="informative-references">
+    <h3 id="b-1-informative-references"><bdi class="secno">B.1 </bdi>Informative references<a class="self-link" aria-label="§" href="#informative-references"></a></h3>
+    <dl class="bibliography"><dt id="bib-corda-messaging">[corda-messaging]</dt><dd><a href="https://docs.corda.net/messaging.html"><cite>Corda Networking and Messaging</cite></a>. URL: <a href="https://docs.corda.net/messaging.html">https://docs.corda.net/messaging.html</a></dd><dt id="bib-corda-network">[corda-network]</dt><dd><a href="https://corda.network/"><cite>Corda Network Foundation</cite></a>. URL: <a href="https://corda.network/">https://corda.network/</a></dd><dt id="bib-corda-testnet">[corda-testnet]</dt><dd><a href="https://docs.corda.net/head/corda-testnet-intro.html"><cite>Corda Testnet</cite></a>. URL: <a href="https://docs.corda.net/head/corda-testnet-intro.html">https://docs.corda.net/head/corda-testnet-intro.html</a></dd><dt id="bib-corda-whitepaper">[corda-whitepaper]</dt><dd><a href="https://www.r3.com/reports/corda-technical-whitepaper/"><cite>Corda Technical White Paper</cite></a>. Mike Hearn; Richard Gendal Brown. URL: <a href="https://www.r3.com/reports/corda-technical-whitepaper/">https://www.r3.com/reports/corda-technical-whitepaper/</a></dd><dt id="bib-ddos-mitigation">[ddos-mitigation]</dt><dd><a href="https://doi.org/10.1016/j.jnca.2016.01.001"><cite>Distributed denial of service (DDoS) resilience in cloud: Review and conceptual cloud DDoS mitigation framework</cite></a>. Opeyemi Osanaiye; Kim-Kwang Raymond Choo; Mqhele Dlodloa. URL: <a href="https://doi.org/10.1016/j.jnca.2016.01.001">https://doi.org/10.1016/j.jnca.2016.01.001</a></dd><dt id="bib-did-core">[did-core]</dt><dd><a href="https://www.w3.org/TR/did-core/"><cite>Decentralized Identifiers (DIDs) v1.0</cite></a>. Drummond Reed; Manu Sporny; Markus Sabadello; Dave Longley; Christopher Allen.  W3C. 25 February 2020. W3C Working Draft. URL: <a href="https://www.w3.org/TR/did-core/">https://www.w3.org/TR/did-core/</a></dd><dt id="bib-multibase">[multibase]</dt><dd><a href="https://tools.ietf.org/id/draft-multiformats-multibase-00.html"><cite>The Multibase Data Format</cite></a>. J. Benet; M. Sporny. URL: <a href="https://tools.ietf.org/id/draft-multiformats-multibase-00.html">https://tools.ietf.org/id/draft-multiformats-multibase-00.html</a></dd><dt id="bib-rfc4122">[rfc4122]</dt><dd><a href="https://tools.ietf.org/html/rfc4122"><cite>A Universally Unique IDentifier (UUID) URN Namespace</cite></a>. P. Leach; M. Mealling; R. Salz.  IETF. July 2005. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc4122">https://tools.ietf.org/html/rfc4122</a></dd><dt id="bib-rfc4648">[rfc4648]</dt><dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. S. Josefsson.  IETF. October 2006. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc4648">https://tools.ietf.org/html/rfc4648</a></dd><dt id="bib-rfc7578">[rfc7578]</dt><dd><a href="https://tools.ietf.org/html/rfc7578"><cite>Returning Values from Forms: multipart/form-data</cite></a>. L. Masinter.  IETF. July 2015. Proposed Standard. URL: <a href="https://tools.ietf.org/html/rfc7578">https://tools.ietf.org/html/rfc7578</a></dd></dl>
+</section></section><p role="navigation" id="back-to-top">
+    <a href="#title"><abbr title="Back to Top">↑</abbr></a>
+</p><script id="respec-dfn-panel">(() => {
+// @ts-check
+if (document.respecIsReady) {
+  document.respecIsReady.then(dfnPanel);
+} else {
+  dfnPanel();
+}
+
+function dfnPanel() {
+  /** @type {HTMLElement} */
+  let panel;
+  document.body.addEventListener("click", event => {
+    if (!(event.target instanceof HTMLElement)) return;
+
+    /** @type {HTMLElement} */
+    const el = event.target;
+
+    const action = deriveAction(el);
+    switch (action) {
+      case "show": {
+        if (panel) hidePanel(panel);
+        /** @type {HTMLElement} */
+        const dfn = el.closest("dfn, .index-term");
+        panel = document.getElementById(`dfn-panel-for-${dfn.id}`);
+        displayPanel(dfn, panel, { x: event.clientX, y: event.clientY });
+        break;
+      }
+      case "dock": {
+        panel.style.left = null;
+        panel.style.top = null;
+        panel.classList.add("docked");
+        break;
+      }
+      case "hide": {
+        hidePanel(panel);
+        break;
+      }
+    }
+  });
+}
+
+/** @param {HTMLElement} clickTarget */
+function deriveAction(clickTarget) {
+  const hitALink = !!clickTarget.closest("a");
+  if (clickTarget.closest("dfn, .index-term")) {
+    return hitALink ? null : "show";
+  }
+  if (clickTarget.closest(".dfn-panel")) {
+    if (hitALink) {
+      const clickedSelfLink = clickTarget.classList.contains("self-link");
+      return clickedSelfLink ? "hide" : "dock";
+    }
+    const panel = clickTarget.closest(".dfn-panel");
+    return panel.classList.contains("docked") ? "hide" : null;
+  }
+  if (document.querySelector(".dfn-panel:not([hidden])")) {
+    return "hide";
+  }
+  return null;
+}
+
+/**
+ * @param {HTMLElement} dfn
+ * @param {HTMLElement} panel
+ * @param {{ x: number, y: number }} clickPosition
+ */
+function displayPanel(dfn, panel, { x, y }) {
+  panel.hidden = false;
+  // distance (px) between edge of panel and the pointing triangle (caret)
+  const MARGIN = 20;
+
+  const dfnRects = dfn.getClientRects();
+  // Find the `top` offset when the `dfn` can be spread across multiple lines
+  let closestTop = 0;
+  let minDiff = Infinity;
+  for (const rect of dfnRects) {
+    const { top, bottom } = rect;
+    const diffFromClickY = Math.abs((top + bottom) / 2 - y);
+    if (diffFromClickY < minDiff) {
+      minDiff = diffFromClickY;
+      closestTop = top;
+    }
+  }
+
+  const top = window.scrollY + closestTop + dfnRects[0].height;
+  const left = x - MARGIN;
+  panel.style.left = `${left}px`;
+  panel.style.top = `${top}px`;
+
+  // Find if the panel is flowing out of the window
+  const panelRect = panel.getBoundingClientRect();
+  const SCREEN_WIDTH = Math.min(window.innerWidth, window.screen.width);
+  if (panelRect.right > SCREEN_WIDTH) {
+    const newLeft = Math.max(MARGIN, x + MARGIN - panelRect.width);
+    const newCaretOffset = left - newLeft;
+    panel.style.left = `${newLeft}px`;
+    /** @type {HTMLElement} */
+    const caret = panel.querySelector(".caret");
+    caret.style.left = `${newCaretOffset}px`;
+  }
+}
+
+/** @param {HTMLElement} panel */
+function hidePanel(panel) {
+  panel.hidden = true;
+  panel.classList.remove("docked");
+}
+})()</script><script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script></body></html>
