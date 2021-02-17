@@ -82,6 +82,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 *
 			 * */
 			val envelope = apiUtils.generateEnvelope(instruction, document, did, Action.CREATE.action)
+			println("Envelope Generated")
 			/**
 			 *  Checks if the provided 'did' is in the correct format.
 			 *
@@ -90,6 +91,7 @@ class MainController(rpc: NodeRPCConnection) {
 				apiResult.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse(APIMessage.INCORRECT_FORMAT).toResponseObj()))
 				return apiResult
 			}
+			println("Did Checked")
 
 			/**
 			 * Checks to see if the generated envelope is correct for the creation use case, otherwise returns the appropriate error.
@@ -100,6 +102,7 @@ class MainController(rpc: NodeRPCConnection) {
 				apiResult.setErrorResult(apiUtils.sendErrorResponse(it.reason))
 				return apiResult
 			}
+			println("Envelope Verified")
 
 			/**
 			 * Passing the generated envelope as a parameter to the CreateDidFlow.
@@ -107,6 +110,7 @@ class MainController(rpc: NodeRPCConnection) {
 			 * Returns a flow handler
 			 * */
 			val flowHandler = proxy.startFlowDynamic(CreateDidFlow::class.java, envelope)
+			println("Flow Handler initialized")
 
 			/**
 			 * Executes the flow in a separate thread and returns result.
@@ -118,10 +122,13 @@ class MainController(rpc: NodeRPCConnection) {
 					val result = flowHandler.use { it.returnValue.getOrThrow() }
 					apiResult.setResult(ResponseEntity.ok().body(ApiResponse(result.toString()).toResponseObj()))
 				} catch (e: IllegalArgumentException) {
+					println("Illegal Argument")
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				} catch (e: DIDAlreadyExistException) {
+					println("Duplicated Did")
 					apiResult.setErrorResult(ResponseEntity(ApiResponse(APIMessage.CONFLICT).toResponseObj(), HttpStatus.CONFLICT))
 				} catch (e: Exception) {
+					println("Other Exception")
 					logger.error(e.message)
 					apiResult.setErrorResult(ResponseEntity.badRequest().body(ApiResponse(e.message).toResponseObj()))
 				}

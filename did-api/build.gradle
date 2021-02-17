@@ -4,10 +4,13 @@ plugins {
     id 'net.corda.plugins.quasar-utils'
     id 'net.corda.plugins.cordformation'
     id 'org.jetbrains.dokka'
+    id "org.springframework.boot" version "2.0.1.RELEASE"
 }
 
+apply plugin: 'java'
+
 ext {
-    spring_boot_version = '1.5.7.RELEASE'
+    spring_boot_version = '2.0.1.RELEASE'
     spring_version = '4.3.11.RELEASE'
     log4j_version = '2.10.0'
 }

@@ -1,6 +1,6 @@
 Corda DID Method Proof-of-Concept
 =================================
-## Table of Contents
+### Table of Contents
 1. [Introduction](#introduction)
 2. [Specifications](#specifications) 
 3. [CorDapp design -CMN views](#cmn)
